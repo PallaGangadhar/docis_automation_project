@@ -1,0 +1,22 @@
+body[data-sidebar=dark] #sidebar-menu  #module {
+    color: #a6b0cf;
+}
+
+body[data-sidebar=dark] #sidebar-menu #testcase_details {
+    color: #a6b0cf;
+}
+
+#sidebar-menu .scroll {
+    display: block;
+    padding: 0.625rem 1.5rem;
+    color: #545a6d;
+    position: relative;
+    font-size: 13px;
+    -webkit-transition: all .4s;
+    transition: all .4s;
+}
+
+
+.checkbox_font{
+    font-size: 16px;
+}

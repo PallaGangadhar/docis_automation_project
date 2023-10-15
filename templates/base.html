@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+
+    
+<!-- Mirrored from themesbrand.com/skote/layouts/dashboard-job.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Oct 2023 05:38:12 GMT -->
+<head>   
+        <meta charset="utf-8" />
+        <title>DOCSIS AUTOMATION</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+        <meta content="Themesbrand" name="author" />
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="../static/images/vodafone.png">
+
+        <!-- Bootstrap Css -->
+        <link href="../static/assets/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
+       
+        
+        <!-- Icons Css -->
+        <link href="../static/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="../static/css/style.css" rel="stylesheet" type="text/css" />
+        <!-- App Css-->
+        <link href="../static/assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
+        <link href="../static/assets/css/style.css" id="app-style" rel="stylesheet" type="text/css" />
+        
+        
+
+</head>
+
+<body >
+    <div class="h-100 d-flex flex-column  ">
+        <div>
+            {% include 'header.html' %}
+         </div>
+
+       <div class="flex-grow-1  overflow-hidden">
+        {% block content %}
+        {% endblock %}
+       </div>
+       
+   <div>
+    {% include 'footer.html' %} 
+   </div>
+       
+    </div>
+ <!-- JAVASCRIPT -->
+
+
+ <script src="https://code.highcharts.com/highcharts.js"></script>
+ <script src="https://code.highcharts.com/modules/data.js"></script>
+ <script src="https://code.highcharts.com/modules/drilldown.js"></script>
+ <script src="https://code.highcharts.com/modules/exporting.js"></script>
+ <script src="https://code.highcharts.com/modules/export-data.js"></script>
+ <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+ <script src="../static/assets/libs/jquery/jquery.min.js"></script>
+ 
+ <script src="../static/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+ <script src="../static/assets/libs/metismenu/metisMenu.min.js"></script>
+ <script src="../static/assets/libs/simplebar/simplebar.min.js"></script>
+ <script src="../static/assets/libs/node-waves/waves.min.js"></script>
+
+ <!-- apexcharts -->
+ <script src="../static/assets/libs/apexcharts/apexcharts.min.js"></script>
+ 
+ <!-- dashboard blog init -->
+ <script src="../static/assets/js/pages/dashboard-job.init.js"></script>
+ <script src="../static/assets/js/app.js"></script>
+ 
+ <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+ <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+ <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+ <script src="../static/js/script.js"></script>
+<script>
+    $(document).ready(function() {
+    var table = $('#regression_details_datatable').DataTable( {
+        lengthChange: false,
+        "info":     false,
+        "pageLength":4,
+        language: { search: "" },
+        buttons: [ 'copy', 'excel', 'pdf', 'colvis' ],
+        "ordering": false,
+        searching: false
+        
+    } );
+ 
+    // table.buttons().container()
+    //     .appendTo( '#example_wrapper .col-md-6:eq(0)' );
+} );
+
+
+
+$(document).on("click", ".open-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    $("#delete_regression").click(function(){
+      $("#delete").attr("action", "/delete_regression/" + pk);
+    }); 
+});
+
+
+
+</script>
+
+</body> 
+</html>

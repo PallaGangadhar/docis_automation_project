@@ -1,0 +1,465 @@
+
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body,html{
+  height: 100%;
+  width: 100%;
+}
+body{
+  overflow: hidden;
+}
+.navbar-nav {
+    margin-left: auto;
+}
+
+.header {
+    padding: 0.2px;
+    text-align: center;
+    background: red;
+    color: white;
+    border :solid red;
+    font-size: 20px;
+  
+  }
+  
+ 
+  #log{
+    overflow-y: auto;
+    height: 400px !important;
+  }
+  .left_buttons{
+    display:block;
+    margin: 0 2%;
+    height: 45px !important;
+  }
+  
+  .overflow-ellipsis {
+    width: 200px;
+    background-color: #fff;
+    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .overflow-ellipsis [data-title]:hover::before {
+      content: attr(data-title);
+      position: absolute;
+      bottom: -46px;
+      padding: 10px;
+      background: #000;
+      color: #fff;
+      font-size: 14px;
+      white-space: nowrap;
+  }
+  .overflow-ellipsis [data-title]:hover::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 8px;
+      border: 8px solid transparent;	
+      border-bottom: 8px solid #000;
+  }
+  .overflow-ellipsis [data-title] {
+      font-size: 18px;
+      position: relative;
+      cursor: help;
+  }
+  
+
+  
+
+.dropbtn {
+background-color: #4CAF50;
+color: white;
+padding: 16px;
+font-size: 10px;
+border: none;
+cursor: pointer;
+}
+
+.dropdown {
+position: relative;
+display: inline-block;
+}
+
+
+
+.header_title, .header_title:hover{
+  color: white;
+  font-size: 16px;
+}
+
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: #f9f9f9;
+min-width: 90px;
+/* width: 200px; */
+box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+z-index: 1;
+}
+
+.dropdown-content a {
+color: black;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+display: block;
+}
+
+.dropdown:hover .dropbtn {
+background-color: #3e8e41;
+}
+.droplink{
+    font-size: 14px !important;
+}
+.vodafone_logo{
+    height: 30px !important;
+    width: 30px !important;
+    margin-left: 20%;
+    margin-top: 20%;
+}
+
+.white_text{
+    color: white !important;
+}
+
+.overflow_y{
+  height: 250px;
+  overflow-y: auto;
+  /* overflow-x: hidden; */
+}
+
+.ml-3{
+  margin-left: 3% !important;
+}
+
+.truncate-cell {
+  cursor: pointer;
+  white-space: nowrap !important;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 200px !important;
+}
+
+
+
+.collapse {
+  display: none;
+}
+
+.display_none{
+  display: none;
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+/* @media only screen and (max-width: 1140px) {
+  #module{
+    width: 230px;
+    height: 300px !important;
+  }
+  #testcase_details{
+    width: 230px;
+    height: 280px !important;
+  }
+  #log{
+    width: 430px;
+    height: 570px !important;
+  }
+}  */
+
+.section_border{
+  border: 1px solid red;
+}
+
+
+
+.index_background_image {
+  height: 480px;
+  width: 100%;
+  background-repeat: no-repeat;
+}
+
+
+.index_text{
+  color: white;
+  position: absolute;
+  margin-left: 45%;
+
+}
+
+.td_text_center{
+  text-align: center;
+}
+
+
+.table_border{
+  border: 2px solid;
+}
+
+
+.hyperlink_text, .hyperlink_text:hover{
+  color: white;
+  text-decoration: none;
+}
+
+
+.delete_icon button{
+  font-size:24px;color:red;
+}
+
+.bootstrap-tagsinput {
+	margin: 0;
+	width: 100%;
+	padding: 0.5rem 0.75rem 0;
+	font-size: 1rem;
+  line-height: 1.25;
+	transition: border-color 0.15s ease-in-out;
+}
+.bootstrap-tagsinput .has-focus {
+    background-color: #fff;
+    border-color: #5cb3fd;
+	}
+	
+.bootstrap-tagsinput .label-info {
+		display: inline-block;
+		background-color: #636c72;
+		padding: 0 .4em .15em;
+		border-radius: .25rem;
+		margin-bottom: 0.4em;
+	}
+.bootstrap-tagsinput input {
+		margin-bottom: 0.5em;
+	}
+
+
+.bootstrap-tagsinput .tag [data-role="remove"]:after {
+	content: '\00d7';
+}
+
+
+
+.header_background{
+  background-color: red !important;
+}
+
+
+.f-16{
+  font-size: 16px !important;
+}
+
+
+.navbar-header .dropdown .show.header-item{
+  background-color: red;
+}
+
+
+.content-wrapper {
+  padding-left: 10px;
+  background: #fafafa;
+  position: relative;
+  padding: 30px;
+  overflow: hidden;
+  min-height: 100vh;
+  /* left: 0; */
+}
+.content-wrapper .page-title {
+  padding: 0px;
+}
+
+.mb-30 {
+  margin-bottom: 2.143rem !important;
+}
+
+.table-card {
+  border-radius: 0;
+  border: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+
+}
+
+.table-card-title {
+  margin-bottom: 15px;
+ 
+}
+
+.table-card-body {
+  flex: 1 1 auto;
+  padding: 1rem 1rem;
+}
+
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.text-dark {
+  color: #212529 !important;
+}
+
+.table > thead {
+  vertical-align: bottom;
+}
+
+thead{
+  border-color: inherit !important;
+  border-style: solid !important;
+  border-width: 0;
+}
+
+.mt-8{
+  margin-top: 8% !important;
+}
+
+
+.mt-5{
+  margin-top: 5% !important;
+}
+
+.footer-section {
+  bottom: 0;
+  padding: 20px calc(24px * .75);
+  /* position: absolute; */
+  right: 0;
+  color: var(--bs-footer-color);
+  height: 40px;
+  background-color: var(--bs-footer-bg);
+}
+
+.fs-16{
+  font-size: 16px !important;
+}
+
+.fs-14{
+  font-size: 14px !important;
+}
+
+
+.dataTables_filter{
+  margin-right: 7% !important;
+}
+
+.regression_scroll_table{
+  overflow-x: auto;
+}
+.w-18{
+  width: 18% !important;
+}
+
+.sidebar-enable .vertical-menu{display:block}
+
+.sidebar_size{
+  bottom: 90px !important;
+  top: 78px !important;
+}
+
+.mainmenu {
+  width: 0;
+  height: 100%;
+  background-color: #333;
+  overflow-x: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Show the menu when the checkbox is checked */
+#check:checked ~ .mainmenu {
+  width: 0;
+}
+
+/* Slide the menu off the screen when unchecked */
+#check:not(:checked) ~ .mainmenu {
+  width: 270px; 
+}
+
+.scroll{
+  margin:4px, 4px;
+  padding:4px;
+  /* width: 0px; */
+  /* height: 420px; */
+  overflow-x: hidden;
+  overflow-y: auto;
+  text-align:justify;
+}
+
+#testcase_details{
+  /* width: 270px; */
+  height: 210px !important;
+}
+
+#module{
+  /* width: 270px; */
+  height: 150px !important;
+}
+
+.div_shadow{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.footer_red_bg_color{
+  background-color: red !important;
+}
+
+.h-50{
+  height: 50px !important;
+}
+
+@media (min-width: 768px){
+.d-md-flex {
+    display: flex !important;
+}}
+
+
+
+/* // X-Small devices (portrait phones, less than 576px) */
+/* @media (max-width: 575.98px) { 
+ 
+} */
+
+/* // Small devices (landscape phones, less than 768px) */
+@media (max-width: 767.98px) { 
+  .regression_scroll_table{
+    height: 380px;
+  }
+
+ }
+
+/* // Medium devices (tablets, less than 992px) */
+@media (max-width: 991.98px) { 
+  .regression_scroll_table{
+    height: 400px ; 
+  }
+
+ }
+
+/* // Large devices (desktops, less than 1200px) */
+/* @media (max-width: 1199.98px) { 
+  .regression_scroll_table{
+    height: 400px;
+    width: 930px;
+    overflow: auto;
+  }
+ } */
+
+/* // X-Large devices (large desktops, less than 1400px) */
+/* @media (max-width: 1399.98px) { 
+  .regression_scroll_table{
+    height: 270px !important;
+    width: 250px !important;
+    overflow: auto;
+  }
+ }  */

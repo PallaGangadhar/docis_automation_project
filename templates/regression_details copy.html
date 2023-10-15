@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{%block content%}
+
+<h1>Regression detail Page</h1>
+
+
+
+
+<div class="container regression_scroll_table">
+  
+  {% if regression_details %}
+  <div class="form-group">
+    <select name="cmts_type_dropdown form-control" id="cmts_type_dropdown">
+      <option name="" class="form-control" value="">--SELECT--</option>
+        {% for type in c_type %}
+        <option name="{{type}}" value="{{type}}">{{type}}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+        <table class="table table-bordered mt-2 table_border" id="tc_report">
+            <thead>
+              <tr>
+                <th scope="col" class="td_text_center">Regression Name</th>
+                <th scope="col" class="td_text_center" >Pass TC</th>
+                <th scope="col" class="td_text_center">Fail TC</th>
+                <th scope="col" class="td_text_center">No Run TC</th>
+                <th scope="col" class="td_text_center">Total TC</th>
+                <th scope="col" class="td_text_center">Status</th>
+                <th scope="col" class="td_text_center" colspan="2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+                
+                {% for reg_details in regression_details %}
+                <tr>
+                  
+                    <td class="td_text_center">{{reg_details[1]}}</td>
+                    <td class="td_text_center">{{reg_details[2]}}</td>
+                    <td class="td_text_center">{{reg_details[3]}}</td>
+                    <td class="td_text_center">{{reg_details[4]}}</td>
+                    <td class="td_text_center">{{reg_details[5]}}</td>
+                    <td class="td_text_center">
+                      {% if reg_details[7] == 'Completed' %}
+                          <button class="btn btn-success">Completed</button>
+                        {% else %}
+                          <button class="btn btn-danger">In Progress</button>
+                        {% endif %}
+                    </td>
+                    <td class="td_text_center"> <a href="view_tc_logs_details/{{reg_details[0]}}" class="">View TC details</a></td>
+                    <td class="td_text_center delete_icon"> 
+                      <button type="button" class="btn bg-transparent open-ConfirmationDialog" data-bs-toggle="modal" data-id="{{reg_details[0]}}" data-bs-target="#myModal">
+                        <i class="fa fa-trash-o"></i>
+
+                      </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+              </tbody>
+            </table>
+            {% else %}
+            <center><h2>No Regression Details Found...</h2></center>
+           
+            {% endif %}
+</div>
+
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Are you sure you want to delete?</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+        Once you delete it, it will not revert back..
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <form name="" id="delete" method="post">
+
+          <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="delete_regression">Yes</button>
+        </form>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  
+$(document).ready(function(){
+    $('#cmts_type_dropdown').on('change', function() {
+        value = this.value;
+        $.ajax({
+          url:"/view_regression_details?cmts_type="+value,
+          method:"GET",
+          success:function(data){
+            $("#tc_report").html(data);
+          }
+        })
+      });
+});
+
+$(document).on("click", ".open-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    $("#delete_regression").click(function(){
+      $("#delete").attr("action", "/delete_regression/" + pk);
+    }); 
+});
+
+</script>
+{% endblock %}

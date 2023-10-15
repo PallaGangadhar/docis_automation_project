@@ -186,6 +186,7 @@ $("input:checkbox[name='modules[]']").click(function(){
 
 $("#select_module").click(function () {
     $(".modules").prop('checked', $(this).prop('checked'));
+    $("#select_all").prop('checked', false);
     select_testcases()
 });
 

@@ -349,5 +349,6 @@ function remove_err_ele(array, val){
 }
 
 
-
-
+function clear_filter(){
+    window.location.href="/view_regression_details"
+}

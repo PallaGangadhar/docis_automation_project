@@ -33,7 +33,23 @@ def send_chart_details(data):
 
 @app.route('/', methods=['GET','POST'])
 def index():
-    return render_template('index.html')
+    curr, conn=db_connection()
+    total_regression_count=curr.execute('SELECT count(*) FROM regression')
+    total_regression_count=curr.fetchone()
+    total_regression_count=total_regression_count[0]
+
+    curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"'')
+    i_cmts_count = curr.fetchone()
+    i_cmts_count = i_cmts_count[0]
+
+    curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"'')
+    harmony_count = curr.fetchone()
+    harmony_count = harmony_count[0]
+    conn.commit()
+    curr.close()
+    conn.close()
+
+    return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count)
 
 @app.route('/logs', methods=['GET','POST'])
 def logs():
@@ -51,7 +67,6 @@ def logs():
 
 @app.route('/i_cmts', methods=['GET','POST'])
 def i_cmts():
-    
     return render_template('i_cmts.html')
 
 @app.route('/harmony', methods=['GET','POST'])
@@ -107,9 +122,21 @@ def add_regression_logs():
 def view_regression_details():
     curr,conn=db_connection()
     cmts_type = request.args.get('cmts_type_dropdown')
-    if cmts_type != None and cmts_type != "":
+    search_reg = request.args.get('search_reg')
+    if cmts_type != None and cmts_type != "" and (search_reg == None or search_reg == ""):
         cmts_type="'"+cmts_type+"'"
         curr.execute(f"SELECT * FROM regression WHERE cmts_type="+cmts_type+"ORDER BY date_added DESC")
+
+    elif search_reg != None and search_reg != "" and (cmts_type == None or cmts_type == ""):
+        search_reg="'%"+search_reg+"%'"
+        # curr.execute(f"SELECT * FROM regression WHERE regression_name LIKE "+search_reg+"ORDER BY date_added DESC")
+        curr.execute(f"SELECT * FROM regression WHERE LOWER(regression_name) LIKE LOWER("+search_reg+")ORDER BY date_added DESC")
+        
+    elif search_reg != None and search_reg != "" and cmts_type != None and cmts_type != "" :
+        search_reg="'%"+search_reg+"%'"
+        cmts_type="'"+cmts_type+"'"
+        curr.execute(f"SELECT * FROM regression WHERE LOWER(regression_name) LIKE LOWER("+search_reg+") and cmts_type="+cmts_type+" ORDER BY date_added DESC")
+
     else:
         curr.execute('SELECT * FROM regression ORDER BY date_added DESC')
 

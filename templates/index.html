@@ -2,8 +2,9 @@
 {%block content%}
 
 <div class="has-bg-img">
-        <div class="bg-img bg-cover" style="background-image: url('/static/images/new_vodafone_1.png');
-            height: 100vh;">
+        <!-- <div class="bg-img bg-cover" style="background-image: url('/static/images/new_vodafone_1.png');
+            height: 100vh;"> -->
+        <div class="bg-img bg-cover">
 
                 <div class="page-content page_content_scroll">
                         <div class="container-fluid">
@@ -80,7 +81,6 @@
                                         <div class="col-lg-12">
                                                 <figure class="highcharts-figure">
                                                         <div id="bar_chart"></div>
-                                                        
                                                 </figure>
                                         </div><!--end col-->
                                         
@@ -91,5 +91,104 @@
                 <!-- End Page-content -->
         </div>
 </div>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+ <script src="https://code.highcharts.com/modules/data.js"></script>
+ <script src="https://code.highcharts.com/modules/drilldown.js"></script>
+ <script src="https://code.highcharts.com/modules/exporting.js"></script>
+ <script src="https://code.highcharts.com/modules/export-data.js"></script>
+ <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
+ <script src="../static/assets/libs/jquery/jquery.min.js"></script>
+<script>
+var regression_date_graph='{{ regression_date_graph|tojson }}';
+var harmony_graph_data='{{ harmony_graph_data|tojson }}';
+var cmts_graph_data='{{ cmts_graph_data|tojson }}';
+regression_date_graph=JSON.parse(regression_date_graph);
+harmony_graph_data=JSON.parse(harmony_graph_data);
+cmts_graph_data=JSON.parse(cmts_graph_data);
+
+
+var reg_data=[]
+var harmony_data=[]
+var cmts_data=[]
+var reg_date=[]
+for(var i=0;i<regression_date_graph['data'].length;i++){
+        reg_data.push(regression_date_graph['data'][i]['count'])
+        reg_date.push(regression_date_graph['data'][i]['date'])
+}
+for(var i=0;i<harmony_graph_data['data'].length;i++){
+        harmony_data.push(harmony_graph_data['data'][i]['count'])
+}
+
+for(var i=0;i<cmts_graph_data['data'].length;i++){
+        cmts_data.push(cmts_graph_data['data'][i]['count'])
+}
+
+Highcharts.chart('bar_chart', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Regression Report'
+    },
+    xAxis: {
+        // categories: [
+            
+        //     'Jan',
+        //     'Feb',
+        //     'Mar',
+        //     'Apr',
+        //     'May',
+        //     'Jun',
+        //     'Jul',
+        //     'Aug',
+        //     'Sep',
+        //     'Oct',
+        //     'Nov',
+        //     'Dec'
+        // ],
+        categories:reg_date,
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Count'
+        }
+    },
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+        name: 'Total Regression',
+        // data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4,
+        //     194.1, 95.6, 54.4],
+        data:reg_data,
+        color:"#00FF00"
+
+    },{
+        name: 'CASA I-CMTS TC Count',
+        data: cmts_data,
+        color:"#0000FF"
+
+    },{
+        name: 'Harmonic-CMTS TC Count',
+        data: harmony_data,
+        color:"#FF0000"
+
+    }
+    ]
+});
+</script>
 {% endblock %}

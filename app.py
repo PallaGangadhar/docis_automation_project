@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, Response, redirect
 from flask_socketio import SocketIO, emit
 from flask_mail import Mail, Message
 import os
+import datetime
 from test_code import *
 from db import *
 from send_mail import send_mail_to
@@ -34,7 +35,14 @@ def send_chart_details(data):
 @app.route('/', methods=['GET','POST'])
 def index():
     curr, conn=db_connection()
-    total_regression_count=curr.execute('SELECT count(*) FROM regression')
+
+    curr.execute('SELECT * FROM regression')
+    sample_data=curr.fetchone()
+    d=sample_data[9].strftime("%d-%m-%Y")
+    print("sample_data=====>",d)
+    print("sample_data=====>",type(d))
+
+    curr.execute('SELECT count(*) FROM regression')
     total_regression_count=curr.fetchone()
     total_regression_count=total_regression_count[0]
 
@@ -45,11 +53,42 @@ def index():
     curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"'')
     harmony_count = curr.fetchone()
     harmony_count = harmony_count[0]
+
+    curr.execute('SELECT count(*),DATE(date_added) FROM regression  GROUP BY DATE(date_added)')
+    regression_graph=curr.fetchall()
+
+    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"' GROUP BY DATE(regression.date_added)')
+    harmony_graph=curr.fetchall()
+
+    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"' GROUP BY DATE(regression.date_added)')
+    cmts_graph=curr.fetchall()
+
+    graph_data={}
+    harmony_graph_data={}
+    cmts_graph_data={}
+    data1=[]
+    data2=[]
+    data3=[]
+    for i in regression_graph:   
+        date=i[1].strftime("%d-%m-%Y")
+        data1.append({'date':date,'count':i[0]})
+    graph_data['data']=data1
+
+    for i in harmony_graph:  
+        date=i[1].strftime("%d-%m-%Y")  
+        data2.append({'date':date,'count':i[0]})
+    harmony_graph_data['data']=data2
+
+    for i in cmts_graph:    
+        date=i[1].strftime("%d-%m-%Y")
+        data3.append({'date':date,'count':i[0]})
+    cmts_graph_data['data']=data3
+
     conn.commit()
     curr.close()
     conn.close()
 
-    return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count)
+    return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data)
 
 @app.route('/logs', methods=['GET','POST'])
 def logs():

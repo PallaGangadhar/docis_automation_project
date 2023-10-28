@@ -98,11 +98,10 @@ $(document).ready(function() {
             {name: no_run +' No Run',y: no_run_per,color:"#2E2EFF"},
         ], true);
 
-      
-
         if (total == total_tc_selected){
             $('#stop').prop('disabled', true);
             $('#clear_logs').prop('disabled', false);
+            $('#tc_status').text("Completed");
             iter = 0;
         }
         
@@ -259,6 +258,7 @@ function close_window(div_id){
 function run_tc(div_id){
     var text=$('#regression_name').val();
     var cmts_type=$("input[name=cmts_type]").val()
+    $('#tc_status').text("In Progres");
     if(text==""){
         alert('Please enter regression name...')
     }

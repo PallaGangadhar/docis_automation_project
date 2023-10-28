@@ -39,9 +39,6 @@ def index():
     curr.execute('SELECT * FROM regression')
     sample_data=curr.fetchone()
     d=sample_data[9].strftime("%d-%m-%Y")
-    print("sample_data=====>",d)
-    print("sample_data=====>",type(d))
-
     curr.execute('SELECT count(*) FROM regression')
     total_regression_count=curr.fetchone()
     total_regression_count=total_regression_count[0]
@@ -54,13 +51,13 @@ def index():
     harmony_count = curr.fetchone()
     harmony_count = harmony_count[0]
 
-    curr.execute('SELECT count(*),DATE(date_added) FROM regression  GROUP BY DATE(date_added)')
+    curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
     regression_graph=curr.fetchall()
 
-    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"' GROUP BY DATE(regression.date_added)')
+    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
     harmony_graph=curr.fetchall()
 
-    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"' GROUP BY DATE(regression.date_added)')
+    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
     cmts_graph=curr.fetchall()
 
     graph_data={}

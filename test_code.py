@@ -1,4 +1,4 @@
-from utlis import send_req
+from utlity import send_req
 import requests
 import texttable as tt
 from db import update_regression_summary_path
@@ -94,9 +94,8 @@ def TC_5():
 def TC_6():
     
     output = """ 
-        Hello Arjun........
-        ASD-GT0003-CCAP001# 
-    show clock 
+        Hello Gangadhar........
+        
     
     """
     tab.add_row(['Gangadhar', 'Gpalla, Inter Milan', '000 and 000'])

@@ -15,13 +15,13 @@ def db_connection():
     conn = psycopg2.connect(f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOSTNAME}:{POSTGRES_PORT}/{DB_NAME}")
     curr = conn.cursor()
     return curr, conn
-    # db_connection()
-    # curr, conn=db_connection()
-    # curr.execute("DELETE  FROM regression_logs_details")
-    # curr.execute("DELETE  FROM regression")
-    # conn.commit()
-    # curr.close()
-    # conn.close()
+# db_connection()
+# curr, conn=db_connection()
+# curr.execute("DELETE  FROM regression_logs_details")
+# curr.execute("DELETE  FROM regression")
+# conn.commit()
+# curr.close()
+# conn.close()
 
 def add_regression(request):
     curr, conn=db_connection()
@@ -75,8 +75,6 @@ def add_regression_details(response):
     tc_logs_path=response.get('tc_logs_path')
     
     status=status.upper()
-    # status_list.append(status)
-    # status = "FAIL" if "FAIL" in status_list else "PASS"
     curr, conn=db_connection()
     curr.execute('''INSERT INTO regression_logs_details(regression_id,testcase_number,testcase_name,status, failed_in,execution_time,tc_logs_path) VALUES (%s,%s,%s,%s,%s,%s,%s)''',(r_id,tc_no,testcase_name,status, fail_in, execution_time,tc_logs_path) )
     
@@ -177,3 +175,5 @@ def select_query_to_get_count_details(reg_id):
 #     PRIMARY KEY(regression_id)
 
 # );
+
+# ikpD10@gpa002

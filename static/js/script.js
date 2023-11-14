@@ -358,3 +358,15 @@ function clear_filter(){
 
 
 
+$(function () {
+    $("#from_date").datepicker({ 
+          autoclose: true, 
+          todayHighlight: true
+    }).datepicker('update', new Date());
+  });
+$(function () {
+    $("#to_date").datepicker({ 
+          autoclose: true, 
+          todayHighlight: true
+    }).datepicker('update', new Date());
+  });

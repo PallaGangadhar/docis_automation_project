@@ -4,8 +4,10 @@ from flask_mail import Mail, Message
 import os
 import datetime
 from test_code import *
+from utlity import genearate_list_of_dict
 from db import *
 from send_mail import send_mail_to
+
 
 async_mode = None
 
@@ -38,7 +40,7 @@ def index():
 
     curr.execute('SELECT * FROM regression')
     sample_data=curr.fetchone()
-    d=sample_data[9].strftime("%d-%m-%Y")
+    # d=sample_data[9].strftime("%d-%m-%Y")
     curr.execute('SELECT count(*) FROM regression')
     total_regression_count=curr.fetchone()
     total_regression_count=total_regression_count[0]
@@ -47,38 +49,66 @@ def index():
     i_cmts_count = curr.fetchone()
     i_cmts_count = i_cmts_count[0]
 
+
     curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"'')
     harmony_count = curr.fetchone()
     harmony_count = harmony_count[0]
 
     curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
     regression_graph=curr.fetchall()
-
+    # SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '2023-11-13' AND '2023-11-15' GROUP BY DATE(date_added) ORDER BY reg_date DESC
+    
     curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
     harmony_graph=curr.fetchall()
+    
 
     curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
     cmts_graph=curr.fetchall()
+    # SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Arris' AND regression.date_added BETWEEN '2023-11-13' AND '2023-11-14' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC
+    # SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Arris' AND regression.date_added >= '2023-11-13' AND regression.date_added <= '2023-11-14' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC
 
+    
     graph_data={}
     harmony_graph_data={}
     cmts_graph_data={}
     data1=[]
     data2=[]
     data3=[]
+    dates=[]
+    h_date=[]
+    c_date=[]
     for i in regression_graph:   
-        date=i[1].strftime("%d-%m-%Y")
+        # date=i[1].strftime("%d-%m-%Y")
+        date=i[1].strftime("%Y-%m-%d")
         data1.append({'date':date,'count':i[0]})
+        dates.append(date)
     graph_data['data']=data1
 
     for i in harmony_graph:  
-        date=i[1].strftime("%d-%m-%Y")  
+        date=i[1].strftime("%Y-%m-%d")
+        h_date.append(date) 
         data2.append({'date':date,'count':i[0]})
+    
+    # for r_date in dates:
+    #     if r_date not in h_date:
+    #         data2.append({'date':r_date,'count':0})
+
+    # data2.sort(key = lambda x:x['date'],reverse=True)
+    data2=genearate_list_of_dict(dates,h_date,data2)
     harmony_graph_data['data']=data2
+    # print(harmony_graph_data)
+
 
     for i in cmts_graph:    
-        date=i[1].strftime("%d-%m-%Y")
+        date=i[1].strftime("%Y-%m-%d")
+        c_date.append(date)
         data3.append({'date':date,'count':i[0]})
+    
+    # for r_date in dates:
+    #     if r_date not in c_date:
+    #         data3.append({'date':r_date,'count':0})
+    # data3.sort(key = lambda x:x['date'],reverse=True)
+    data3=genearate_list_of_dict(dates,c_date,data3)
     cmts_graph_data['data']=data3
 
     conn.commit()

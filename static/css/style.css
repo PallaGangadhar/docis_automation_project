@@ -495,6 +495,8 @@ thead{
     background: #f1f7ff;
 }
 
+#datepicker{width:180px; margin: 0 20px 20px 20px;}
+#datepicker > span:hover{cursor: pointer;}
 
 
 @media (min-width: 768px){

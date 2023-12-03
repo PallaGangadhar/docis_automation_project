@@ -1,7 +1,7 @@
 import requests
 import time
 import secrets
-
+import datetime
 def send_req(message):
     # time.sleep(0.3)
     requests.post("http://localhost:5000/connect", json={"data": message},headers = {'Content-type': 'application/json'})
@@ -20,7 +20,11 @@ def genearate_list_of_dict(r_dates,type_dates,graph_data):
     [new_list.append(i) for i in graph_data]
     return new_list
 
-# import re
-# output="D:\Ganga\Arjun_Project\static\\files\\abc.txt"
-# pat=re.search("[a-zA-z0-9]+[.]txt$", output)
-# print(pat.group(0))
+
+def convert_str_to_date(date,d_format):
+    datetime_str = datetime.datetime.strptime(date, d_format)
+    return datetime_str
+
+def convert_date_to_str(date,d_format):
+    return date.strftime(d_format)
+   

@@ -30,14 +30,20 @@
                     <input type="text" class="form-control" name="search_reg" placeholder="Enter regression name">
                 </div>
                 <div class="col-sm-4 col-md-2">
-                  
                   <input type="submit" id="search_regression" class="btn btn-primary" value="Search"/>
                   <input type="button" class="btn btn-primary" value="Clear Fiter" onclick="clear_filter()"/>
+                  
                 </div>
-                
+              
               </div>
             </form>
-              <table class="table center-aligned-table mb-0 rounded table-responsive-md" id="regression_details_datatable">
+            <div class="col-sm-4 col-md-2"> 
+                <input type="button" class="btn btn-primary" value="Delete Selected Regression" onclick="delete_selected_regression()" />
+                <form method="post" action="/delete_all_regressions">
+                  <input type="submit" class="btn btn-primary" value="Delete All Regression"/>
+                </form>
+            </div>
+            <table class="table center-aligned-table mb-0 rounded table-responsive-md" id="regression_details_datatable">
             <thead class="table-light text-center">
               <tr class="text-dark">
                 <th>Regression Name</th>
@@ -47,12 +53,14 @@
                 <th>No Run TC</th>
                 <th>Status</th>
                 <th>Action</th>
+                
                 <!-- <th></th> -->
               </tr>
             </thead>
             <tbody class="text-center" id="reg_report">
               {% for reg_details in regression_details %}
               <tr class="fs-14">
+               
                 <td>{{reg_details[1]}}</td>
                 <td>{{reg_details[5]}}</td>
                 <td>{{reg_details[2]}}</td>
@@ -69,7 +77,9 @@
                   <a href="view_tc_logs_details/{{reg_details[0]}}" class="btn btn-outline-warning btn-sm">View TC details</a>
                   <span class="btn btn-danger btn-sm  open-ConfirmationDialog"  data-bs-toggle="modal" data-id="{{reg_details[0]}}" data-bs-target="#myModal">Delete
                   </span>
+                  <input type="checkbox" class="reg_box" name="reg_box" value="{{reg_details[0]}}"/>
                 </td>
+                
                 <!-- <td class="td_text_center delete_icon"> 
                   
                 </td> -->

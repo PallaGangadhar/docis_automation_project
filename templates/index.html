@@ -2,10 +2,10 @@
 {%block content%}
 
 <div class="has-bg-img">
+        
         <!-- <div class="bg-img bg-cover" style="background-image: url('/static/images/new_vodafone_1.png');
             height: 100vh;"> -->
         <div class="bg-img bg-cover">
-
                 <div class="page-content page_content_scroll">
                         <div class="container-fluid">
                                 <div class="row">
@@ -16,16 +16,10 @@
                                                                         <div class="flex-grow-1">
                                                                                 <p class="text-muted fw-medium f-18">
                                                                                         Total Regression
+                                                                                        {{total_regression_count}}
                                                                                 </p>
-                                                                                <h4 class="mb-0">
-                                                                                        {{total_regression_count}}</h4>
                                                                         </div>
 
-                                                                        <div class="flex-shrink-0 align-self-center">
-                                                                                <div class="avatar-title bg-light rounded-circle text-primary font-size-20">
-                                                                                        <i class="bx bxs-book-bookmark f-28"></i>
-                                                                                </div>
-                                                                        </div>
                                                                 </div>
                                                         </div>
 
@@ -38,15 +32,11 @@
                                                                 <div class="d-flex">
                                                                         <div class="flex-grow-1">
                                                                                 <p class="text-muted fw-medium f-18">CASA I-CMTS TC Count
+                                                                                        {{i_cmts_count}}
                                                                                 </p>
-                                                                                <h4 class="mb-0">{{i_cmts_count}}</h4>
                                                                         </div>
 
-                                                                        <div class="flex-shrink-0 align-self-center">
-                                                                                <div class="avatar-title bg-light rounded-circle text-primary font-size-20">
-                                                                                        <i class="bx bxs-book-bookmark f-28"></i>
-                                                                                </div>
-                                                                        </div>
+                                                                        
                                                                 </div>
                                                         </div>
 
@@ -60,15 +50,11 @@
                                                                         <div class="flex-grow-1">
                                                                                 <p class="text-muted fw-medium f-18">
                                                                                         Harmonic-CMTS TC Count       
+                                                                                        {{harmony_count}}
                                                                                 </p>
-                                                                                <h4 class="mb-0">{{harmony_count}}</h4>
+                                                                                
                                                                         </div>
 
-                                                                        <div class="flex-shrink-0 align-self-center">
-                                                                                <div class="avatar-title bg-light rounded-circle text-primary font-size-20">
-                                                                                        <i class="bx bxs-book-bookmark f-28"></i>
-                                                                                </div>
-                                                                        </div>
                                                                 </div>
                                                         </div>
 
@@ -76,28 +62,40 @@
                                         </div><!--end col-->
 
                                 </div><!--end row-->
-                                <div class="row">
-                                        <div class="col-lg-2">
-                                                <div id="from_date" class="input-group date" data-date-format="yyyy-mm-dd">
-                                                        <input class="form-control" type="text" readonly />
-                                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                                    </div>
-                                        </div>
-                                        <div class="col-lg-2">
-                                                <div id="to_date" class="input-group date" data-date-format="yyyy-mm-dd">
-                                                        <input class="form-control" type="text" readonly />
-                                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                <form id="filter_graph" method="GET" action="/">
+                                        <div class="row">
+                                                        
+                                                <div class="col-lg-2">
+                                                        <div id="from_date" class="input-group date" data-date-format="yyyy-mm-dd">
+                                                                <input class="form-control" type="text"  name="from_date" id="from_date_val" autocomplete="off" placeholder="From Date"/>
+                                                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                                        </div>
                                                 </div>
-                                        </div> 
-                                        <div class="col-lg-2">
-                                                <input type="submit" id="search_regression" class="btn btn-primary" value="Search"/>
-                                                <input type="button" class="btn btn-primary" value="Clear Fiter" onclick="clear_filter()"/>
+                                                <div class="col-lg-2">
+                                                        <div id="to_date" class="input-group date" data-date-format="yyyy-mm-dd"> 
+                                                                <input class="form-control" type="text" name="to_date" id="to_date_val" autocomplete="off" placeholder="To Date"/>
+                                                                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                                        </div>
+                                                </div> 
+                                                
+                                                <div class="col-lg-2">
+                                                        <input type="submit" class="btn btn-primary" value="Search" id="search_button"/>
+                                                        <input type="button" class="btn btn-primary" value="Clear Fiter" onclick="clear_filter()"/>
+                                                </div>
+                                                
+                                                
                                         </div>
-                                </div>
+                                        </form>
                                 <div class="row">
                                         <div class="col-lg-12">
+                                   
+                                                
                                                 <figure class="highcharts-figure">
-                                                        <div id="bar_chart"></div>
+                                                        {% if error_message != True %}
+                                                        <div id="bar_chart" style="height: 350px;"></div>
+                                                        {% else %}
+                                                        <h5><center>End Date should be greater than or equal to From Date.</center></h5>
+                                                        {% endif %}
                                                 </figure>
                                         </div><!--end col-->
                                         
@@ -117,6 +115,8 @@
 
  <script src="../static/assets/libs/jquery/jquery.min.js"></script>
 <script>
+
+
 var regression_date_graph='{{ regression_date_graph|tojson }}';
 var harmony_graph_data='{{ harmony_graph_data|tojson }}';
 var cmts_graph_data='{{ cmts_graph_data|tojson }}';
@@ -143,6 +143,7 @@ for(var i=0;i<cmts_graph_data['data'].length;i++){
 
 Highcharts.chart('bar_chart', {
     chart: {
+        // type: 'column'
         type: 'column'
     },
     title: {
@@ -207,7 +208,6 @@ Highcharts.chart('bar_chart', {
     }
     ]
 });
-
 
 
 </script>

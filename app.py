@@ -4,7 +4,7 @@ from flask_mail import Mail, Message
 import os
 import datetime
 from test_code import *
-from utlity import genearate_list_of_dict
+from utlity import genearate_list_of_dict,convert_date_to_str,convert_str_to_date
 from db import *
 from send_mail import send_mail_to
 
@@ -36,38 +36,7 @@ def send_chart_details(data):
 
 @app.route('/', methods=['GET','POST'])
 def index():
-    curr, conn=db_connection()
-
-    curr.execute('SELECT * FROM regression')
-    sample_data=curr.fetchone()
-    # d=sample_data[9].strftime("%d-%m-%Y")
-    curr.execute('SELECT count(*) FROM regression')
-    total_regression_count=curr.fetchone()
-    total_regression_count=total_regression_count[0]
-
-    curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"'')
-    i_cmts_count = curr.fetchone()
-    i_cmts_count = i_cmts_count[0]
-
-
-    curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"'')
-    harmony_count = curr.fetchone()
-    harmony_count = harmony_count[0]
-
-    curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
-    regression_graph=curr.fetchall()
-    # SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '2023-11-13' AND '2023-11-15' GROUP BY DATE(date_added) ORDER BY reg_date DESC
-    
-    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
-    harmony_graph=curr.fetchall()
-    
-
-    curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
-    cmts_graph=curr.fetchall()
-    # SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Arris' AND regression.date_added BETWEEN '2023-11-13' AND '2023-11-14' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC
-    # SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Arris' AND regression.date_added >= '2023-11-13' AND regression.date_added <= '2023-11-14' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC
-
-    
+    total_regression_count = i_cmts_count = harmony_count=0
     graph_data={}
     harmony_graph_data={}
     cmts_graph_data={}
@@ -77,55 +46,104 @@ def index():
     dates=[]
     h_date=[]
     c_date=[]
-    for i in regression_graph:   
-        # date=i[1].strftime("%d-%m-%Y")
-        date=i[1].strftime("%Y-%m-%d")
-        data1.append({'date':date,'count':i[0]})
-        dates.append(date)
-    graph_data['data']=data1
+    from_date = request.args.get('from_date')
+    to_date = request.args.get('to_date')
+    flag=False
 
-    for i in harmony_graph:  
-        date=i[1].strftime("%Y-%m-%d")
-        h_date.append(date) 
-        data2.append({'date':date,'count':i[0]})
+    if from_date != "" and to_date != "" and from_date != None and to_date != None:
+        if from_date > to_date:
+            flag=True
+
+    if from_date != "" and to_date == "":
+        to_date = from_date
+    elif from_date == "" and to_date != "":
+        from_date = to_date
+    print("flag===>",flag)
+    if flag == False:
+
+        curr, conn=db_connection()
+        curr.execute('SELECT * FROM regression')
+        sample_data=curr.fetchone()
+        curr.execute('SELECT count(*) FROM regression')
+        total_regression_count=curr.fetchone()
+        total_regression_count=total_regression_count[0]
+
+        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"'')
+        i_cmts_count = curr.fetchone()
+        i_cmts_count = i_cmts_count[0]
+
+
+        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"'')
+        harmony_count = curr.fetchone()
+        harmony_count = harmony_count[0]
+
+        if from_date == None and to_date == None or from_date == "" and to_date == "":
+            curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
+            regression_graph=curr.fetchall()
+            
+            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
+            harmony_graph=curr.fetchall()
+            
+
+            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
+            cmts_graph=curr.fetchall()
+        
+        elif from_date != None and to_date != None  and from_date != "" and to_date != "":
+            to_date=convert_str_to_date(to_date,"%Y-%m-%d")+datetime.timedelta(days=1)
+            to_date=convert_date_to_str(to_date,"%Y-%m-%d")
+            curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
+            regression_graph=curr.fetchall()
+            
+            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Harmony' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
+            harmony_graph=curr.fetchall()
+            
+            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Arris' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
+            cmts_graph=curr.fetchall()
+        
+        
+        
+        for i in regression_graph:   
+            # date=i[1].strftime("%d-%m-%Y")
+            date=i[1].strftime("%Y-%m-%d")
+            data1.append({'date':date,'count':i[0]})
+            dates.append(date)
+        graph_data['data']=data1
+
+        for i in harmony_graph:  
+            date=i[1].strftime("%Y-%m-%d")
+            h_date.append(date) 
+            data2.append({'date':date,'count':i[0]})
+        
     
-    # for r_date in dates:
-    #     if r_date not in h_date:
-    #         data2.append({'date':r_date,'count':0})
-
-    # data2.sort(key = lambda x:x['date'],reverse=True)
-    data2=genearate_list_of_dict(dates,h_date,data2)
-    harmony_graph_data['data']=data2
-    # print(harmony_graph_data)
-
-
-    for i in cmts_graph:    
-        date=i[1].strftime("%Y-%m-%d")
-        c_date.append(date)
-        data3.append({'date':date,'count':i[0]})
+        data2=genearate_list_of_dict(dates,h_date,data2)
+        harmony_graph_data['data']=data2
     
-    # for r_date in dates:
-    #     if r_date not in c_date:
-    #         data3.append({'date':r_date,'count':0})
-    # data3.sort(key = lambda x:x['date'],reverse=True)
-    data3=genearate_list_of_dict(dates,c_date,data3)
-    cmts_graph_data['data']=data3
+        for i in cmts_graph:    
+            date=i[1].strftime("%Y-%m-%d")
+            c_date.append(date)
+            data3.append({'date':date,'count':i[0]})
+        
 
-    conn.commit()
-    curr.close()
-    conn.close()
+        data3=genearate_list_of_dict(dates,c_date,data3)
+        cmts_graph_data['data']=data3
 
-    return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data)
+        conn.commit()
+        curr.close()
+        conn.close()
+        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data)
+
+    else:
+        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,error_message=True)
+
+
 
 @app.route('/logs', methods=['GET','POST'])
 def logs():
-
     if request.method == "POST":
         global reg_id
         reg_id=add_regression(request)
         tc = request.form.get('data')
         for tc_name in tc.split(','):
-
             eval(tc_name + "()")
            
         call_after_execution(reg_id)
@@ -138,6 +156,11 @@ def i_cmts():
 @app.route('/harmony', methods=['GET','POST'])
 def harmony():
     return render_template('harmony.html')
+
+@app.route('/ganga', methods=['GET','POST'])
+def ganga():
+    return render_template('ganga.html')
+
 
 @app.route("/connect", methods=['GET','POST'])
 @socketio.event
@@ -195,7 +218,6 @@ def view_regression_details():
 
     elif search_reg != None and search_reg != "" and (cmts_type == None or cmts_type == ""):
         search_reg="'%"+search_reg+"%'"
-        # curr.execute(f"SELECT * FROM regression WHERE regression_name LIKE "+search_reg+"ORDER BY date_added DESC")
         curr.execute(f"SELECT * FROM regression WHERE LOWER(regression_name) LIKE LOWER("+search_reg+")ORDER BY date_added DESC")
         
     elif search_reg != None and search_reg != "" and cmts_type != None and cmts_type != "" :
@@ -263,6 +285,31 @@ def send_mail(reg_id):
         conn.close()
         return redirect("/view_regression_details")
 
+@app.route('/delete_selected_regression', methods=['GET','POST'])
+def delete_selected_regression():
+    tc_ids = request.form.get('data')
+    tc_ids=tc_ids.split(',')
+    print("dd===",len(tc_ids))
+    curr,conn=db_connection()
+    for ids in tc_ids:
+        curr.execute(f'DELETE FROM regression_logs_details WHERE regression_id={ids}')
+        curr.execute(f'DELETE FROM regression WHERE regression_id={ids}')
+    conn.commit()
+    curr.close()
+    conn.close()
+    
+    return redirect("/view_regression_details")
+
+@app.route('/delete_all_regressions', methods=['GET','POST'])
+def delete_all_regressions():
+    curr,conn=db_connection()
+    curr.execute(f'DELETE FROM regression_logs_details')
+    curr.execute(f'DELETE FROM regression ')
+    conn.commit()
+    curr.close()
+    conn.close()
+    
+    return redirect("/view_regression_details")
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

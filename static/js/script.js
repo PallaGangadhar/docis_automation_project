@@ -91,10 +91,10 @@ $(document).ready(function() {
         $('#total_fail_count').text(msg.fail_tc);
         $('#no_run_count').text(no_run);
         $('#tc_count b').text("Total TC Selected: "+total_tc_selected);
-        
+        console.log("pass===>",pass)
         chart.series[0].setData([
-            {name: pass +' PASS',y: pass_per,color:"#00FF00"}, 
-            {name: fail +' FAIL',y: fail_per,color:"#FF0000"},
+            {name: msg.pass_tc +' PASS',y: pass_per,color:"#00FF00"}, 
+            {name: msg.fail_tc +' FAIL',y: fail_per,color:"#FF0000"},
             {name: no_run +' No Run',y: no_run_per,color:"#2E2EFF"},
         ], true);
 
@@ -353,20 +353,60 @@ function remove_err_ele(array, val){
 
 
 function clear_filter(){
-    window.location.href="/view_regression_details"
+    window.location.href=window.location.href.split("?")[0]
 }
-
-
 
 $(function () {
     $("#from_date").datepicker({ 
           autoclose: true, 
           todayHighlight: true
-    }).datepicker('update', new Date());
-  });
+    }).datepicker();
+    
+});
 $(function () {
     $("#to_date").datepicker({ 
           autoclose: true, 
           todayHighlight: true
-    }).datepicker('update', new Date());
-  });
+    }).datepicker();
+});
+try{
+    date=window.location.href
+    from_date=date.split('?')[1].split('&')[0].split('=')[1]
+    to_date=date.split('?')[1].split('&')[1].split('=')[1]
+    $('#from_date_val').val(from_date);
+    $('#to_date_val').val(to_date);
+}
+catch(err){
+    console.log(err)
+}
+
+var testcase_id=[];
+
+$("input:checkbox[name='reg_box']").on('change', function () {
+    if(this.checked) {           
+        testcase_id.push($(this).val());  
+    }  
+    else{
+        remove_err_ele(testcase_id,$(this).val());
+    }
+});
+
+function delete_selected_regression(){
+    if (testcase_id.length == 0){
+        alert('Please select atleast one testcase')
+    }
+    else{
+        console.log("====>",testcase_id);
+        testcase_id = testcase_id.toString(); 
+        $.ajax({  
+            url:"/delete_selected_regression",  
+            method:"POST",  
+            data:{ "data":testcase_id},  
+            success:function(){  
+                location.reload();
+            }  
+        });
+    }
+    
+    
+}

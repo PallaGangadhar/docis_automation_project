@@ -27,7 +27,7 @@ def TC_1():
     send_req("====== TABLE ====================")
     
     send_req("TestStep:Pass")
-    table_summary("1","TC 1","FAiL","N/A","12 seconds","a.txt")
+    table_summary("001","TC 1","FAiL","N/A","12 seconds","a.txt")
     requests.post("http://localhost:5000/charts", json={"pass":0, "fail":1},headers = {'Content-type': 'application/json'})
 
 def TC_2():
@@ -42,7 +42,7 @@ def TC_2():
     send_req("\n\n########### Test Case 2 #################\n\n")
     for i in output.splitlines():
         send_req(i)
-    table_summary("2","TC 2","PASS","N/A","5 seconds","a.txt")
+    table_summary("012","TC 2","PASS","N/A","5 seconds","a.txt")
     requests.post("http://localhost:5000/charts", json={"pass":1, "fail":0},headers = {'Content-type': 'application/json'})
 
 def TC_3():
@@ -59,7 +59,7 @@ def TC_3():
     for i in output.splitlines():
         send_req(i)
     send_req("Teststep:Fail")
-    table_summary("3","TC 3","PASS","N/A","6 seconds","a.txt")
+    table_summary("03_022","TC 3","PASS","N/A","6 seconds","a.txt")
     requests.post("http://localhost:5000/charts", json={"pass":1, "fail":0},headers = {'Content-type': 'application/json'})
     
 def TC_4():

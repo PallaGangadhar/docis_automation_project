@@ -289,7 +289,6 @@ def send_mail(reg_id):
 def delete_selected_regression():
     tc_ids = request.form.get('data')
     tc_ids=tc_ids.split(',')
-    print("dd===",len(tc_ids))
     curr,conn=db_connection()
     for ids in tc_ids:
         curr.execute(f'DELETE FROM regression_logs_details WHERE regression_id={ids}')
@@ -310,6 +309,7 @@ def delete_all_regressions():
     conn.close()
     
     return redirect("/view_regression_details")
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

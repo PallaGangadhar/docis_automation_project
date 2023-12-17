@@ -498,7 +498,9 @@ thead{
 #datepicker{width:180px; margin: 0 20px 20px 20px;}
 #datepicker > span:hover{cursor: pointer;}
 
-
+.table_boder_light_grey{
+  border-color:lightgray;
+}
 @media (min-width: 768px){
 .d-md-flex {
     display: flex !important;

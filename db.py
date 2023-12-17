@@ -149,8 +149,8 @@ def select_query_to_get_count_details(reg_id):
 
 # CREATE TABLE IF NOT EXISTS regression_logs_details(
 #     log_id serial,
-#     regression_id INT,
-#     testcase_number INT,
+#     regression_id serial,
+#     testcase_number text,
 #     testcase_name text,
 #     status varchar(1000),
 #     failed_in text,

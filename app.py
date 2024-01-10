@@ -36,16 +36,19 @@ def send_chart_details(data):
 
 @app.route('/', methods=['GET','POST'])
 def index():
-    total_regression_count = i_cmts_count = harmony_count=0
+    total_regression_count = i_cmts_count = harmony_count=vccap_count=0
     graph_data={}
     harmony_graph_data={}
     cmts_graph_data={}
+    vccap_graph_data={}
     data1=[]
     data2=[]
     data3=[]
+    data4=[]
     dates=[]
     h_date=[]
     c_date=[]
+    vc_date=[]
     from_date = request.args.get('from_date')
     to_date = request.args.get('to_date')
     flag=False
@@ -68,25 +71,30 @@ def index():
         total_regression_count=curr.fetchone()
         total_regression_count=total_regression_count[0]
 
-        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"'')
+        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'CASA I-CMTS'"'')
         i_cmts_count = curr.fetchone()
         i_cmts_count = i_cmts_count[0]
 
-
-        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"'')
+        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmonic CMTS'"'')
         harmony_count = curr.fetchone()
         harmony_count = harmony_count[0]
+
+        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'VCCAP'"'')
+        vccap_count = curr.fetchone()
+        vccap_count = vccap_count[0]
 
         if from_date == None and to_date == None or from_date == "" and to_date == "":
             curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
             regression_graph=curr.fetchall()
             
-            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmony'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
+            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmonic CMTS'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
             harmony_graph=curr.fetchall()
-            
 
-            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Arris'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
+            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'CASA I-CMTS'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
             cmts_graph=curr.fetchall()
+
+            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'VCCAP'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
+            vccap_graph=curr.fetchall()
         
         elif from_date != None and to_date != None  and from_date != "" and to_date != "":
             to_date=convert_str_to_date(to_date,"%Y-%m-%d")+datetime.timedelta(days=1)
@@ -94,11 +102,14 @@ def index():
             curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
             regression_graph=curr.fetchall()
             
-            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Harmony' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
+            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Harmonic CMTS' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
             harmony_graph=curr.fetchall()
             
-            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Arris' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
+            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='CASA I-CMTS' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
             cmts_graph=curr.fetchall()
+
+            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='VCCAP'  AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
+            vccap_graph=curr.fetchall()
         
         
         
@@ -127,13 +138,22 @@ def index():
         data3=genearate_list_of_dict(dates,c_date,data3)
         cmts_graph_data['data']=data3
 
+        for i in vccap_graph:    
+            date=i[1].strftime("%Y-%m-%d")
+            vc_date.append(date)
+            data4.append({'date':date,'count':i[0]})
+        
+
+        data4=genearate_list_of_dict(dates,vc_date,data4)
+        vccap_graph_data['data']=data4
+
         conn.commit()
         curr.close()
         conn.close()
-        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data)
+        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,vccap_graph_data=vccap_graph_data,vccap_count=vccap_count)
 
     else:
-        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,error_message=True)
+        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,vccap_count=vccap_count,vccap_graph_data=vccap_graph_data,error_message=True)
 
 
 
@@ -191,9 +211,10 @@ def test_disconnect():
 
 
 @app.route("/stop", methods=['GET','POST'])
+@socketio.on('disconnect')
 def stop():
     if request.method == "POST":
-        socketio.stop()
+        # socketio.stop()
         os.system("python -m flask run --reload")
     return Response({'msg':''})
 
@@ -313,5 +334,4 @@ def delete_all_regressions():
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
-
 

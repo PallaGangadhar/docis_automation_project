@@ -102,7 +102,20 @@
                                     </div><!--end row-->
 
                         </div> <!-- container-fluid -->
+
+
+                        <div class="container-fluid">
+                                <figure class="highcharts-figure">
+                                        <div id="line_chart"></div>
+                                        <p class="highcharts-description">
+                                            Basic line chart showing trends in a dataset. This chart includes the
+                                            <code>series-label</code> module, which adds a label to each line for
+                                            enhanced readability.
+                                        </p>
+                                    </figure>
+                        </div>
                 </div>
+                
                 <!-- End Page-content -->
         </div>
 </div>
@@ -120,14 +133,17 @@
 var regression_date_graph='{{ regression_date_graph|tojson }}';
 var harmony_graph_data='{{ harmony_graph_data|tojson }}';
 var cmts_graph_data='{{ cmts_graph_data|tojson }}';
+var vccap_graph_data='{{ vccap_graph_data|tojson }}';
 regression_date_graph=JSON.parse(regression_date_graph);
 harmony_graph_data=JSON.parse(harmony_graph_data);
 cmts_graph_data=JSON.parse(cmts_graph_data);
+vccap_graph_data=JSON.parse(vccap_graph_data);
 
 
 var reg_data=[]
 var harmony_data=[]
 var cmts_data=[]
+var vccap_data=[]
 var reg_date=[]
 for(var i=0;i<regression_date_graph['data'].length;i++){
         reg_data.push(regression_date_graph['data'][i]['count'])
@@ -139,6 +155,9 @@ for(var i=0;i<harmony_graph_data['data'].length;i++){
 
 for(var i=0;i<cmts_graph_data['data'].length;i++){
         cmts_data.push(cmts_graph_data['data'][i]['count'])
+}
+for(var i=0;i<vccap_graph_data['data'].length;i++){
+        vccap_data.push(vccap_graph_data['data'][i]['count'])
 }
 
 Highcharts.chart('bar_chart', {
@@ -190,8 +209,6 @@ Highcharts.chart('bar_chart', {
     },
     series: [{
         name: 'Total Regression',
-        // data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4,
-        //     194.1, 95.6, 54.4],
         data:reg_data,
         color:"#00FF00"
 
@@ -205,8 +222,73 @@ Highcharts.chart('bar_chart', {
         data: harmony_data,
         color:"#FF0000"
 
+    },{
+        name: 'VCCAP TC Count',
+        data: vccap_data,
+        color:"#FFFF00"
+
     }
     ]
+});
+
+Highcharts.chart('line_chart', {
+    
+    title: {
+        text: 'Monthly Average Temperature'
+    },
+    subtitle: {
+        text: 'Source: ' +
+            '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
+            'target="_blank">Wikipedia.com</a>'
+    },
+    xAxis: {
+        categories: reg_date,
+        accessibility: {
+            description: 'Months of the year'
+        }
+    },
+    yAxis: {
+        title: {
+            text: 'Temperature'
+        },
+        labels: {
+            format: '{value}'
+        }
+    },
+    tooltip: {
+        crosshairs: true,
+        shared: true
+    },
+    plotOptions: {
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
+            }
+        }
+    },
+    series: [{
+        name: 'Total Regression',
+        data:reg_data,
+        color:"#00FF00"
+
+    },{
+        name: 'CASA I-CMTS TC Count',
+        data: cmts_data,
+        color:"#0000FF"
+
+    },{
+        name: 'Harmonic-CMTS TC Count',
+        data: harmony_data,
+        color:"#FF0000"
+
+    },{
+        name: 'VCCAP TC Count',
+        data: vccap_data,
+        color:"#FFFF00"
+
+    }]
 });
 
 

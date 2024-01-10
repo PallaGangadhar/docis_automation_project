@@ -406,7 +406,12 @@ function delete_selected_regression(){
                 location.reload();
             }  
         });
-    }
-    
-    
+    }    
 }
+
+try{
+    var selected_value=window.location.href.split('?')[1].split('=')[1].split('&')[0]
+    $("#cmts_type_filter").val(selected_value);
+  }
+  catch(err){
+  }

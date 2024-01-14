@@ -79,7 +79,7 @@ def index():
         harmony_count = curr.fetchone()
         harmony_count = harmony_count[0]
 
-        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'VCCAP'"'')
+        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'vCCAP'"'')
         vccap_count = curr.fetchone()
         vccap_count = vccap_count[0]
 
@@ -93,7 +93,7 @@ def index():
             curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'CASA I-CMTS'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
             cmts_graph=curr.fetchall()
 
-            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'VCCAP'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
+            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'vCCAP'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
             vccap_graph=curr.fetchall()
         
         elif from_date != None and to_date != None  and from_date != "" and to_date != "":
@@ -108,7 +108,7 @@ def index():
             curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='CASA I-CMTS' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
             cmts_graph=curr.fetchall()
 
-            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='VCCAP'  AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
+            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='vCCAP'  AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
             vccap_graph=curr.fetchall()
         
         

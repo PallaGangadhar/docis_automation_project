@@ -67,6 +67,7 @@ $(document).ready(function() {
             color="red"
         }
         $('#log').append('<div style="color:'+color+'">' + $('<div/>').text( msg.data).html());
+        $('#log').scrollTop($('#log')[0].scrollHeight);
         if (cb)
             cb();
     });
@@ -113,60 +114,63 @@ $(document).ready(function() {
 });
 
 // function show_charts(pass_per, fail_per, pass, fail){
-
-$(document).ready(function(){
-chart = Highcharts.chart('container', {
-        chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            type: 'pie',
-            height:250
-        },
-        title: {
-            text: '',
-            // align: 'cenet'
-        },
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-        },
-        accessibility: {
-            point: {
-                valueSuffix: '%'
-            }
-        },
-        plotOptions: {
-            pie: {
-                allowPointSelect: true,
-                cursor: 'pointer',
-                dataLabels: {
-                    enabled: false
+try{
+    $(document).ready(function(){
+        chart = Highcharts.chart('container', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie',
+                    height:250
                 },
-                showInLegend: true
-            }
-        },
-        series: [{
-            // name: 'Brands',
-            colorByPoint: true,
-            data: [{
-                name: '0 Pass',
-                y: 0,
-                color:"#00FF00"
-            },  {
-                name: '0 FAIL',
-                y:0,
-                color:'#FF0000'
-            }, 
-            {
-                name: "No Run",
-                y:100,
-                color:'#2E2EFF'
-            }, 
-            
-            ]
-        }]
-});
-});
+                title: {
+                    text: '',
+                    // align: 'cenet'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    // name: 'Brands',
+                    colorByPoint: true,
+                    data: [{
+                        name: '0 Pass',
+                        y: 0,
+                        color:"#00FF00"
+                    },  {
+                        name: '0 FAIL',
+                        y:0,
+                        color:'#FF0000'
+                    }, 
+                    {
+                        name: "No Run",
+                        y:100,
+                        color:'#2E2EFF'
+                    }, 
+                    
+                    ]
+                }]
+        });
+        });
+        
+}
+catch(err){}
 
 
     
@@ -411,6 +415,8 @@ function delete_selected_regression(){
 
 try{
     var selected_value=window.location.href.split('?')[1].split('=')[1].split('&')[0]
+    // alert(selected_value);
+    selected_value = selected_value.replace("+"," ")
     $("#cmts_type_filter").val(selected_value);
   }
   catch(err){

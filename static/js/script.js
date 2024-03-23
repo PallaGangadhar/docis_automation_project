@@ -400,7 +400,6 @@ function delete_selected_regression(){
         alert('Please select atleast one testcase')
     }
     else{
-        console.log("====>",testcase_id);
         testcase_id = testcase_id.toString(); 
         $.ajax({  
             url:"/delete_selected_regression",  
@@ -421,3 +420,4 @@ try{
   }
   catch(err){
   }
+

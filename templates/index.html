@@ -8,29 +8,29 @@
                         <div class="container-fluid">
                                 <div class="row"  style="background-color: #d3d3d3">
                                         
-                                        <div class="col-sm-3" style="border: 2px solid;">
-                                                <div>
-                                                        <span>Total Regression</span>
-                                                </div>
-                                                <span style="font-size: 30px;">18</span>
-                                        </div>
                                         <div class="col-sm-3">
                                                 <div>
                                                         <span>Total Regression</span>
                                                 </div>
-                                                <span style="font-size: 30px;">18</span>
+                                                <span style="font-size: 30px;"><b>{{total_regression_count}}</b></span>
                                         </div>
                                         <div class="col-sm-3">
                                                 <div>
-                                                        <span>Total Regression</span>
+                                                        <span>CASA-I-CMTS</span>
                                                 </div>
-                                                <span style="font-size: 30px;">18</span>
+                                                <span style="font-size: 30px;"><b>{{i_cmts_count}}</b></span>
                                         </div>
                                         <div class="col-sm-3">
                                                 <div>
-                                                        <span>Total Regression</span>
+                                                        <span>Harmany Count</span>
                                                 </div>
-                                                <span style="font-size: 30px;">18</span>
+                                                <span style="font-size: 30px;"><b>{{harmony_count}}</b></span>
+                                        </div>
+                                        <div class="col-sm-3">
+                                                <div>
+                                                        <span>vCCAP Count</span>
+                                                </div>
+                                                <span style="font-size: 30px;"><b>{{vccap_count}}</b></span>
                                         </div>
                                         
                                 </div><!--end row-->
@@ -131,11 +131,6 @@ var casa_i_cmts_per=(parseInt(casa_i_cmts_count)/total_count)*100
 var harmony_per=(parseInt(harmony_count)/total_count)*100
 var vccap_per=(parseInt(vccap_count)/total_count)*100
 
-console.log(regression_per)
-console.log(casa_i_cmts_per)
-console.log(harmony_per)
-console.log(vccap_per)
-
 regression_date_graph=JSON.parse(regression_date_graph);
 harmony_graph_data=JSON.parse(harmony_graph_data);
 cmts_graph_data=JSON.parse(cmts_graph_data);
@@ -162,7 +157,10 @@ for(var i=0;i<vccap_graph_data['data'].length;i++){
         vccap_data.push(vccap_graph_data['data'][i]['count'])
 }
 
-Highcharts.chart('bar_chart', {
+
+try{
+
+    Highcharts.chart('bar_chart', {
     chart: {
         // type: 'column'
         type: 'column'
@@ -233,7 +231,8 @@ Highcharts.chart('bar_chart', {
     ]
 });
 
-Highcharts.chart('line_chart', {
+
+    Highcharts.chart('line_chart', {
     
     title: {
         // text: 'Monthly Average Temperature'
@@ -326,17 +325,28 @@ Highcharts.chart('regression_pie_chart', {
         name: 'Brands',
         colorByPoint: true,
         data: [{
+            name: 'Total Regression Count',
+            y: regression_per,
+            color:"#00FF00"
+           
+        }, {
             name: 'CASA-I-CMTS',
-            y: casa_i_cmts_per
+            y: casa_i_cmts_per,
+            color:"#0000FF"
         },  {
             name: 'Harmany',
-            y: harmony_per
+            y: harmony_per,
+            color:"#FF0000"
         }, {
             name: 'vCCAP',
-            y: vccap_per
+            y: vccap_per,
+            color:"#FFFF00"
         }]
     }]
 });
+
+}
+catch(err){}
 
 </script>
 {% endblock %}

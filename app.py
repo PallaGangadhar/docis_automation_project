@@ -61,7 +61,7 @@ def index():
         to_date = from_date
     elif from_date == "" and to_date != "":
         from_date = to_date
-    print("flag===>",flag)
+
     if flag == False:
 
         curr, conn=db_connection()

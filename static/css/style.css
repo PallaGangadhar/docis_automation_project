@@ -512,7 +512,7 @@ thead{
   border-radius: 10px !important;
 }
    
-::placeholder {
+.textbox::placeholder {
   opacity: 1;
   font-size: 24px;
 }
@@ -527,6 +527,8 @@ thead{
   font-style: oblique;
   font-weight: bold;
 }
+
+
 @media (min-width: 768px){
 .d-md-flex {
     display: flex !important;

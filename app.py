@@ -391,6 +391,7 @@ def register():
 
             conn.commit()
             msg = 'You have successfully registered !'
+            return redirect(url_for('login'))
     elif request.method == 'POST':
         msg = 'Please fill out the form !'
     return render_template('register.html', msg = msg)

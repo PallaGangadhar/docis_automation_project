@@ -113,7 +113,7 @@
 
  <script src="../static/assets/libs/jquery/jquery.min.js"></script>
 <script>
-
+try{
 
 var regression_date_graph='{{ regression_date_graph|tojson }}';
 var harmony_graph_data='{{ harmony_graph_data|tojson }}';
@@ -155,6 +155,10 @@ for(var i=0;i<cmts_graph_data['data'].length;i++){
 }
 for(var i=0;i<vccap_graph_data['data'].length;i++){
         vccap_data.push(vccap_graph_data['data'][i]['count'])
+}
+}
+catch(err){
+    
 }
 
 

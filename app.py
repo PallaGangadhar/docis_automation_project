@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, redirect
+from flask import Flask, render_template, request, Response, redirect, session, url_for
 from flask_socketio import SocketIO, emit
 from flask_mail import Mail, Message
 import os
@@ -7,12 +7,27 @@ from test_code import *
 from utlity import genearate_list_of_dict,convert_date_to_str,convert_str_to_date
 from db import *
 from send_mail import send_mail_to
-
+from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+import re
+from decorators import login_required
 
 async_mode = None
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
+app.config['SECRET_KEY'] = "testkey"
+
+
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def loader_user(id):
+    curr, conn=db_connection()
+    curr.execute('SELECT * FROM user_info WHERE user_id = %d', (id))
+    account = curr.fetchone()
+    return account
 
 socketio = SocketIO(app, async_mode=async_mode)
 
@@ -35,7 +50,9 @@ def send_chart_details(data):
 
 
 @app.route('/', methods=['GET','POST'])
+@login_required
 def index():
+    print("s===",session.get("loggedin"))
     total_regression_count = i_cmts_count = harmony_count=vccap_count=0
     graph_data={}
     harmony_graph_data={}
@@ -158,6 +175,7 @@ def index():
 
 
 @app.route('/logs', methods=['GET','POST'])
+@login_required
 def logs():
     if request.method == "POST":
         global reg_id
@@ -170,16 +188,15 @@ def logs():
     return render_template('logs.html')
 
 @app.route('/i_cmts', methods=['GET','POST'])
+@login_required
 def i_cmts():
     return render_template('i_cmts.html')
 
 @app.route('/harmony', methods=['GET','POST'])
+@login_required
 def harmony():
     return render_template('harmony.html')
 
-@app.route('/ganga', methods=['GET','POST'])
-def ganga():
-    return render_template('ganga.html')
 
 
 @app.route("/connect", methods=['GET','POST'])
@@ -193,6 +210,7 @@ def connect():
         emit('my_response', {'data': ''})
 
 @app.route("/charts", methods=['GET','POST'])
+@login_required
 @socketio.event
 def charts():    
     if request.method == "POST":
@@ -220,6 +238,7 @@ def stop():
 
 
 @app.route("/add_regression_logs", methods=['GET','POST'])
+@login_required
 def add_regression_logs():
     if request.method == "POST":
         response=request.json
@@ -227,8 +246,8 @@ def add_regression_logs():
         add_regression_details(response)
     return Response({'msg':''})
 
-
 @app.route("/view_regression_details", methods=['GET','POST'])
+@login_required
 def view_regression_details():
     curr,conn=db_connection()
     cmts_type = request.args.get('cmts_type_dropdown')
@@ -266,6 +285,7 @@ def view_regression_details():
     
     return render_template('regression_details.html',regression_details=regression_details,c_type=c_type,status=status)
 
+@login_required
 @app.route("/view_tc_logs_details/<int:reg_id>", methods=['GET','POST'])
 def view_tc_logs_details(reg_id):
     curr,conn=db_connection()
@@ -331,6 +351,57 @@ def delete_all_regressions():
     
     return redirect("/view_regression_details")
 
+@app.route('/login', methods=['GET','POST'])
+def login():
+    msg = ''
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        username = request.form['username']
+        password = request.form['password']
+        curr,conn=db_connection()
+        curr.execute('SELECT * FROM user_info WHERE username = %s AND password = %s', (username, password, ))
+        account = curr.fetchone()
+        if account:
+            session['loggedin'] = True
+            session['id'] = account[0]
+            session['username'] = account[1]
+            msg = 'Logged in successfully !'
+            return redirect(url_for('index'))
+        else:
+            msg = 'Incorrect username / password !'
+    return render_template('login.html',msg = msg)
+
+
+@app.route('/register', methods =['GET', 'POST'])
+def register():
+    msg = ''
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form :
+        username = request.form['username']
+        password = request.form['password']
+        curr,conn=db_connection()
+        curr.execute('SELECT * FROM user_info WHERE username = %s', (username, ))
+        account = curr.fetchone()
+        if account:
+            msg = 'Account already exists !'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers !'
+        elif not username or not password:
+            msg = 'Please fill out the form !'
+        else:
+            curr.execute('''INSERT INTO user_info(username, password) VALUES (%s, %s)''', (username, password, ))
+
+            conn.commit()
+            msg = 'You have successfully registered !'
+    elif request.method == 'POST':
+        msg = 'Please fill out the form !'
+    return render_template('register.html', msg = msg)
+
+ 
+@app.route('/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

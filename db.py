@@ -11,17 +11,11 @@ POSTGRES_PASSWORD=os.environ.get('POSTGRES_PASSWORD')
 POSTGRES_HOSTNAME=os.environ.get('POSTGRES_HOSTNAME')
 POSTGRES_PORT=os.environ.get('POSTGRES_PORT')
 
+
 def db_connection():
     conn = psycopg2.connect(f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOSTNAME}:{POSTGRES_PORT}/{DB_NAME}")
     curr = conn.cursor()
     return curr, conn
-# db_connection()
-# curr, conn=db_connection()
-# curr.execute("DELETE  FROM regression_logs_details")
-# curr.execute("DELETE  FROM regression")
-# conn.commit()
-# curr.close()
-# conn.close()
 
 def add_regression(request):
     curr, conn=db_connection()
@@ -103,6 +97,14 @@ def select_query_to_get_count_details(reg_id):
     curr.close()
     conn.close()
     return pass_count, fail_count, total_count,no_run
+
+# CREATE TABLE IF NOT EXISTS user_info(
+#     user_id serial,
+#     username text NOT NULL, 
+#     password text NOT NULL
+   
+# );
+
 # def insert()
 # curr.execute('CREATE TABLE IF NOT EXISTS regression (regression_id INT,'
 #                                  'regression_name varchar (1000) NOT NULL,'

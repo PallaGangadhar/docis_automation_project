@@ -501,6 +501,32 @@ thead{
 .table_boder_light_grey{
   border-color:lightgray;
 }
+
+
+
+/* Login css */
+
+
+.textbox{
+  padding: 10px 40px !important;
+  border-radius: 10px !important;
+}
+   
+::placeholder {
+  opacity: 1;
+  font-size: 24px;
+}
+
+.word{
+  font-style: oblique;
+  font-weight: bold;
+}
+
+.bottom{
+  color: #236B8E;
+  font-style: oblique;
+  font-weight: bold;
+}
 @media (min-width: 768px){
 .d-md-flex {
     display: flex !important;

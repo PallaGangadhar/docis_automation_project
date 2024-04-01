@@ -523,9 +523,164 @@ thead{
 }
 
 .bottom{
-  color: #236B8E;
+  color: #4a7d47;
   font-style: oblique;
   font-weight: bold;
+  margin-top: 13%;
+  margin-left: 11%;
+}
+
+.btn_green{
+  background-color: #4a7d47 !important;
+}
+
+#username, #password {
+	display: block;
+	width: 77%;
+	margin-left: 10.5%;
+	margin-top: 4%;
+	margin-bottom: 2%;
+	min-width: 100px;
+	height: 30px;
+	padding: 4px;
+	padding-right: 4px;
+	padding-left: 4px;
+	border: none;
+	border-radius: 2px;
+	background-color: #c7e8ca;
+	border-bottom: 2px solid #4a7d47;
+	font-size: 18px;
+	z-index: 3;
+}
+
+#username:focus, #password:focus {
+	outline: none;
+}
+
+#username:autofill, #password:autofill {
+	background-color: #6da66a !important;
+}
+
+.loginDiv {
+	position: relative;
+	top: 15%;
+	margin: auto;
+	width: 30%;
+	height: 50%;
+	min-height: 400px;
+	min-width: 400px;
+	background-color: #C7E8CA;
+	border-radius: 35px;
+	box-sizing: content-box;
+	box-shadow: 0 0 20px -8px #4a7d47;
+}
+
+.login {
+  position: absolute;
+	bottom: 100px !important;
+	left: 5%;
+	width: 90%;
+  padding: 10px;
+  background-color: #4a7d47;
+  color: white;
+  border: none;
+  cursor: pointer;
+	border-radius: 15px;
+	font-size: 18px;
+	box-shadow: 0 0 10px -5px #2D5C29;
+	transition: all 0.1s;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+.register {
+	bottom: 20px !important;
+}
+
+.login:hover {
+	bottom: 31px;
+	font-size: 20px;
+	background-color: #5D9C59;
+	transition: all 0.1s;
+	box-shadow: 0 0 20px -2px #2D5C29;
+}
+
+.login:active {
+	bottom: 32px;
+	font-size: 18px;
+	background-color: #385e35;
+	transition: all 0.1s;
+	box-shadow: 0 0 10px -7px #2D5C29;
+}
+
+
+label {
+	position: relative;
+	top: -40px;
+	margin-left: 10.5%;
+	font-size: 18px;
+	z-index: 0;
+	transition: all 0.4s;
+  pointer-events: none;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+#password:focus ~ label, #password:valid ~ label {
+	font-size: 14px;
+	top: -70px;
+	transition: all 0.2s;
+	color: #4a7d47;
+}
+
+#username:focus ~ label,
+#username:valid ~ label {
+	font-size: 14px;
+	top: -70px;
+	transition: all 0.2s;
+	color: #4a7d47;
+}
+
+#username:valid ~ .error {
+	display: none;
+}
+
+.inputField {
+	height: 60px;
+}
+
+.error {
+	display: none;
+	width: 80%;
+	margin: auto;
+	color: #DF2E38;
+	margin-top: -20px;
+}
+
+input[aria-invalid="true"] {
+  border-bottom: 2px solid #DF2E38;
+}
+
+.login_text {
+	text-align: center;
+	padding-top: 24px;
+	font-family: 'Poppins';
+	padding-bottom: 15px;
+	color: #253e24;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 

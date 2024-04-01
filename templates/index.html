@@ -125,8 +125,7 @@ var casa_i_cmts_count='{{i_cmts_count}}';
 var harmony_count='{{harmony_count}}';
 var vccap_count='{{vccap_count}}';
 
-var total_count = parseInt(total_regression_count)+parseInt(casa_i_cmts_count)+parseInt(harmony_count)+parseInt(vccap_count)
-var regression_per=(parseInt(total_regression_count)/total_count)*100
+var total_count = parseInt(casa_i_cmts_count)+parseInt(harmony_count)+parseInt(vccap_count)
 var casa_i_cmts_per=(parseInt(casa_i_cmts_count)/total_count)*100
 var harmony_per=(parseInt(harmony_count)/total_count)*100
 var vccap_per=(parseInt(vccap_count)/total_count)*100
@@ -212,11 +211,6 @@ try{
         }
     },
     series: [{
-        name: 'Total Regression',
-        data:reg_data,
-        color:"#00FF00"
-
-    },{
         name: 'CASA I-CMTS TC Count',
         data: cmts_data,
         color:"#0000FF"
@@ -236,7 +230,7 @@ try{
 });
 
 
-    Highcharts.chart('line_chart', {
+Highcharts.chart('line_chart', {
     
     title: {
         // text: 'Monthly Average Temperature'
@@ -274,11 +268,6 @@ try{
         }
     },
     series: [{
-        name: 'Total Regression',
-        data:reg_data,
-        color:"#00FF00"
-
-    },{
         name: 'CASA I-CMTS TC Count',
         data: cmts_data,
         color:"#0000FF"
@@ -328,12 +317,7 @@ Highcharts.chart('regression_pie_chart', {
     series: [{
         name: 'Brands',
         colorByPoint: true,
-        data: [{
-            name: 'Total Regression Count',
-            y: regression_per,
-            color:"#00FF00"
-           
-        }, {
+        data: [ {
             name: 'CASA-I-CMTS',
             y: casa_i_cmts_per,
             color:"#0000FF"

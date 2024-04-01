@@ -1,22 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div align="center">
-    <div align="center" class="border">
-       <div>
-          <h1>Login</h1>
-       </div></br></br></br>
-      <h2 class="word">
-          <form action="{{ url_for('login') }}" method="post">
-            <div class="msg">{{ msg }}</div>
-              <input id="username" name="username" type="text" placeholder="Enter Your Username" class="textbox"/></br></br>
-              <input id="password" name="password" type="password" placeholder="Enter Your Password" class="textbox"/></br></br></br>
-              <input type="submit" class="btn btn-primary" value="Sign In"></br></br>
-          </form>
-      </h2>
-      <p class="bottom">Don't have an account?  <a class="btn btn-primary" href="{{url_for('register')}}"> Sign Up here</a></p>
-      {{msgs}}
+
+
+<div class="loginDiv" id="loginDiv">
+  <h1 class="login_text">Login</h1>
+  <form action="{{ url_for('login') }}" method="post">
+    <div class="inputField">
+      <input type="text" id="username" required aria-invalid="false" name="username"/>
+      <label>Email or Username</label>
     </div>
-  </div>
+    <div class="inputField">
+      <input type="password" id="password" required aria-invalid="false" name="password"/>
+      <label>Password</label>
+    </div>
+    <div class="error" aria-errormessage="Invalid username or password." id="error">
+      <p>You have entered an invalid username or password.</p>
+    </div>
+
+    <input type="submit" class="login" value="Sign In"></br></br>
+    
+    <p class="bottom">Don't have an account?  <a class="btn btn-primary btn_green" href="{{url_for('register')}}"> Sign Up here</a></p>
+    {{msgs}}
+    
+    </br></br>
+    
+  </form>
+  
+</div>
+
+
+
+
 
 {% endblock %}

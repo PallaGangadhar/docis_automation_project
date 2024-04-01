@@ -235,8 +235,6 @@ function select_testcases(){
             $("#tc_select").css('display','block');
             uncheckboxes_value=removeDuplicates(uncheckboxes_value)
             remove_err_ele(uncheckboxes_value, modules[i]);
-            console.log("====>",uncheckboxes_value)
-            
         }
         
     }
@@ -297,7 +295,7 @@ function run_tc(div_id){
             $('#check_tc').prop('disabled', true);
             $('#tc_count b').text("Total TC Selected: "+total_tc_selected);
             $('#total_tc_count').text(total_tc_selected);
-            
+           
             $.ajax({  
                 url:"/logs",  
                 method:"POST",  

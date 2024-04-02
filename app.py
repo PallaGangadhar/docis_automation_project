@@ -10,6 +10,10 @@ from send_mail import send_mail_to
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 import re
 from decorators import login_required
+import bcrypt
+import threading
+from cryptography.fernet import Fernet
+
 
 async_mode = None
 
@@ -17,17 +21,6 @@ app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['SECRET_KEY'] = "testkey"
 
-
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-@login_manager.user_loader
-def loader_user(id):
-    curr, conn=db_connection()
-    curr.execute('SELECT * FROM user_info WHERE user_id = %d', (id))
-    account = curr.fetchone()
-    return account
 
 socketio = SocketIO(app, async_mode=async_mode)
 
@@ -183,7 +176,6 @@ def logs():
         tc = request.form.get('data')
         for tc_name in tc.split(','):
             eval(tc_name + "()")
-           
         call_after_execution(reg_id)
     return render_template('logs.html')
 
@@ -358,16 +350,23 @@ def login():
         username = request.form['username']
         password = request.form['password']
         curr,conn=db_connection()
-        curr.execute('SELECT * FROM user_info WHERE username = %s AND password = %s', (username, password, ))
+        # curr.execute('SELECT * FROM user_info WHERE username = %s AND password = md5(%s)', (username, password, ))
+        curr.execute('SELECT * FROM user_info WHERE username = %s', (username, ))
         account = curr.fetchone()
-        if account:
-            session['loggedin'] = True
-            session['id'] = account[0]
-            session['username'] = account[1]
-            msg = 'Logged in successfully !'
-            return redirect(url_for('index'))
+        if account != None:
+            password = password.encode('utf-8') 
+            account_password = account[1].encode('utf-8')
+            if password == account_password:
+                session['loggedin'] = True
+                session['id'] = account[0]
+                session['username'] = account[1]
+                msg = 'Logged in successfully !'
+                return redirect(url_for('index'))
+            else:
+                msg = 'Incorrect username / password !'
         else:
             msg = 'Incorrect username / password !'
+
     return render_template('login.html',msg = msg)
 
 
@@ -383,11 +382,16 @@ def register():
         if account:
             msg = 'Account already exists !'
         elif not re.match(r'[A-Za-z0-9]+', username):
-            msg = 'Username must contain only characters and numbers !'
+            msg = 'Usernamconverted_to_bytese must contain only characters and numbers !'
         elif not username or not password:
             msg = 'Please fill out the form !'
         else:
-            curr.execute('''INSERT INTO user_info(username, password) VALUES (%s, %s)''', (username, password, ))
+            converted_to_bytes = password.encode('utf-8') 
+            salt = bcrypt.gensalt() 
+            encrypted_password = bcrypt.hashpw(converted_to_bytes, salt)
+            print("encrypted_password===",encrypted_password) 
+            print("encrypted_password===",type(encrypted_password)) 
+            curr.execute('''INSERT INTO user_info(username, password) VALUES (%s, %s)''', (username, encrypted_password, ))
 
             conn.commit()
             msg = 'You have successfully registered !'
@@ -403,6 +407,8 @@ def logout():
     session.pop('id', None)
     session.pop('username', None)
     return redirect(url_for('login'))
+
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

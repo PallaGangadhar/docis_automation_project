@@ -202,7 +202,6 @@ def connect():
         emit('my_response', {'data': ''})
 
 @app.route("/charts", methods=['GET','POST'])
-@login_required
 @socketio.event
 def charts():    
     if request.method == "POST":
@@ -230,7 +229,6 @@ def stop():
 
 
 @app.route("/add_regression_logs", methods=['GET','POST'])
-@login_required
 def add_regression_logs():
     if request.method == "POST":
         response=request.json

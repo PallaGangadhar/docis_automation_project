@@ -684,6 +684,23 @@ input[aria-invalid="true"] {
 }
 
 
+.casa_card_bg_color{
+  background-color: #0000FF;
+}
+
+.harmonic_card_bg_color{
+  background-color: #FF0000;
+}
+
+.vccap_card_bg_color{
+  background-color: #EDED00;
+}
+
+.regression_card_bg_color{
+  background-color: #45e9a5;
+}
+
+
 @media (min-width: 768px){
 .d-md-flex {
     display: flex !important;

@@ -22,6 +22,7 @@ def add_regression(request):
     regression_name = request.form.get('regression_name')
     total_tc_selected = request.form.get('total_tc_selected')
     cmts_type = request.form.get('cmts_type')
+    total_tc_select=0
     curr.execute(
         '''INSERT INTO regression \
         (regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type) VALUES (%s, %s, %s, %s,%s,%s,%s) RETURNING regression_id''',
@@ -102,6 +103,14 @@ def select_query_to_get_count_details(reg_id):
 #     user_id serial,
 #     username text NOT NULL, 
 #     password text NOT NULL
+   
+# );
+# CREATE TABLE IF NOT EXISTS user_access(
+#     access_id serial,
+#     user_id serial,
+#     password text NOT NULL,
+#     CONSTRAINT fk_user FOREIGN KEY(user_id)
+#         REFERENCES user_info(user_id)
    
 # );
 

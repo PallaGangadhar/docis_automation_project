@@ -2,339 +2,351 @@
 {%block content%}
 
 <div class="has-bg-img">
-        
-        <div class="bg-img bg-cover">
-                <div class="page-content page_content_scroll">
-                        <div class="container-fluid">
-                                <div class="row"  style="background-color: #d3d3d3">
-                                        
-                                        <div class="col-sm-3">
-                                                <div>
-                                                        <span>Total Regression</span>
-                                                </div>
-                                                <span style="font-size: 30px;"><b>{{total_regression_count}}</b></span>
-                                        </div>
-                                        <div class="col-sm-3">
-                                                <div>
-                                                        <span>CASA-I-CMTS</span>
-                                                </div>
-                                                <span style="font-size: 30px;"><b>{{i_cmts_count}}</b></span>
-                                        </div>
-                                        <div class="col-sm-3">
-                                                <div>
-                                                        <span>Harmany Count</span>
-                                                </div>
-                                                <span style="font-size: 30px;"><b>{{harmony_count}}</b></span>
-                                        </div>
-                                        <div class="col-sm-3">
-                                                <div>
-                                                        <span>vCCAP Count</span>
-                                                </div>
-                                                <span style="font-size: 30px;"><b>{{vccap_count}}</b></span>
-                                        </div>
-                                        
-                                </div><!--end row-->
+
+    <div class="bg-img bg-cover">
+        <div class="page-content page_content_scroll">
+            <div class="container-fluid px-6">
+                <div class="row gx-8">
+                    <div class="col">
+                        <div class="p-3 border regression_card_bg_color">
+                            <div>
+                                <span class="text-white">Total Regression</span>
+                            </div>
+                            <span style="font-size: 30px;" class="text-white"><b>{{total_regression_count}}</b></span>
                         </div>
-                        <div class="container-fluid mt-2">
-                                <div class="row">
-                                        <form id="filter_graph" method="GET" action="/">
-                                                <div class="row">
-                                                                
-                                                        <div class="col-lg-2">
-                                                                <div id="from_date" class="input-group date" data-date-format="yyyy-mm-dd">
-                                                                        <input class="form-control" type="text"  name="from_date" id="from_date_val" autocomplete="off" placeholder="From Date"/>
-                                                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                                                </div>
-                                                        </div>
-                                                        <div class="col-lg-2">
-                                                                <div id="to_date" class="input-group date" data-date-format="yyyy-mm-dd"> 
-                                                                        <input class="form-control" type="text" name="to_date" id="to_date_val" autocomplete="off" placeholder="To Date"/>
-                                                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                                                </div>
-                                                        </div> 
-                                                        
-                                                        <div class="col-lg-2">
-                                                                <input type="submit" class="btn btn-primary" value="Search" id="search_button"/>
-                                                                <input type="button" class="btn btn-primary" value="Clear Fiter" onclick="clear_filter()"/>
-                                                        </div>
-                                                        
-                                                        
-                                                </div>
-                                        </form>
-                                </div>
+                    </div>
+                    <div class="col">
+                        <div class="p-3 border casa_card_bg_color">
+                            <div>
+                                <span class="text-white">CASA-I-CMTS</span>
+                            </div>
+                            <span style="font-size: 30px;" class="text-white"><b>{{i_cmts_count}}</b></span>
                         </div>
-                        <div class="container-fluid mt-2">
-                                <div class="row">
-                                        <div class="col-lg-12">
-                                   
-                                                
-                                                <figure class="highcharts-figure">
-                                                        {% if error_message != True %}
-                                                        <div id="bar_chart" style="height: 350px;"></div>
-                                                        {% else %}
-                                                        <h5><center>End Date should be greater than or equal to From Date.</center></h5>
-                                                        {% endif %}
-                                                </figure>
-                                        </div><!--end col-->
-                                        
-                                    </div><!--end row-->
-
-                        </div> <!-- container-fluid -->
-
-
-                        <div class="container-fluid">
-                                <div class="row">
-                                      <div class="col-sm-6 col-md-6">
-                                        <figure class="highcharts-figure">
-                                                <div id="line_chart"></div>       
-                                        </figure>
-                                      </div> 
-                                      <div class="col-sm-6 col-md-6">
-                                        <figure class="highcharts-figure">
-                                                <div id="regression_pie_chart"></div>       
-                                        </figure>
-                                      </div>                  
-                                </div>
-
-                                
-                                
+                    </div>
+                    <div class="col">
+                        <div class="p-3 border harmonic_card_bg_color">
+                            <div>
+                                <span class="text-white">Harmany Count</span>
+                            </div>
+                            <span style="font-size: 30px;" class="text-white"><b>{{harmony_count}}</b></span>
                         </div>
+                    </div>
+                    <div class="col">
+                        <div class="p-3 border vccap_card_bg_color">
+                            <div>
+                                <span class="text-white">vCCAP Count</span>
+                            </div>
+                            <span style="font-size: 30px;" class="text-white"><b>{{vccap_count}}</b></span>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- End Page-content -->
+            </div>
+           
+            <div class="container-fluid mt-2">
+                <div class="row">
+                    <form id="filter_graph" method="GET" action="/">
+                        <div class="row">
+
+                            <div class="col-lg-2">
+                                <div id="from_date" class="input-group date" data-date-format="yyyy-mm-dd">
+                                    <input class="form-control" type="text" name="from_date" id="from_date_val"
+                                        autocomplete="off" placeholder="From Date" />
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div id="to_date" class="input-group date" data-date-format="yyyy-mm-dd">
+                                    <input class="form-control" type="text" name="to_date" id="to_date_val"
+                                        autocomplete="off" placeholder="To Date" />
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-2">
+                                <input type="submit" class="btn btn-primary" value="Search" id="search_button" />
+                                <input type="button" class="btn btn-primary" value="Clear Fiter"
+                                    onclick="clear_filter()" />
+                            </div>
+
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="container-fluid mt-2">
+                <div class="row">
+                    <div class="col-lg-12">
+
+
+                        <figure class="highcharts-figure">
+                            {% if error_message != True %}
+                            <div id="bar_chart" style="height: 350px;"></div>
+                            {% else %}
+                            <h5>
+                                <center>End Date should be greater than or equal to From Date.</center>
+                            </h5>
+                            {% endif %}
+                        </figure>
+                    </div><!--end col-->
+
+                </div><!--end row-->
+
+            </div> <!-- container-fluid -->
+
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                        <figure class="highcharts-figure">
+                            <div id="line_chart"></div>
+                        </figure>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <figure class="highcharts-figure">
+                            <div id="regression_pie_chart"></div>
+                        </figure>
+                    </div>
+                </div>
+
+
+
+            </div>
         </div>
+
+        <!-- End Page-content -->
+    </div>
 </div>
 <script src="https://code.highcharts.com/highcharts.js"></script>
- <script src="https://code.highcharts.com/modules/data.js"></script>
- <script src="https://code.highcharts.com/modules/drilldown.js"></script>
- <script src="https://code.highcharts.com/modules/exporting.js"></script>
- <script src="https://code.highcharts.com/modules/export-data.js"></script>
- <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://code.highcharts.com/modules/drilldown.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
- <script src="../static/assets/libs/jquery/jquery.min.js"></script>
+<script src="../static/assets/libs/jquery/jquery.min.js"></script>
 <script>
-try{
+    try {
 
-var regression_date_graph='{{ regression_date_graph|tojson }}';
-var harmony_graph_data='{{ harmony_graph_data|tojson }}';
-var cmts_graph_data='{{ cmts_graph_data|tojson }}';
-var vccap_graph_data='{{ vccap_graph_data|tojson }}';
+        var regression_date_graph = '{{ regression_date_graph|tojson }}';
+        var harmony_graph_data = '{{ harmony_graph_data|tojson }}';
+        var cmts_graph_data = '{{ cmts_graph_data|tojson }}';
+        var vccap_graph_data = '{{ vccap_graph_data|tojson }}';
 
-var total_regression_count='{{total_regression_count}}';
-var casa_i_cmts_count='{{i_cmts_count}}';
-var harmony_count='{{harmony_count}}';
-var vccap_count='{{vccap_count}}';
+        var total_regression_count = '{{total_regression_count}}';
+        var casa_i_cmts_count = '{{i_cmts_count}}';
+        var harmony_count = '{{harmony_count}}';
+        var vccap_count = '{{vccap_count}}';
 
-var total_count = parseInt(casa_i_cmts_count)+parseInt(harmony_count)+parseInt(vccap_count)
-var casa_i_cmts_per=(parseInt(casa_i_cmts_count)/total_count)*100
-var harmony_per=(parseInt(harmony_count)/total_count)*100
-var vccap_per=(parseInt(vccap_count)/total_count)*100
+        var total_count = parseInt(casa_i_cmts_count) + parseInt(harmony_count) + parseInt(vccap_count)
+        var casa_i_cmts_per = (parseInt(casa_i_cmts_count) / total_count) * 100
+        var harmony_per = (parseInt(harmony_count) / total_count) * 100
+        var vccap_per = (parseInt(vccap_count) / total_count) * 100
 
-regression_date_graph=JSON.parse(regression_date_graph);
-harmony_graph_data=JSON.parse(harmony_graph_data);
-cmts_graph_data=JSON.parse(cmts_graph_data);
-vccap_graph_data=JSON.parse(vccap_graph_data);
-
-
-var reg_data=[]
-var harmony_data=[]
-var cmts_data=[]
-var vccap_data=[]
-var reg_date=[]
-for(var i=0;i<regression_date_graph['data'].length;i++){
-        reg_data.push(regression_date_graph['data'][i]['count'])
-        reg_date.push(regression_date_graph['data'][i]['date'])
-}
-for(var i=0;i<harmony_graph_data['data'].length;i++){
-        harmony_data.push(harmony_graph_data['data'][i]['count'])
-}
-
-for(var i=0;i<cmts_graph_data['data'].length;i++){
-        cmts_data.push(cmts_graph_data['data'][i]['count'])
-}
-for(var i=0;i<vccap_graph_data['data'].length;i++){
-        vccap_data.push(vccap_graph_data['data'][i]['count'])
-}
-}
-catch(err){
-    
-}
+        regression_date_graph = JSON.parse(regression_date_graph);
+        harmony_graph_data = JSON.parse(harmony_graph_data);
+        cmts_graph_data = JSON.parse(cmts_graph_data);
+        vccap_graph_data = JSON.parse(vccap_graph_data);
 
 
-try{
-
-    Highcharts.chart('bar_chart', {
-    chart: {
-        // type: 'column'
-        type: 'column'
-    },
-    title: {
-        text: 'Regression Report'
-    },
-    xAxis: {
-        // categories: [
-            
-        //     'Jan',
-        //     'Feb',
-        //     'Mar',
-        //     'Apr',
-        //     'May',
-        //     'Jun',
-        //     'Jul',
-        //     'Aug',
-        //     'Sep',
-        //     'Oct',
-        //     'Nov',
-        //     'Dec'
-        // ],
-        categories:reg_date,
-        crosshair: true
-    },
-    yAxis: {
-        min: 0,
-        title: {
-            text: 'Count'
+        var reg_data = []
+        var harmony_data = []
+        var cmts_data = []
+        var vccap_data = []
+        var reg_date = []
+        for (var i = 0; i < regression_date_graph['data'].length; i++) {
+            reg_data.push(regression_date_graph['data'][i]['count'])
+            reg_date.push(regression_date_graph['data'][i]['date'])
         }
-    },
-    tooltip: {
-        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
-        footerFormat: '</table>',
-        shared: true,
-        useHTML: true
-    },
-    plotOptions: {
-        column: {
-            pointPadding: 0.2,
-            borderWidth: 0
+        for (var i = 0; i < harmony_graph_data['data'].length; i++) {
+            harmony_data.push(harmony_graph_data['data'][i]['count'])
         }
-    },
-    series: [{
-        name: 'CASA I-CMTS TC Count',
-        data: cmts_data,
-        color:"#0000FF"
 
-    },{
-        name: 'Harmonic-CMTS TC Count',
-        data: harmony_data,
-        color:"#FF0000"
-
-    },{
-        name: 'VCCAP TC Count',
-        data: vccap_data,
-        color:"#FFFF00"
+        for (var i = 0; i < cmts_graph_data['data'].length; i++) {
+            cmts_data.push(cmts_graph_data['data'][i]['count'])
+        }
+        for (var i = 0; i < vccap_graph_data['data'].length; i++) {
+            vccap_data.push(vccap_graph_data['data'][i]['count'])
+        }
+    }
+    catch (err) {
 
     }
-    ]
-});
 
 
-Highcharts.chart('line_chart', {
-    
-    title: {
-        // text: 'Monthly Average Temperature'
-    },
-    subtitle: {
-        // text: 'Source: ' +
-        //     '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
-        //     'target="_blank">Wikipedia.com</a>'
-    },
-    xAxis: {
-        categories: reg_date,
-        accessibility: {
-            description: ''
-        }
-    },
-    yAxis: {
-        title: {
-            text: ''
-        },
-        labels: {
-            format: '{value}'
-        }
-    },
-    tooltip: {
-        crosshairs: true,
-        shared: true
-    },
-    plotOptions: {
-        spline: {
-            marker: {
-                radius: 4,
-                lineColor: '#666666',
-                lineWidth: 1
+    try {
+
+        Highcharts.chart('bar_chart', {
+            chart: {
+                // type: 'column'
+                type: 'column'
+            },
+            title: {
+                text: 'Regression Report'
+            },
+            xAxis: {
+                // categories: [
+
+                //     'Jan',
+                //     'Feb',
+                //     'Mar',
+                //     'Apr',
+                //     'May',
+                //     'Jun',
+                //     'Jul',
+                //     'Aug',
+                //     'Sep',
+                //     'Oct',
+                //     'Nov',
+                //     'Dec'
+                // ],
+                categories: reg_date,
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Count'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'CASA I-CMTS TC Count',
+                data: cmts_data,
+                color: "#0000FF"
+
+            }, {
+                name: 'Harmonic-CMTS TC Count',
+                data: harmony_data,
+                color: "#FF0000"
+
+            }, {
+                name: 'VCCAP TC Count',
+                data: vccap_data,
+                color: "#FFFF00"
+
             }
-        }
-    },
-    series: [{
-        name: 'CASA I-CMTS TC Count',
-        data: cmts_data,
-        color:"#0000FF"
+            ]
+        });
 
-    },{
-        name: 'Harmonic-CMTS TC Count',
-        data: harmony_data,
-        color:"#FF0000"
 
-    },{
-        name: 'VCCAP TC Count',
-        data: vccap_data,
-        color:"#FFFF00"
+        Highcharts.chart('line_chart', {
 
-    }]
-});
+            title: {
+                // text: 'Monthly Average Temperature'
+            },
+            subtitle: {
+                // text: 'Source: ' +
+                //     '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
+                //     'target="_blank">Wikipedia.com</a>'
+            },
+            xAxis: {
+                categories: reg_date,
+                accessibility: {
+                    description: ''
+                }
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                labels: {
+                    format: '{value}'
+                }
+            },
+            tooltip: {
+                crosshairs: true,
+                shared: true
+            },
+            plotOptions: {
+                spline: {
+                    marker: {
+                        radius: 4,
+                        lineColor: '#666666',
+                        lineWidth: 1
+                    }
+                }
+            },
+            series: [{
+                name: 'CASA I-CMTS TC Count',
+                data: cmts_data,
+                color: "#0000FF"
 
-Highcharts.chart('regression_pie_chart', {
-    chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
-        plotShadow: false,
-        type: 'pie'
-    },
-    title: {
-        text: 'Browser market shares in May, 2020',
-        align: 'left'
-    },
-    tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-    },
-    accessibility: {
-        point: {
-            valueSuffix: '%'
-        }
-    },
-    plotOptions: {
-        pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-                enabled: true,
-                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-            }
-        }
-    },
-    series: [{
-        name: 'Brands',
-        colorByPoint: true,
-        data: [ {
-            name: 'CASA-I-CMTS',
-            y: casa_i_cmts_per,
-            color:"#0000FF"
-        },  {
-            name: 'Harmany',
-            y: harmony_per,
-            color:"#FF0000"
-        }, {
-            name: 'vCCAP',
-            y: vccap_per,
-            color:"#FFFF00"
-        }]
-    }]
-});
+            }, {
+                name: 'Harmonic-CMTS TC Count',
+                data: harmony_data,
+                color: "#FF0000"
 
-}
-catch(err){}
+            }, {
+                name: 'VCCAP TC Count',
+                data: vccap_data,
+                color: "#FFFF00"
+
+            }]
+        });
+
+        Highcharts.chart('regression_pie_chart', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Browser market shares in May, 2020',
+                align: 'left'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                    }
+                }
+            },
+            series: [{
+                name: 'Brands',
+                colorByPoint: true,
+                data: [{
+                    name: 'CASA-I-CMTS',
+                    y: casa_i_cmts_per,
+                    color: "#0000FF"
+                }, {
+                    name: 'Harmany',
+                    y: harmony_per,
+                    color: "#FF0000"
+                }, {
+                    name: 'vCCAP',
+                    y: vccap_per,
+                    color: "#FFFF00"
+                }]
+            }]
+        });
+
+    }
+    catch (err) { }
 
 </script>
 {% endblock %}

@@ -24,6 +24,11 @@ app.config['SECRET_KEY'] = "testkey"
 
 socketio = SocketIO(app, async_mode=async_mode)
 
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
 
 def background_thread(data):
     socketio.emit('my_response',
@@ -171,6 +176,7 @@ def index():
 @login_required
 def logs():
     if request.method == "POST":
+        
         global reg_id
         reg_id=add_regression(request)
         tc = request.form.get('data')
@@ -184,12 +190,15 @@ def logs():
 def i_cmts():
     return render_template('i_cmts.html')
 
-@app.route('/harmony', methods=['GET','POST'])
+@app.route('/harmonic_cmts', methods=['GET','POST'])
 @login_required
 def harmony():
     return render_template('harmony.html')
 
-
+@app.route('/vCCAP', methods=['GET','POST'])
+@login_required
+def vccap():
+    return render_template('vCCAP.html')
 
 @app.route("/connect", methods=['GET','POST'])
 @socketio.event
@@ -213,10 +222,11 @@ def charts():
 
 
 
+@app.route("/disconnect", methods=['GET','POST'])
 @socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected')
-    emit('client disconnected','a client disconnected but I dont know who',broadcast = True)
+    emit('client disconnected','a client disconnected but I dont know who')
 
 
 @app.route("/stop", methods=['GET','POST'])
@@ -224,7 +234,9 @@ def test_disconnect():
 def stop():
     if request.method == "POST":
         # socketio.stop()
-        os.system("python -m flask run --reload")
+        shutdown_server()
+        # requests.post("http://localhost:5000/disconnect", json={"data": ""},headers = {'Content-type': 'application/json'})
+        # os.system("python -m flask run --reload")
     return Response({'msg':''})
 
 
@@ -348,7 +360,6 @@ def login():
         username = request.form['username']
         password = request.form['password']
         curr,conn=db_connection()
-        # curr.execute('SELECT * FROM user_info WHERE username = %s AND password = md5(%s)', (username, password, ))
         curr.execute('SELECT * FROM user_info WHERE username = %s', (username, ))
         account = curr.fetchone()
         if account != None:
@@ -387,8 +398,6 @@ def register():
             converted_to_bytes = password.encode('utf-8') 
             salt = bcrypt.gensalt() 
             encrypted_password = bcrypt.hashpw(converted_to_bytes, salt)
-            print("encrypted_password===",encrypted_password) 
-            print("encrypted_password===",type(encrypted_password)) 
             curr.execute('''INSERT INTO user_info(username, password) VALUES (%s, %s)''', (username, encrypted_password, ))
 
             conn.commit()
@@ -406,7 +415,9 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-
+@app.route('/test_logs/<reg_id>', methods=['GET','POST'])
+def test_logs():
+    return render_template('test_logs.html')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

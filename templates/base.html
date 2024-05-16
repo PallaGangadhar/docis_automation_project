@@ -82,9 +82,16 @@
         language: { search: "" },
         buttons: [ 'copy', 'excel', 'pdf', 'colvis' ],
         "ordering": false,
-        searching: false
+        searching: false,
+        "bStateSave": true
         
     } );
+
+    // $("#regression_details_datatable").on('page.dt', function () {
+    // var info = table.page.info();
+    // console.log(('Currently showing page ' + (info.page + 1) + ' of ' + info.pages + ' pages.'))
+    // // window.location.href = window.location.href+"?page="+(info.page + 1)
+    // });
  
     // table.buttons().container()
     //     .appendTo( '#example_wrapper .col-md-6:eq(0)' );

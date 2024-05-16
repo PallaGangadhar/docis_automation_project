@@ -13,34 +13,78 @@ def table_summary(tc_no,tc_name,status,fail_in,execution_time,tc_logs_path):
 
 def TC_1():
     print("\n\nTC_1 Called===")
-    output = """ASD-GT0003-CCAP001# show clock 
-
-    """
+    send_req("\n\n########### Test Case 2 #################\n\n")
+    output = """
+ PRIM    1ST TIME     TIMES  %                             ONLINE TIME                  OFFLINE TIME
+ SID     ONLINE       ONLINE  ONLINE  MIN         AVG         MAX         MIN         AVG         MAX
+ ------  -----------  ------  ------  ----------  ----------  ----------  ----------  ----------  ----------
+Md17:0/0.0
+      1  Apr 18 2024       2  100     0d0h0m      2d10h6m     4d20h12m    0d0h0m      0d0h0m      0d0h0m    
+      8  Apr 18 2024       1  100     0d0h0m      8d18h54m    8d18h54m    0d0h0m      0d0h0m      0d0h0m    
+      2  Apr 18 2024       5  100     0d0h0m      0d19h57m    4d3h49m     0d0h0m      0d0h0m      0d0h0m    
+      7  Apr 18 2024       1  100     0d0h0m      8d18h53m    8d18h53m    0d0h0m      0d0h0m      0d0h0m    
+      6  Apr 18 2024       1  100     0d0h0m      8d18h53m    8d18h53m    0d0h0m      0d0h0m      0d0h0m    
+      3  Apr 18 2024       1  100     0d0h0m      8d18h53m    8d18h53m    0d0h0m      0d0h0m      0d0h0m    
+      4  Apr 18 2024       1  100     0d0h0m      8d18h53m    8d18h53m    0d0h0m      0d0h0m      0d0h0m    
+      5  Apr 18 2024       1  100     0d0h0m      8d18h53m    8d18h53m    0d0h0m      0d0h0m      0d0h0m    
+Md62:0/0.0
+     41  Apr 24 2024       1  100     0d0h0m      2d22h30m    2d22h30m    0d0h0m      0d0h0m      0d0h0m    
+     37  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     63  Apr 24 2024       1  100     0d0h0m      2d22h20m    2d22h20m    0d0h0m      0d0h0m      0d0h0m    
+     61  Apr 24 2024       1  100     0d0h0m      2d22h27m    2d22h27m    0d0h0m      0d0h0m      0d0h0m    
+     52  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+     58  Apr 24 2024       1  100     0d0h0m      2d22h27m    2d22h27m    0d0h0m      0d0h0m      0d0h0m    
+     51  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+     59  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+     36  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     46  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     38  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     44  Apr 24 2024       1  100     0d0h0m      2d22h30m    2d22h30m    0d0h0m      0d0h0m      0d0h0m    
+     34  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     57  Apr 24 2024       1  100     0d0h0m      2d22h27m    2d22h27m    0d0h0m      0d0h0m      0d0h0m    
+     56  Apr 24 2024       1  100     0d0h0m      2d22h27m    2d22h27m    0d0h0m      0d0h0m      0d0h0m    
+     50  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+     54  Apr 24 2024       1  100     0d0h0m      2d22h27m    2d22h27m    0d0h0m      0d0h0m      0d0h0m    
+     49  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+     48  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+     55  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+     60  Apr 24 2024       1  100     0d0h0m      2d22h26m    2d22h26m    0d0h0m      0d0h0m      0d0h0m    
+     53  Apr 24 2024       1  100     0d0h0m      2d22h27m    2d22h27m    0d0h0m      0d0h0m      0d0h0m    
+     35  Apr 24 2024       2  100     0d0h0m      0d9h44m     0d19h28m    0d0h0m      0d0h0m      0d0h0m    
+     40  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     39  Apr 24 2024       1  100     0d0h0m      2d22h30m    2d22h30m    0d0h0m      0d0h0m      0d0h0m    
+     42  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     62  Apr 24 2024       1  100     0d0h0m      2d22h23m    2d22h23m    0d0h0m      0d0h0m      0d0h0m    
+     43  Apr 24 2024       1  100     0d0h0m      2d22h30m    2d22h30m    0d0h0m      0d0h0m      0d0h0m    
+     45  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
+     47  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
+ ==========================================================================================================="""
     tab.add_row(['Ottmar Hitzfeld', 'Borussia Dortmund, Bayern Munich','1997 and 2001'])
 
     send_req("\n\n########### Executed command: show clock #################\n\n")
 
-    for i in output.splitlines():
-        # print(i)
-        send_req(i)
+    # for i in output.splitlines():
+    #     print(i)
+    send_req(output)
 
     send_req("====== TABLE ====================")
     
     send_req("TestStep:Pass")
     table_summary("001","TC 1","FAiL","N/A","12 seconds","a.txt")
-    requests.post("http://localhost:5000/charts", json={"pass":0, "fail":1},headers = {'Content-type': 'application/json'})
+    requests.post("http://localhost:5000/charts", json={"pass":1, "fail":0},headers = {'Content-type': 'application/json'})
 
 def TC_2():
     print("\n\nTC_2 Called===")
     output = """ 
-  ASD-GT0003-CCAP001# show clock 
-    2023 June 1 07:00:46 
+  ASD-GT0003-CCAP001# TC 2 called
+    Fine!!!!
     """
     # row = ['Ernst Happel', 'Feyenoord, Hamburg', '1970 and 1983']
     tab.add_row(['Ernst Happel', 'Feyenoord, Hamburg', '1970 and 1983'])
 
     send_req("\n\n########### Test Case 2 #################\n\n")
     for i in output.splitlines():
+        print(i)
         send_req(i)
     table_summary("012","TC 2","PASS","N/A","5 seconds","a.txt")
     requests.post("http://localhost:5000/charts", json={"pass":1, "fail":0},headers = {'Content-type': 'application/json'})

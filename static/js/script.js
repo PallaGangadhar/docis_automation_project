@@ -18,12 +18,6 @@ $('#TC').on("click","button", function(){
 });
 
 $(document).ready(function () {
-    // $("#select_all").click(function () {
-    //     // $(".testcases").attr('checked', this.checked);
-    //     $(".testcases").prop('checked', $(this).prop('checked'));
-
-    // });
-    
     $('.testcases').click(function(){
         $('#select_all').prop('checked', false);
     });
@@ -66,8 +60,14 @@ $(document).ready(function() {
         else if(msg.data.includes('TestStep') == true  && msg.data.includes('FAIL') == true){
             color="red"
         }
-        $('#log').append('<div style="color:'+color+'">' + $('<div/>').text( msg.data).html());
-        $('#log').scrollTop($('#log')[0].scrollHeight);
+        var eachLine = msg.data.split('\n');
+        
+        for(var i = 0, l = eachLine.length; i < l; i++) {
+            // console.log('Line ' + (i+1) + ': ' + eachLine[i]);
+            $('#log').append('<div style="color:'+color+'">' + $('<div/>').append( eachLine[i].trim().replace(/ /g, "&nbsp;")).html());
+        }
+        // $('#log').append('<div style="color:'+color+'">' + $('<div/>').append( msg.data.trim().replace(/ /g, "&nbsp;")).html());
+        // $('#log').scrollTop($('#log')[0].scrollHeight);
         if (cb)
             cb();
     });
@@ -92,7 +92,6 @@ $(document).ready(function() {
         $('#total_fail_count').text(msg.fail_tc);
         $('#no_run_count').text(no_run);
         $('#tc_count b').text("Total TC Selected: "+total_tc_selected);
-        console.log("pass===>",pass)
         chart.series[0].setData([
             {name: msg.pass_tc +' PASS',y: pass_per,color:"#00FF00"}, 
             {name: msg.fail_tc +' FAIL',y: fail_per,color:"#FF0000"},
@@ -128,14 +127,7 @@ try{
                     text: '',
                     // align: 'cenet'
                 },
-                tooltip: {
-                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                },
-                accessibility: {
-                    point: {
-                        valueSuffix: '%'
-                    }
-                },
+               
                 plotOptions: {
                     pie: {
                         allowPointSelect: true,
@@ -147,7 +139,7 @@ try{
                     }
                 },
                 series: [{
-                    // name: 'Brands',
+                    name:null,
                     colorByPoint: true,
                     data: [{
                         name: '0 Pass',
@@ -257,6 +249,8 @@ function close_window(div_id){
     var divelement = document.getElementById(div_id);
     divelement.style.display = 'none';
 }
+
+
 function run_tc(div_id){
     var text=$('#regression_name').val();
     var cmts_type=$("input[name=cmts_type]").val()
@@ -300,9 +294,7 @@ function run_tc(div_id){
                 url:"/logs",  
                 method:"POST",  
                 data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type },  
-                success:function(){  
-                    
-                }  
+                 
             }); 
            
             
@@ -412,9 +404,11 @@ function delete_selected_regression(){
 
 try{
     var selected_value=window.location.href.split('?')[1].split('=')[1].split('&')[0]
-    // alert(selected_value);
+    var search_reg=window.location.href.split('?')[1].split('&')[1].split('=')[1]
     selected_value = selected_value.replace("+"," ")
     $("#cmts_type_filter").val(selected_value);
+    search_reg = search_reg.replace(/[+]/g,' ');
+    $("#search_reg").val(search_reg);
   }
   catch(err){
   }

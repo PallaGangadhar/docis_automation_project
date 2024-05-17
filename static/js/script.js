@@ -66,8 +66,6 @@ $(document).ready(function() {
             // console.log('Line ' + (i+1) + ': ' + eachLine[i]);
             $('#log').append('<div style="color:'+color+'">' + $('<div/>').append( eachLine[i].trim().replace(/ /g, "&nbsp;")).html());
         }
-        // $('#log').append('<div style="color:'+color+'">' + $('<div/>').append( msg.data.trim().replace(/ /g, "&nbsp;")).html());
-        // $('#log').scrollTop($('#log')[0].scrollHeight);
         if (cb)
             cb();
     });

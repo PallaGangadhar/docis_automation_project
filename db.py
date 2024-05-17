@@ -20,11 +20,11 @@ def db_connection():
 def add_regression(request):
     curr, conn=db_connection()
     regression_name = request.form.get('regression_name')
-    total_tc_selected = request.form.get('total_tc_selected')
+    total_tc_selected = request.form.get('total_tc_regressionselected')
     cmts_type = request.form.get('cmts_type')
     total_tc_select=0
     curr.execute(
-        '''INSERT INTO regression \
+        '''INSERT INTO  \
         (regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type) VALUES (%s, %s, %s, %s,%s,%s,%s) RETURNING regression_id''',
         (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type))
 
@@ -112,6 +112,31 @@ def select_query_to_get_count_details(reg_id):
 #     CONSTRAINT fk_user FOREIGN KEY(user_id)
 #         REFERENCES user_info(user_id)
    
+# );
+# CREATE TABLE IF NOT EXISTS modules_details(
+#     device_id serial,
+#     modules_id serial PRIMARY KEY,
+#     module_name text NOT NULL,
+# CONSTRAINT fk_device FOREIGN KEY(device_id)
+#         REFERENCES devices_details(device_id)
+# );
+# CREATE TABLE IF NOT EXISTS devices_details(
+#     device_id serial,
+#     device_name text NOT NULL,
+#     ip text NOT NULL,
+#     model text NOT NULL,
+#     vendor text not null,
+# PRIMARY KEY(regression_id)
+
+# );
+# CREATE TABLE IF NOT EXISTS testcase_details(
+#     testcase_id serial PRIMARY KEY,
+# modules_id serial,
+#     testcase_number text not null,
+#     testcase_name text not null,
+#     testcase_function text not null,
+# CONSTRAINT fk_module FOREIGN KEY(modules_id)
+#         REFERENCES modules_details(modules_id)
 # );
 
 # def insert()

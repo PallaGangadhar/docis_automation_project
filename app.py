@@ -176,7 +176,6 @@ def index():
 @login_required
 def logs():
     if request.method == "POST":
-        
         global reg_id
         reg_id=add_regression(request)
         tc = request.form.get('data')
@@ -194,6 +193,77 @@ def i_cmts():
 @login_required
 def harmony():
     return render_template('harmony.html')
+
+@app.route('/modules', methods=['GET','POST'])
+@login_required
+def modules():
+    curr, conn=db_connection()
+    curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
+    modules_details=curr.fetchall()
+    conn.commit()
+    curr.close()
+    conn.close()
+    return render_template('modules.html',modules_details=modules_details)
+
+@app.route('/devices', methods=['GET','POST'])
+@login_required
+def devices():
+    curr, conn=db_connection()
+    curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
+    devices_details=curr.fetchall()
+    conn.commit()
+    curr.close()
+    conn.close()
+    return render_template('device_details.html',devices_details=devices_details)
+
+@app.route('/add_modules_details', methods=['GET','POST'])
+@login_required
+def add_modules():
+    curr, conn=db_connection()
+    if request.method == "POST":
+        module = str(request.form.get('module'))
+        device_id = str(request.form.get('device_id'))
+        curr.execute('''INSERT INTO modules_details(device_id,module_name) VALUES (%s,%s)''',(device_id,module) )
+    curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
+    devices_details=curr.fetchall()
+    conn.commit()
+    curr.close()
+    conn.close()
+    
+    return render_template('add_modules.html',devices_details=devices_details)
+
+@app.route('/add_device_details', methods=['GET','POST'])
+@login_required
+def add_device_details():
+    if request.method == "POST":
+        device_name = str(request.form.get('device_name'))
+        device_ip = str(request.form.get('device_ip'))
+        model = str(request.form.get('model'))
+        vendor = str(request.form.get('vendor'))
+        curr, conn=db_connection()
+        curr.execute('''INSERT INTO devices_details(device_name,ip,model, vendor) VALUES (%s,%s,%s,%s)''',(device_name,device_ip, model, vendor) )
+        conn.commit()
+        curr.close()
+        conn.close()
+    return render_template('add_device_details.html')
+
+@app.route('/add_testcase_details', methods=['GET','POST'])
+@login_required
+def add_testcase_details():
+    curr, conn=db_connection()
+    if request.method == "POST":
+        module_id = str(request.form.get('module_id'))
+        testcase_number = str(request.form.get('testcase_number'))
+        testcase_name = str(request.form.get('testcase_name'))
+        testcase_function = str(request.form.get('testcase_function'))
+        curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function) VALUES (%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function) )
+    curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
+    modules_details=curr.fetchall()
+    conn.commit()
+    curr.close()
+    conn.close()
+    
+    return render_template('add_testcase_details.html',modules_details=modules_details)
 
 @app.route('/vCCAP', methods=['GET','POST'])
 @login_required

@@ -1,25 +1,25 @@
-
 {% extends 'base.html' %}
 {%block content%}
 
-<div>   
+<div>
   <!-- main body -->
-<div class="row">
-  <div class="col-xl-12 mb-30">
-    <div class="table-card table-card-statistics h-100">
-      <div class="table-card-body">
-        <div class="d-block d-md-flex justify-content-between alert alert-success">
-          <!-- <div class="d-block">  -->
-              <span class="fs-16 fst-italic">Regression Details</span>
-          <!-- </div> -->
-        </div>
-        <div class="p-3 regression_scroll_table div_shadow" >
-          <form id="search_form" method="GET" action="/view_regression_details">
-            <div class="row">
+  <div class="row">
+    <div class="col-xl-12 mb-30">
+      <div class="table-card table-card-statistics h-100">
+        <div class="table-card-body">
+          <div class="d-block d-md-flex justify-content-between alert alert-success">
+            <!-- <div class="d-block">  -->
+            <span class="fs-16 fst-italic">Regression Details</span>
+            <!-- </div> -->
+          </div>
+          <div class="p-3 regression_scroll_table div_shadow">
+            <form id="search_form" method="GET" action="/view_regression_details">
+              <div class="row">
 
                 <div class="col-sm-2 col-md-2">
-                  
-                  <select name="cmts_type_dropdown" class="form-select form-select-lg  form-select-sm mb-3" id="cmts_type_filter">
+
+                  <select name="cmts_type_dropdown" class="form-select form-select-lg  form-select-sm mb-3"
+                    id="cmts_type_filter">
                     <option name="" class="form-control" value="">--SELECT--</option>
                     {% for type in c_type %}
                     <option name="{{type}}" value="{{type}}" class="form-control">{{type}}</option>
@@ -27,73 +27,79 @@
                   </select>
                 </div>
                 <div class="col-sm-2 col-md-2">
-                    <input type="text" class="form-control" name="search_reg" placeholder="Enter regression name"  id="search_reg">
+                  <input type="text" class="form-control" name="search_reg" placeholder="Enter regression name"
+                    id="search_reg">
                 </div>
                 <div class="col-sm-2 col-md-8">
-                  <input type="submit" id="search_regression" class="btn btn-primary" value="Search"/>
-                  <input type="button" class="btn btn-primary" value="Clear Fiter" onclick="clear_filter()"/>
-                  <input type="button" class="btn btn-primary" value="Delete Selected Regression" onclick="delete_selected_regression()" />
+                  <input type="submit" id="search_regression" class="btn btn-primary" value="Search" />
+                  <input type="button" class="btn btn-primary" value="Clear Fiter" onclick="clear_filter()" />
+                  <input type="button" class="btn btn-primary" value="Delete Selected Regression"
+                    onclick="delete_selected_regression()" />
                 </div>
-              
-              </div>
-          </form>
 
-          <div> 
-            <table class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey" id="regression_details_datatable">
-              
+              </div>
+            </form>
+
+            <div>
+              <table
+                class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey"
+                id="regression_details_datatable">
+
                 <thead class="table-light text-center">
-                <tr class="text-dark">
-                  <th>Regression Name</th>
-                  <th>Total TC</th>
-                  <th>Pass TC</th>
-                  <th>Fail TC</th>
-                  <th>No Run TC</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                  
-                  <!-- <th></th> -->
-                </tr>
-              </thead>
-              <tbody class="text-center" id="reg_report">
-                {% for reg_details in regression_details %}
-                <tr class="fs-14">
-                
-                  <td>{{reg_details[1]}}</td>
-                  <td>{{reg_details[5]}}</td>
-                  <td>{{reg_details[2]}}</td>
-                  <td>{{reg_details[3]}}</td>
-                  <td>{{reg_details[4]}}</td>
-                  <td>
-                    {% if reg_details[7] == 'Completed' %}
+                  <tr class="text-dark">
+                    <th>Regression Name</th>
+                    <th>Total TC</th>
+                    <th>Pass TC</th>
+                    <th>Fail TC</th>
+                    <th>No Run TC</th>
+                    <th>Status</th>
+                    <th>Action</th>
+
+                    <!-- <th></th> -->
+                  </tr>
+                </thead>
+                <tbody class="text-center" id="reg_report">
+                  {% for reg_details in regression_details %}
+                  <tr class="fs-14">
+
+                    <td>{{reg_details[1]}}</td>
+                    <td>{{reg_details[5]}}</td>
+                    <td>{{reg_details[2]}}</td>
+                    <td>{{reg_details[3]}}</td>
+                    <td>{{reg_details[4]}}</td>
+                    <td>
+                      {% if reg_details[7] == 'Completed' %}
                       <label class="btn btn-outline-success btn-sm">{{reg_details[7]}}</label>
-                    {% else %}
-                    <label class="btn btn-outline-danger btn-sm">In Progress</label>
-                    {% endif %}
-                  </td>
-                  <td>
-                    <a href="view_tc_logs_details/{{reg_details[0]}}" class="btn btn-outline-warning btn-sm">View TC details</a>
-                    <span class="btn btn-sm  open-ConfirmationDialog"  data-bs-toggle="modal" data-id="{{reg_details[0]}}" data-bs-target="#myModal">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
-                    </span>
-                    
-                    <input type="checkbox" class="reg_box" name="reg_box" value="{{reg_details[0]}}"/>
-                  </td>
-                </tr>
+                      {% else %}
+                      <label class="btn btn-outline-danger btn-sm">In Progress</label>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="view_tc_logs_details/{{reg_details[0]}}" class="btn btn-outline-warning btn-sm">View TC
+                        details</a>
+                      <span class="btn btn-sm  open-ConfirmationDialog" data-bs-toggle="modal"
+                        data-id="{{reg_details[0]}}" data-bs-target="#myModal">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </span>
+
+                      <input type="checkbox" class="reg_box" name="reg_box" value="{{reg_details[0]}}" />
+                    </td>
+                  </tr>
                   {% endfor %}
-                
-                
-              </tbody>
-            </table>
-          </div>   
+
+
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!--=================================
+  <!--=================================
 footer -->
-<!--=================================
+  <!--=================================
 footer -->
 </div>
 
@@ -130,6 +136,6 @@ footer -->
 
 
 <script>
-  
+
 </script>
 {% endblock %}

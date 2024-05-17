@@ -48,14 +48,27 @@
                     <a class="dropdown-item" href="/i_cmts">CASA I-CMTS</a>
                     <a class="dropdown-item" href="/harmonic_cmts">Harmonic CMTS</a>
                     <a class="dropdown-item" href="/vCCAP">vCCAP CMTS</a>
-                </div>
-                <div class="dropdown d-none d-lg-inline-block ms-1">
-                    <button type="button" class="btn header-item noti-icon waves-effect">
-                        <span class="d-none d-xl-inline-block ms-1 f-16 text-white" key="t-henry">
-                            <a class="dropdown-item" href="/logout">Logout</a></span>
-                    </button>
-                </div>
+                </div>  
             </div>
+            <div class="dropdown d-inline-block">
+                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-cog settings"  aria-hidden="true"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <!-- item-->
+                    <a class="dropdown-item" href="/modules">Modules</a>
+                    <a class="dropdown-item" href="/devices">Devices</a>
+                    <a class="dropdown-item" href="/add_testcase_details">TestCases</a>
+                </div>        
+            </div>
+            <div class="dropdown d-none d-lg-inline-block ms-1">
+                <button type="button" class="btn header-item noti-icon waves-effect">
+                    <span class="d-none d-xl-inline-block ms-1 f-16 text-white" key="t-henry">
+                        <a class="dropdown-item" href="/logout">Logout</a></span>
+                </button>
+            </div>
+            
         {% endif %}
          
 

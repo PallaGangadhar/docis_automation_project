@@ -700,6 +700,10 @@ input[aria-invalid="true"] {
   background-color: #45e9a5;
 }
 
+.settings {
+  color: wheat;
+  font-size: 24px;
+}
 
 @media (min-width: 768px){
 .d-md-flex {

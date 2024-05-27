@@ -45,9 +45,12 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <!-- item-->
-                    <a class="dropdown-item" href="/i_cmts">CASA I-CMTS</a>
+                    <!-- <a class="dropdown-item" href="/i_cmts">CASA I-CMTS</a>
                     <a class="dropdown-item" href="/harmonic_cmts">Harmonic CMTS</a>
-                    <a class="dropdown-item" href="/vCCAP">vCCAP CMTS</a>
+                    <a class="dropdown-item" href="/vCCAP">vCCAP CMTS</a> -->
+                    {% for details in devices_details %}
+                        <a class="dropdown-item" href="/tc_execution/{{details[0]}}">{{details[1]}}</a>
+                    {% endfor %}
                 </div>  
             </div>
             <div class="dropdown d-inline-block">

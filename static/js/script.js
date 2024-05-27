@@ -213,15 +213,14 @@ function select_testcases(){
     $("input:checkbox[name='modules[]']:not(:checked)").each(function(){   
         unchecked_module = $(this).attr("id");
         uncheckboxes_value.push($(this).attr("id"));
-        $("#show_"+unchecked_module).css('display','none');
+        $(".show_"+unchecked_module).css('display','none');
         
     });
     for(let i=0.;i<modules.length;i++){
         module_id = modules[i].replace ( /[^\d.]/g, '' );
         module_id_arr.push(module_id)
-        
         if ($("#module_"+module_id).is(":checked") == true){
-            $("#show_module_"+module_id).css('display','block');
+            $(".show_module_"+module_id).css('display','block');
             $("#tc_select").css('display','block');
             uncheckboxes_value=removeDuplicates(uncheckboxes_value)
             remove_err_ele(uncheckboxes_value, modules[i]);
@@ -287,7 +286,7 @@ function run_tc(div_id){
             $('#check_tc').prop('disabled', true);
             $('#tc_count b').text("Total TC Selected: "+total_tc_selected);
             $('#total_tc_count').text(total_tc_selected);
-           
+            console.log(total_tc_selected)
             $.ajax({  
                 url:"/logs",  
                 method:"POST",  

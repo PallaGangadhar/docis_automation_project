@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<!-- ========== Left Sidebar Start ========== -->
+
+
+<div class="h-100 d-flex   ">
+  
+  <div class="side-section">
+    <!-- Left menu-->
+    <input type="checkbox" id="check" class="d-none">
+
+    <div class="mainmenu h-100 list-unstyled bg-black d-flex flex-column justify-content-between p-2 d-md-block d-lg-block d-sm-block" >
+      <div class="overflow-auto"> <!--First -->
+        <li class="text-black fs-5 mb-2  alert alert-success" key="t-pages">Modules List</li>
+        <div id="module" class="scroll">
+          <div class="form-check checkbox_font">
+            <input type="checkbox" class="form-check-input" id="select_module">
+            <label class="form-check-label text-white fs-6" for="check1">Select Module</label>
+          </div>
+          {% for details in modules_details %}
+          <div class="form-check checkbox_font">
+            <input type="checkbox" class="form-check-input modules" name="modules[]" value="{{details[0]}}" id="module_{{details[1]}}">
+            <label class="form-check-label text-white fs-6" for="check1">{{details[2]}}</label>
+          </div>
+          {% endfor %}
+        
+
+        </div>
+        <!--First -->
+      </div>
+      <div class=" ">
+        <!--Second -->
+
+        <li class="text-black fs-5 nb-2  mt-2   alert alert-success" key="t-pages">TestCase List</li>
+        <div id="testcase_details" class="scroll">
+
+          <div class="form-check checkbox_font" style="display: none;" id="tc_select">
+            <input type="checkbox" class="form-check-input" id="select_all">
+            <label class="form-check-label text-white fs-6" for="check1">Select All</label>
+          </div>
+         
+          {% for tc in testcase_details %}
+          <div class="show_module_{{tc[1]}}" style="display:none;">
+            <div class="form-check checkbox_font">
+              <input type="checkbox" class="form-check-input testcases" name="testcase_module_{{tc[1]}}[]" value="{{tc[4]}}">
+              <label class="form-check-label truncate-cell text-white fs-6" for="check1" data-toggle="tooltip"
+                data-placement="bottom" title="Module TC 1 run show clock command">{{tc[3]}}</label>
+            </div>
+            
+          </div>
+          {% endfor %}
+
+         
+        </div>
+        <!--Second -->
+
+      </div>
+      <div class="mb-1">
+        <div class="button-section d-flex align-item-center justify-content-between ">
+          <button type="button" class="btn btn-success" onclick="show_modal('exampleModal');"
+            id="check_tc">Run</button>
+          <button type="button" id="stop" class=" btn btn-success" disabled>Stop</button>
+          <button type="button" id="clear_logs" class=" btn btn-success" disabled>Clear Logs</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex-grow-1 overflow-auto ">
+    <div class="p-2">
+      {% include 'logs.html' %}
+    </div>
+  </div>
+</div>
+
+
+<!-- Left Sidebar End -->
+
+
+
+<!-- END layout-wrapper -->
+
+
+<!-- Right bar overlay-->
+<div class="rightbar-overlay"></div>
+
+<!-- Add Regression Modal -->
+<div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          onclick="close_window('exampleModal')"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" placeholder="Enter Regression name" id="regression_name" />
+        <input type="hidden" class="form-control" name="cmts_type" placeholder="Enter Regression name" id=""
+          value="{{device_name}}" />
+          <!-- value="CASA I-CMTS" /> -->
+      </div>
+      <div class="modal-footer">
+        <!-- <button type="button" class="btn btn-primary" id="run" onclick="run_tc('exampleModal');">Save</button> -->
+        <button type="submit" class="btn btn-primary" id="run" onclick="run_tc('exampleModal');">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+</script>
+{% endblock %}

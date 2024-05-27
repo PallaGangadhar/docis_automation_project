@@ -50,7 +50,6 @@ def send_chart_details(data):
 @app.route('/', methods=['GET','POST'])
 @login_required
 def index():
-    print("s===",session.get("loggedin"))
     total_regression_count = i_cmts_count = harmony_count=vccap_count=0
     graph_data={}
     harmony_graph_data={}
@@ -67,7 +66,7 @@ def index():
     from_date = request.args.get('from_date')
     to_date = request.args.get('to_date')
     flag=False
-
+    
     if from_date != "" and to_date != "" and from_date != None and to_date != None:
         if from_date > to_date:
             flag=True
@@ -85,6 +84,8 @@ def index():
         curr.execute('SELECT count(*) FROM regression')
         total_regression_count=curr.fetchone()
         total_regression_count=total_regression_count[0]
+        curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
+        devices_details=curr.fetchall()
 
         curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'CASA I-CMTS'"'')
         i_cmts_count = curr.fetchone()
@@ -165,7 +166,7 @@ def index():
         conn.commit()
         curr.close()
         conn.close()
-        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,vccap_graph_data=vccap_graph_data,vccap_count=vccap_count)
+        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,vccap_graph_data=vccap_graph_data,vccap_count=vccap_count,devices_details=devices_details)
 
     else:
         return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,vccap_count=vccap_count,vccap_graph_data=vccap_graph_data,error_message=True)
@@ -184,10 +185,21 @@ def logs():
         call_after_execution(reg_id)
     return render_template('logs.html')
 
-@app.route('/i_cmts', methods=['GET','POST'])
+@app.route('/tc_execution/<int:device_id>', methods=['GET','POST'])
 @login_required
-def i_cmts():
-    return render_template('i_cmts.html')
+def tc_execution(device_id):
+    curr, conn=db_connection()
+    curr.execute(f"SELECT * FROM modules_details where device_id={device_id}")
+    modules_details=curr.fetchall()
+    curr.execute(f"SELECT * FROM testcase_details WHERE modules_id in (SELECT modules_id FROM modules_details where device_id={device_id} )")
+    testcase_details = curr.fetchall()
+    curr.execute(f"SELECT * FROM devices_details where device_id={device_id}")
+    device_name = curr.fetchone()
+    device_name = device_name[1]
+    conn.commit()
+    curr.close()
+    conn.close()
+    return render_template('tc_execution.html',modules_details=modules_details,testcase_details=testcase_details,device_name=device_name)
 
 @app.route('/harmonic_cmts', methods=['GET','POST'])
 @login_required
@@ -290,8 +302,6 @@ def charts():
     else:
         return render_template('charts.html')
 
-
-
 @app.route("/disconnect", methods=['GET','POST'])
 @socketio.on('disconnect')
 def test_disconnect():
@@ -361,7 +371,6 @@ def view_regression_details():
 @app.route("/view_tc_logs_details/<int:reg_id>", methods=['GET','POST'])
 def view_tc_logs_details(reg_id):
     curr,conn=db_connection()
-    # curr.execute(f'SELECT regression_logs_details.*,regression.summary_path FROM regression_logs_details,regression WHERE regression_logs_details.regression_id={reg_id} and regression.regression_id=regression_logs_details.regression_id')
     curr.execute(f'SELECT * FROM regression_logs_details WHERE regression_id={reg_id}')
     tc_logs_details=curr.fetchall()
     curr.execute(f"SELECT summary_path FROM regression WHERE regression_id={reg_id}")

@@ -15,18 +15,19 @@ POSTGRES_PORT=os.environ.get('POSTGRES_PORT')
 def db_connection():
     conn = psycopg2.connect(f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOSTNAME}:{POSTGRES_PORT}/{DB_NAME}")
     curr = conn.cursor()
+    print("Curr===", curr)
     return curr, conn
+
 
 def add_regression(request):
     curr, conn=db_connection()
     regression_name = request.form.get('regression_name')
-    total_tc_selected = request.form.get('total_tc_regressionselected')
+    total_tc_selected = request.form.get('total_tc_selected')
     cmts_type = request.form.get('cmts_type')
-    total_tc_select=0
-    curr.execute(
-        '''INSERT INTO  \
-        (regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type) VALUES (%s, %s, %s, %s,%s,%s,%s) RETURNING regression_id''',
-        (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type))
+    r_id=0
+    curr.execute('''INSERT INTO regression(regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type) VALUES (%s, %s, %s, %s,%s,%s,%s) RETURNING regression_id''',
+                  (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type))
+
 
     r_id = curr.fetchone()
     conn.commit()
@@ -35,7 +36,6 @@ def add_regression(request):
     r_id=str(r_id[0])
     return r_id
         
-
 
 def update_regression(pass_tc,fail_tc,r_id):
     curr, conn=db_connection()
@@ -98,6 +98,9 @@ def select_query_to_get_count_details(reg_id):
     curr.close()
     conn.close()
     return pass_count, fail_count, total_count,no_run
+
+
+
 
 # CREATE TABLE IF NOT EXISTS user_info(
 #     user_id serial,

@@ -44,10 +44,6 @@
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block f-16 text-white"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <!-- item-->
-                    <!-- <a class="dropdown-item" href="/i_cmts">CASA I-CMTS</a>
-                    <a class="dropdown-item" href="/harmonic_cmts">Harmonic CMTS</a>
-                    <a class="dropdown-item" href="/vCCAP">vCCAP CMTS</a> -->
                     {% for details in devices_details %}
                         <a class="dropdown-item" href="/tc_execution/{{details[0]}}">{{details[1]}}</a>
                     {% endfor %}
@@ -60,9 +56,9 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
                     <!-- item-->
-                    <a class="dropdown-item" href="/modules">Modules</a>
                     <a class="dropdown-item" href="/devices">Devices</a>
-                    <a class="dropdown-item" href="/add_testcase_details">TestCases</a>
+                    <a class="dropdown-item" href="/modules">Modules</a>
+                    <a class="dropdown-item" href="/testcase_details">TestCases</a>
                 </div>        
             </div>
             <div class="dropdown d-none d-lg-inline-block ms-1">

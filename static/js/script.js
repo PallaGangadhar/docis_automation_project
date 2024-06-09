@@ -251,6 +251,7 @@ function close_window(div_id){
 function run_tc(div_id){
     var text=$('#regression_name').val();
     var cmts_type=$("input[name=cmts_type]").val()
+    var device_id=$("input[name=device_id]").val()
     $('#tc_status').text("In Progres");
     if(text==""){
         alert('Please enter regression name...')
@@ -290,7 +291,7 @@ function run_tc(div_id){
             $.ajax({  
                 url:"/logs",  
                 method:"POST",  
-                data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type },  
+                data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type,"device_id":device_id },  
                  
             }); 
            

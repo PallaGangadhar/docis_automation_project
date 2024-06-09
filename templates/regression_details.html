@@ -62,14 +62,14 @@
                   {% for reg_details in regression_details %}
                   <tr class="fs-14">
 
-                    <td>{{reg_details[1]}}</td>
-                    <td>{{reg_details[5]}}</td>
                     <td>{{reg_details[2]}}</td>
+                    <td>{{reg_details[6]}}</td>
                     <td>{{reg_details[3]}}</td>
                     <td>{{reg_details[4]}}</td>
+                    <td>{{reg_details[5]}}</td>
                     <td>
-                      {% if reg_details[7] == 'Completed' %}
-                      <label class="btn btn-outline-success btn-sm">{{reg_details[7]}}</label>
+                      {% if reg_details[8] == 'Completed' %}
+                      <label class="btn btn-outline-success btn-sm">{{reg_details[8]}}</label>
                       {% else %}
                       <label class="btn btn-outline-danger btn-sm">In Progress</label>
                       {% endif %}

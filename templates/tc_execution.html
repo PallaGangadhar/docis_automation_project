@@ -26,8 +26,6 @@
             <label class="form-check-label text-white fs-6" for="check1">{{details[2]}}</label>
           </div>
           {% endfor %}
-        
-
         </div>
         <!--First -->
       </div>
@@ -98,11 +96,11 @@
       <div class="modal-body">
         <input type="text" class="form-control" placeholder="Enter Regression name" id="regression_name" />
         <input type="hidden" class="form-control" name="cmts_type" placeholder="Enter Regression name" id=""
-          value="{{device_name}}" />
-          <!-- value="CASA I-CMTS" /> -->
+          value="{{device_details[1]}}" />
+          <input type="hidden" class="form-control" name="device_id" id=""
+          value="{{device_details[0]}}" />
       </div>
       <div class="modal-footer">
-        <!-- <button type="button" class="btn btn-primary" id="run" onclick="run_tc('exampleModal');">Save</button> -->
         <button type="submit" class="btn btn-primary" id="run" onclick="run_tc('exampleModal');">Save</button>
       </div>
     </div>

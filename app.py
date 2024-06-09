@@ -38,6 +38,7 @@ def background_thread(data):
 def send_chart_details(data):
     pass_tc = data.get('pass')
     fail_tc = data.get('fail')
+    print("pass tc===", pass_tc)
     p=0
     f=0
     pass_count, fail_count, total_count,no_run = select_query_to_get_count_details(reg_id)
@@ -50,19 +51,13 @@ def send_chart_details(data):
 @app.route('/', methods=['GET','POST'])
 @login_required
 def index():
-    total_regression_count = i_cmts_count = harmony_count=vccap_count=0
+    total_regression_count = 0
     graph_data={}
-    harmony_graph_data={}
-    cmts_graph_data={}
-    vccap_graph_data={}
+
     data1=[]
-    data2=[]
-    data3=[]
-    data4=[]
+   
     dates=[]
-    h_date=[]
-    c_date=[]
-    vc_date=[]
+  
     from_date = request.args.get('from_date')
     to_date = request.args.get('to_date')
     flag=False
@@ -81,95 +76,84 @@ def index():
         curr, conn=db_connection()
         curr.execute('SELECT * FROM regression')
         sample_data=curr.fetchone()
-        curr.execute('SELECT count(*) FROM regression')
+        curr.execute('SELECT count(regression_logs_details.log_id) from  regression_logs_details')
         total_regression_count=curr.fetchone()
         total_regression_count=total_regression_count[0]
         curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
         devices_details=curr.fetchall()
 
-        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'CASA I-CMTS'"'')
-        i_cmts_count = curr.fetchone()
-        i_cmts_count = i_cmts_count[0]
-
-        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmonic CMTS'"'')
-        harmony_count = curr.fetchone()
-        harmony_count = harmony_count[0]
-
-        curr.execute('SELECT count(regression_logs_details.*) from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'vCCAP'"'')
-        vccap_count = curr.fetchone()
-        vccap_count = vccap_count[0]
-
+      
+        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details INNER JOIN regression ON regression.regression_id = regression_logs_details.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
+        devices_regression_count = curr.fetchall()
+        
         if from_date == None and to_date == None or from_date == "" and to_date == "":
             curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
             regression_graph=curr.fetchall()
             
-            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'Harmonic CMTS'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
-            harmony_graph=curr.fetchall()
+            curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC')
+            graph_details = curr.fetchall()
 
-            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'CASA I-CMTS'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
-            cmts_graph=curr.fetchall()
+            curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY  devices_details.device_name')
+            pie_chart_details = curr.fetchall()
 
-            curr.execute('SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='"'vCCAP'"' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC')
-            vccap_graph=curr.fetchall()
         
         elif from_date != None and to_date != None  and from_date != "" and to_date != "":
             to_date=convert_str_to_date(to_date,"%Y-%m-%d")+datetime.timedelta(days=1)
             to_date=convert_date_to_str(to_date,"%Y-%m-%d")
             curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
             regression_graph=curr.fetchall()
-            
-            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='Harmonic CMTS' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
-            harmony_graph=curr.fetchall()
-            
-            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='CASA I-CMTS' AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
-            cmts_graph=curr.fetchall()
-
-            curr.execute(f"SELECT count(regression_logs_details.regression_id),DATE(regression.date_added) as reg_date from regression_logs_details, regression WHERE regression_logs_details.regression_id=regression.regression_id and regression.cmts_type='vCCAP'  AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added) ORDER BY reg_date DESC")
-            vccap_graph=curr.fetchall()
-        
-        
+           
         
         for i in regression_graph:   
-            # date=i[1].strftime("%d-%m-%Y")
             date=i[1].strftime("%Y-%m-%d")
             data1.append({'date':date,'count':i[0]})
             dates.append(date)
         graph_data['data']=data1
-
-        for i in harmony_graph:  
-            date=i[1].strftime("%Y-%m-%d")
-            h_date.append(date) 
-            data2.append({'date':date,'count':i[0]})
-        
-    
-        data2=genearate_list_of_dict(dates,h_date,data2)
-        harmony_graph_data['data']=data2
-    
-        for i in cmts_graph:    
-            date=i[1].strftime("%Y-%m-%d")
-            c_date.append(date)
-            data3.append({'date':date,'count':i[0]})
         
 
-        data3=genearate_list_of_dict(dates,c_date,data3)
-        cmts_graph_data['data']=data3
-
-        for i in vccap_graph:    
-            date=i[1].strftime("%Y-%m-%d")
-            vc_date.append(date)
-            data4.append({'date':date,'count':i[0]})
         
 
-        data4=genearate_list_of_dict(dates,vc_date,data4)
-        vccap_graph_data['data']=data4
+        new_data =[]
+        
+        for graph_detail in graph_details:
+            dt=convert_date_to_str(graph_detail[2],"%Y-%m-%d")
+            new_data.append({'date':dt, 'data':[graph_detail[1]],'name':graph_detail[0]})
+   
+        for dt in range(0, len(new_data),1):
+            for ct in range(0, len(dates),1):
+                if dates[ct] not in new_data[dt]['date']:
+                    new_data[dt]['data'].insert(ct,0)
+
+        new_graph_data={}
+        new_graph_list_data=[]
+        
+        for i in range(0,len(new_data),1):
+            if new_data[i]['name'] in new_graph_data.keys():
+                new_graph_data[new_data[i]['name']].append(new_data[i]['data'])
+            else:
+                new_graph_data[new_data[i]['name']] = [new_data[i]['data']]
+        
+        new_data_2 ={}
+        new_graph_data = [new_graph_data]
+        for k in range(0,len([new_graph_data]),1):
+            for i in new_graph_data[0].keys():
+                output_list = [sum(pair) for pair in zip(*new_graph_data[k][i])]
+                new_graph_list_data.append({'name':i,'data':output_list}) 
+
+        new_data_2['data'] = new_graph_list_data
+        pie_chart = []
+        for pie in pie_chart_details:
+            per = (pie[1]/total_regression_count)*100
+            pie_chart.append({'name':pie[0], 'y':round(per,2)})
+
 
         conn.commit()
         curr.close()
         conn.close()
-        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,vccap_graph_data=vccap_graph_data,vccap_count=vccap_count,devices_details=devices_details)
+        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart)
 
     else:
-        return render_template('index.html',total_regression_count=total_regression_count,i_cmts_count=i_cmts_count,harmony_count=harmony_count,regression_date_graph=graph_data,harmony_graph_data=harmony_graph_data,cmts_graph_data=cmts_graph_data,vccap_count=vccap_count,vccap_graph_data=vccap_graph_data,error_message=True)
+        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,error_message=True,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart)
 
 
 
@@ -194,12 +178,12 @@ def tc_execution(device_id):
     curr.execute(f"SELECT * FROM testcase_details WHERE modules_id in (SELECT modules_id FROM modules_details where device_id={device_id} )")
     testcase_details = curr.fetchall()
     curr.execute(f"SELECT * FROM devices_details where device_id={device_id}")
-    device_name = curr.fetchone()
-    device_name = device_name[1]
+    device_details = curr.fetchone()
+    
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('tc_execution.html',modules_details=modules_details,testcase_details=testcase_details,device_name=device_name)
+    return render_template('tc_execution.html',modules_details=modules_details,testcase_details=testcase_details,device_details=device_details)
 
 @app.route('/harmonic_cmts', methods=['GET','POST'])
 @login_required
@@ -227,6 +211,17 @@ def devices():
     curr.close()
     conn.close()
     return render_template('device_details.html',devices_details=devices_details)
+
+@app.route('/testcase_details', methods=['GET','POST'])
+@login_required
+def testcase_details():
+    curr, conn=db_connection()
+    curr.execute(f"SELECT * FROM testcase_details ORDER BY testcase_id DESC")
+    testcase_details=curr.fetchall()
+    conn.commit()
+    curr.close()
+    conn.close()
+    return render_template('testcase_details.html',testcase_details=testcase_details)
 
 @app.route('/add_modules_details', methods=['GET','POST'])
 @login_required

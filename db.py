@@ -15,7 +15,6 @@ POSTGRES_PORT=os.environ.get('POSTGRES_PORT')
 def db_connection():
     conn = psycopg2.connect(f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_HOSTNAME}:{POSTGRES_PORT}/{DB_NAME}")
     curr = conn.cursor()
-    print("Curr===", curr)
     return curr, conn
 
 
@@ -24,9 +23,10 @@ def add_regression(request):
     regression_name = request.form.get('regression_name')
     total_tc_selected = request.form.get('total_tc_selected')
     cmts_type = request.form.get('cmts_type')
+    device_id = request.form.get('device_id')
     r_id=0
-    curr.execute('''INSERT INTO regression(regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type) VALUES (%s, %s, %s, %s,%s,%s,%s) RETURNING regression_id''',
-                  (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type))
+    curr.execute('''INSERT INTO regression(regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type,device_id) VALUES (%s, %s, %s, %s,%s,%s,%s,%s) RETURNING regression_id''',
+                  (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type,device_id))
 
 
     r_id = curr.fetchone()
@@ -41,11 +41,10 @@ def update_regression(pass_tc,fail_tc,r_id):
     curr, conn=db_connection()
     curr.execute(f'SELECT * FROM regression WHERE regression_id={r_id}')
     query_data=curr.fetchone()
-    print(query_data)
-    pass_count=query_data[2]
-    fail_count=query_data[3]
-    no_run_count=query_data[4]
-    total_count=query_data[5]
+    pass_count=query_data[3]
+    fail_count=query_data[4]
+    no_run_count=query_data[5]
+    total_count=query_data[6]
 
     pass_count+=pass_tc
     fail_count+=fail_tc
@@ -90,10 +89,10 @@ def select_query_to_get_count_details(reg_id):
     curr,conn=db_connection()
     curr.execute(f"SELECT * FROM regression WHERE regression_id={reg_id}")
     query_data=curr.fetchone()
-    pass_count=query_data[2]
-    fail_count=query_data[3]
-    no_run=query_data[4]
-    total_count=query_data[5]
+    pass_count=query_data[3]
+    fail_count=query_data[4]
+    no_run=query_data[5]
+    total_count=query_data[6]
     conn.commit()
     curr.close()
     conn.close()
@@ -202,6 +201,7 @@ def select_query_to_get_count_details(reg_id):
 
 # CREATE TABLE IF NOT EXISTS regression(
 #     regression_id serial,
+#     device_id serial,
 #     regression_name text NOT NULL, 
 #     pass_count integer NOT NULL,
 #     fail_count integer NOT NULL,
@@ -212,6 +212,8 @@ def select_query_to_get_count_details(reg_id):
 #     cmts_type varchar(1000),
 #     date_added timestamp DEFAULT CURRENT_TIMESTAMP,
 #     PRIMARY KEY(regression_id)
+# CONSTRAINT fk_device FOREIGN KEY(device_id)
+#         REFERENCES devices_details(device_id)
 
 # );
 

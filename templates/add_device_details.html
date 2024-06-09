@@ -14,27 +14,35 @@
           </div>
           <div class="p-3 regression_scroll_table div_shadow">
             <form name="" action="/add_device_details" method="post">
-              <div class="row">
-                <div class="col-sm-2 col-md-8">
-                  <input type="text" class="form-control" name="device_name" placeholder="Add Device Name"/>
-                </div>
-                <div class="col-sm-2 col-md-8">
-                  <input type="text" class="form-control" name="device_ip" placeholder="Add Device IP"/>
-                </div>
-                <div class="col-sm-2 col-md-8">
-                  <input type="text" class="form-control" name="model" placeholder="Add Model"/>
-                </div>
-                
-                <div class="col-sm-2 col-md-8">
-                  <input type="text" class="form-control" name="vendor" placeholder="Add Venfdor"/>
-                </div>
 
+              <div class="row d-flex justify-content-center mb-2">
+                <div class="col-sm-4 col-md-4">
+                  <input type="text" class="form-control" name="device_name" placeholder="Add Device Name" required/>
+                </div>
               </div>
-              <div class="row">
-                <div class="col-sm-2 col-md-2">
+              <div class="row d-flex justify-content-center mb-2">
+                <div class="col-sm-4 col-md-4">
+                  <input type="text" class="form-control" name="device_ip" placeholder="Add Device IP" required/>
+                </div>
+              </div>
+              <div class="row d-flex justify-content-center mb-2">
+                <div class="col-sm-2 col-md-4">
+                  <input type="text" class="form-control" name="model" placeholder="Add Model" required/>
+                </div>
+              </div>
+              <div class="row d-flex justify-content-center mb-2">
+                <div class="col-sm-2 col-md-4">
+                  <input type="text" class="form-control" name="vendor" placeholder="Add Vendor" required/>
+                </div>
+              </div>
+              <div class="row d-flex justify-content-center">
+                <div class="col-sm-4 col-md-4">
                   <input type="submit" class="btn btn-primary" />
                 </div>
               </div>
+              </div>
+            
+              
             </form>
 
             <div>

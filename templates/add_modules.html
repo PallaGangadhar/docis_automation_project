@@ -14,25 +14,30 @@
           </div>
           <div class="p-3 regression_scroll_table div_shadow">
             <form name="" action="/add_modules_details" method="post">
-              <div class="row">
-                <div class="col-sm-2 col-md-8">
-                  <input type="text" class="form-control" name="module" placeholder="Add Module Name" />
+              <div class="row  d-flex justify-content-center mb-2">
+                <div class="col-sm-4 col-md-4">
+                  <input type="text" class="form-control" name="module" placeholder="Add Module Name" required/>
                 </div>
-                <div class="col-sm-2 col-md-8">
-                  <select class="form-control" name="device_id">
+              </div>
+              <div class="row  d-flex justify-content-center mb-2">
+                <div class="col-sm-4 col-md-4">
+                  <select class="form-control" name="device_id" required>
+                    <option value="">--Select Device--</option>
+
                     {% for details in devices_details %}
                     <option value="{{details[0]}}">{{details[1]}}</option>
                     {% endfor %}
 
                   </select>
                 </div>
-
               </div>
-              <div class="row">
-                <div class="col-sm-2 col-md-2">
+              <div class="row d-flex justify-content-center">
+                <div class="col-sm-4 col-md-4">
                   <input type="submit" class="btn btn-primary" />
                 </div>
               </div>
+              </div>
+              
             </form>
 
             <div>

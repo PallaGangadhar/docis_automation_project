@@ -22,7 +22,7 @@
                             {% for details in devices_regression_count %}
                             <div class="carousel-item">
                                 <div class="col">
-                                    <div class="p-3 border Harmonic_card_bg_color">
+                                    <div class="p-3 border" id="color_{{details[0]}}">
                                         <div>
                                             <span class="text-white">{{details[0]}} Count</span>
                                         </div>
@@ -133,6 +133,7 @@
         var graph_data = '{{ new_data_2|tojson }}';
         var pie_chart = '{{pie_chart|tojson}}';
         var regression_date_graph = '{{ regression_date_graph|tojson }}';
+        var devices_regression_count = '{{devices_regression_count|tojson}}';
        
         var total_regression_count = '{{total_regression_count}}';
         var casa_i_cmts_count = '{{i_cmts_count}}';
@@ -147,8 +148,18 @@
         regression_date_graph = JSON.parse(regression_date_graph);
         pie_chart = JSON.parse(pie_chart)
         new_data = JSON.parse(graph_data)
-
-
+        devices_regression_count = JSON.parse(devices_regression_count)
+        const randColor = () => {
+        return "#" + Math. floor(Math. random()*16777215). toString(16). padStart(6, '0'). toUpperCase();
+        }
+        for (var i = 0; i < devices_regression_count.length; i++){
+            var color = randColor()
+            console.log(color)
+            if(color != '#FFFFFF' && color != '#000000'){
+                $('#color_'+devices_regression_count[i][0]).css('background',color)
+            }
+        }
+        
         var reg_data = []
         var harmony_data = []
         var cmts_data = []

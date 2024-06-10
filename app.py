@@ -102,6 +102,13 @@ def index():
             to_date=convert_date_to_str(to_date,"%Y-%m-%d")
             curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
             regression_graph=curr.fetchall()
+
+            curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC")
+            graph_details = curr.fetchall()
+
+            curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY  devices_details.device_name")
+            pie_chart_details = curr.fetchall()
+            
            
         
         for i in regression_graph:   
@@ -110,9 +117,6 @@ def index():
             dates.append(date)
         graph_data['data']=data1
         
-
-        
-
         new_data =[]
         
         for graph_detail in graph_details:
@@ -242,17 +246,27 @@ def add_modules():
 @app.route('/add_device_details', methods=['GET','POST'])
 @login_required
 def add_device_details():
+    error_message=None
     if request.method == "POST":
         device_name = str(request.form.get('device_name'))
         device_ip = str(request.form.get('device_ip'))
         model = str(request.form.get('model'))
         vendor = str(request.form.get('vendor'))
         curr, conn=db_connection()
-        curr.execute('''INSERT INTO devices_details(device_name,ip,model, vendor) VALUES (%s,%s,%s,%s)''',(device_name,device_ip, model, vendor) )
+        
+        try:
+            curr.execute('''INSERT INTO devices_details(device_name,ip,model, vendor) VALUES (%s,%s,%s,%s)''',(device_name,device_ip, model, vendor) )
+        except Exception as e:
+            pat = re.search("DETAIL:.*", str(e))
+            if pat!= None:
+                error_message=pat.group(0)
+            else:
+                error_message = str(e)
+            
         conn.commit()
         curr.close()
         conn.close()
-    return render_template('add_device_details.html')
+    return render_template('add_device_details.html',error_message=error_message)
 
 @app.route('/add_testcase_details', methods=['GET','POST'])
 @login_required

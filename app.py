@@ -142,9 +142,11 @@ def index():
         for k in range(0,len([new_graph_data]),1):
             for i in new_graph_data[0].keys():
                 output_list = [sum(pair) for pair in zip(*new_graph_data[k][i])]
-                new_graph_list_data.append({'name':i,'data':output_list}) 
+                new_graph_list_data.append({'name':i,'data':output_list})
+         
 
         new_data_2['data'] = new_graph_list_data
+
         pie_chart = []
         for pie in pie_chart_details:
             per = (pie[1]/total_regression_count)*100
@@ -277,7 +279,8 @@ def add_testcase_details():
         testcase_number = str(request.form.get('testcase_number'))
         testcase_name = str(request.form.get('testcase_name'))
         testcase_function = str(request.form.get('testcase_function'))
-        curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function) VALUES (%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function) )
+        testcase_reference=str(request.form.get('testcase_reference'))
+        curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function,testcase_reference) VALUES (%s,%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function,testcase_reference) )
     curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
     modules_details=curr.fetchall()
     conn.commit()

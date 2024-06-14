@@ -708,6 +708,10 @@ input[aria-invalid="true"] {
   font-size: 24px;
 }
 
+.text-black{
+  color: #000;
+}
+
 @media (min-width: 768px){
 .d-md-flex {
     display: flex !important;

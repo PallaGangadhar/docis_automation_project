@@ -1,107 +1,81 @@
 {% extends 'base.html' %}
-{%block content%}
 
-<div>
-  <!-- main body -->
-  <div class="row">
-    <div class="col-xl-12 mb-30">
-      <div class="table-card table-card-statistics h-100">
-        <div class="table-card-body">
-          <div class="d-block d-md-flex justify-content-between alert alert-success">
-            <!-- <div class="d-block">  -->
-            <span class="fs-16 fst-italic">Add TestCases Details</span>
-            <!-- </div> -->
-          </div>
-          <div class="p-3 regression_scroll_table div_shadow">
-            <form name="" action="/add_testcase_details" method="post">
-              <div class="row  d-flex justify-content-center mb-2">
-                <div class="col-sm-4 col-md-4">
-                  <input type="text" class="form-control" name="testcase_number" placeholder="Add Testcase Number" required/>
-                </div>
-              </div>
-              <div class="row  d-flex justify-content-center mb-2">
-                <div class="col-sm-4 col-md-4">
-                  <input type="text" class="form-control" name="testcase_name" placeholder="Add Testcase Name" required/>
-                </div>
-              </div>
-              <div class="row  d-flex justify-content-center mb-2">
-                <div class="col-sm-4 col-md-4">
-                  <input type="text" class="form-control" name="testcase_function" placeholder="Add Testcase Function" required/>
-                </div>
-              </div>
-              <div class="row  d-flex justify-content-center mb-2">
-                <div class="col-sm-4 col-md-4">
-                  <select class="form-control" name="module_id" required>
-                    <option value="">--Select Module--</option>
-                    {% for details in modules_details %}
-                    <option value="{{details[1]}}">{{details[2]}}</option>
-                    {% endfor %}
+{% block title %}Add TestCases Details{% endblock %}
 
-                  </select>
-                </div>
-              </div>
-              <div class="row  d-flex justify-content-center mb-2">
-                <div class="col-sm-4 col-md-4">
-                  <input type="text" class="form-control" name="testcase_reference" placeholder="Add Testcase Reference" required/>
-                </div>
-              </div>
-              <div class="row d-flex justify-content-center mb-2">
-                <div class="col-sm-4 col-md-4">
-                  <input type="submit" class="btn btn-primary" />
-                </div>
-              </div>
-              </div>
-              
-            </form>
+{% block content %}
 
-            <div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="table-card table-card-statistics h-100">
+            <div class="table-card-body">
+                <div class="d-block d-md-flex justify-content-between alert alert-success">
+                    <span class="fs-16 fst-italic">Add TestCases Details</span>
+                </div>
 
+                <div class="p-3 regression_scroll_table div_shadow">
+                    <form name="" action="/add_testcase_details" method="post">
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="testcase_number" placeholder="Testcase Number" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="testcase_name" placeholder="Testcase Name" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="testcase_function" placeholder="Testcase Function" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <select class="form-control" name="module_id" required>
+                                    <option value="">-- Select Module --</option>
+                                    {% for details in modules_details %}
+                                    <option value="{{ details[1] }}">{{ details[2] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-
-  <!--=================================
-footer -->
-  <!--=================================
-footer -->
 </div>
 
 <!-- The Modal -->
 <div class="modal" id="myModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Are you sure you want to delete?</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <!-- Modal body -->
-      <div class="modal-body">
-        Once you delete it, it will not revert back..
-      </div>
-
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <form name="" id="delete" method="post">
-
-          <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="delete_regression">Yes</button>
-        </form>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-      </div>
-
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure you want to delete?</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Once you delete it, it will not revert back..
+            </div>
+            <div class="modal-footer">
+                <form name="" id="delete" method="post">
+                    <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="delete_regression">Yes</button>
+                </form>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-<!-- {% include 'footer.html' %} -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
 
-
-<script>
-
-</script>
 {% endblock %}

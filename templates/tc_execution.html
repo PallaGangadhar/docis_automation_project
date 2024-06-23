@@ -4,77 +4,112 @@
 
 
 <!-- ========== Left Sidebar Start ========== -->
-
-
-<div class="h-100 d-flex   ">
-  
+<div class="h-100 d-flex">
   <div class="side-section">
-    <!-- Left menu-->
+    <!-- Left menu -->
     <input type="checkbox" id="check" class="d-none">
 
-    <div class="mainmenu h-100 list-unstyled bg-black d-flex flex-column justify-content-between p-2 d-md-block d-lg-block d-sm-block" >
-      <div class="overflow-auto"> <!--First -->
-        <li class="text-black fs-5 mb-2  alert alert-success" key="t-pages">Modules List</li>
-        <div id="module" class="scroll">
-          <div class="form-check checkbox_font">
-            <input type="checkbox" class="form-check-input" id="select_module">
-            <label class="form-check-label text-white fs-6" for="check1">Select Module</label>
+    <div class="mainmenu h-100 list-unstyled bg-sleek-blue d-flex flex-column justify-content-between p-2">
+      <div class="overflow-auto">
+        <!-- Modules List -->
+        <div class="card bg-dark text-light mb-3">
+          <div class="card-header">
+            <h5 class="card-title m-0">Modules List</h5>
           </div>
-          {% for details in modules_details %}
-          <div class="form-check checkbox_font">
-            <input type="checkbox" class="form-check-input modules" name="modules[]" value="{{details[0]}}" id="module_{{details[1]}}">
-            <label class="form-check-label text-white fs-6" for="check1">{{details[2]}}</label>
-          </div>
-          {% endfor %}
-        </div>
-        <!--First -->
-      </div>
-      <div class=" ">
-        <!--Second -->
-
-        <li class="text-black fs-5 nb-2  mt-2   alert alert-success" key="t-pages">TestCase List</li>
-        <div id="testcase_details" class="scroll">
-
-          <div class="form-check checkbox_font" style="display: none;" id="tc_select">
-            <input type="checkbox" class="form-check-input" id="select_all">
-            <label class="form-check-label text-white fs-6" for="check1">Select All</label>
-          </div>
-         
-          {% for tc in testcase_details %}
-          <div class="show_module_{{tc[1]}}" style="display:none;">
-            <div class="form-check checkbox_font">
-              <input type="checkbox" class="form-check-input testcases" name="testcase_module_{{tc[1]}}[]" value="{{tc[4]}}">
-              <label class="form-check-label truncate-cell text-white fs-6" for="check1" data-toggle="tooltip"
-                data-placement="bottom" title="Module TC 1 run show clock command">{{tc[3]}}</label>
+          <div class="card-body p-2">
+            <div id="module" class="scroll">
+              <div class="form-check checkbox_font">
+                <input type="checkbox" class="form-check-input" id="select_module">
+                <label class="form-check-label" for="select_module">Select Module</label>
+              </div>
+              {% for details in modules_details %}
+              <div class="form-check checkbox_font">
+                <input type="checkbox" class="form-check-input modules" name="modules[]" value="{{details[0]}}" id="module_{{details[1]}}">
+                <label class="form-check-label" for="module_{{details[1]}}">{{details[2]}}</label>
+              </div>
+              {% endfor %}
             </div>
-            
           </div>
-          {% endfor %}
-
-         
         </div>
-        <!--Second -->
-
       </div>
+
+      <div class="mt-2">
+        <!-- TestCase List -->
+        <div class="card bg-dark text-light mb-3">
+          <div class="card-header">
+            <h5 class="card-title m-0">TestCase List</h5>
+          </div>
+          <div class="card-body p-2">
+            <div id="testcase_details" class="scroll">
+              <div class="form-check checkbox_font" style="display: none;" id="tc_select">
+                <input type="checkbox" class="form-check-input" id="select_all">
+                <label class="form-check-label" for="select_all">Select All</label>
+              </div>
+              {% for tc in testcase_details %}
+              <div class="show_module_{{tc[1]}}" style="display:none;">
+                <div class="form-check checkbox_font">
+                  <input type="checkbox" class="form-check-input testcases" name="testcase_module_{{tc[1]}}[]" value="{{tc[4]}}">
+                  <label class="form-check-label truncate-cell" for="testcase_module_{{tc[1]}}[]" data-toggle="tooltip" data-placement="bottom" title="{{tc[3]}}">{{tc[3]}}</label>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="mb-1">
-        <div class="button-section d-flex align-item-center justify-content-between ">
-          <button type="button" class="btn btn-success" onclick="show_modal('exampleModal');"
-            id="check_tc">Run</button>
-          <button type="button" id="stop" class=" btn btn-success" disabled>Stop</button>
-          <button type="button" id="clear_logs" class=" btn btn-success" disabled>Clear Logs</button>
+        <div class="button-section d-flex justify-content-between">
+          <button type="button" class="btn btn-success btn-sm" onclick="show_modal('exampleModal');" id="check_tc">
+            <i class="fas fa-play"></i> Run
+          </button>
+          <button type="button" id="stop" class="btn btn-danger btn-sm" disabled>
+            <i class="fas fa-stop"></i> Stop
+          </button>
+          <button type="button" id="clear_logs" class="btn btn-warning btn-sm" disabled>
+            <i class="fas fa-trash-alt"></i> Clear Logs
+          </button>
         </div>
       </div>
     </div>
   </div>
-  <div class="flex-grow-1 overflow-auto ">
+
+  <div class="flex-grow-1 overflow-auto">
     <div class="p-2">
       {% include 'logs.html' %}
     </div>
   </div>
 </div>
-
-
 <!-- Left Sidebar End -->
+
+<!-- Include Bootstrap CSS and FontAwesome icons -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<style>
+  .bg-sleek-blue {
+    background-color: #2c3e50; /* Sleek blue background color */
+  }
+  .text-light {
+    color: #ecf0f1 !important; /* Light text color for better contrast */
+  }
+  .scroll {
+    max-height: 275px; /* Adjust this height as needed */
+    overflow-y: auto;
+  }
+  .checkbox_font {
+    font-size: 0.9rem;
+  }
+  .truncate-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+
+
+
+
+
 
 
 

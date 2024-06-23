@@ -1,12 +1,40 @@
 {% extends 'base.html' %}
+
 {%block content%}
+
 
 <div class="has-bg-img">
 
     <div class="bg-img bg-cover">
         <div class="page-content page_content_scroll">
             <div class="container-fluid px-6">
-                <div class="row gx-8">
+                <div class="row gx-8" id="firstdiv">
+                    <div class="row">
+                        <div class="col">
+                            <div class="p-3 border regression_card_bg_color">
+                                <div>
+                                    <span class="text-white">Total Regression</span>
+                                </div>
+                                <span style="font-size: 30px;"
+                                    class="text-white"><b>{{total_regression_count}}</b></span>
+                            </div>
+                        </div>
+                        {% for details in devices_regression_count %}
+                        <div class="col">
+                            <div class="p-3 border Harmonic_card_bg_color" id="firstdivcolor_{{details[0]}}">
+                                <div>
+                                    <span class="text-white">{{details[0]}} Count</span>
+                                </div>
+                                <span style="font-size: 30px;" class="text-white"><b>
+
+                                        {{details[1]}}</b></span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+                <div class="row gx-8" id="seconddiv">
                     <div id="recipeCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner" role="listbox">
                             <div class="carousel-item active">
@@ -15,46 +43,48 @@
                                         <div>
                                             <span class="text-white">Total Regression</span>
                                         </div>
-                                        <span style="font-size: 30px;" class="text-white"><b>{{total_regression_count}}</b></span>
+                                        <span style="font-size: 30px;"
+                                            class="text-white"><b>{{total_regression_count}}</b></span>
                                     </div>
                                 </div>
                             </div>
                             {% for details in devices_regression_count %}
                             <div class="carousel-item">
                                 <div class="col">
-                                    
-                                    <div class="p-3 border Harmonic_card_bg_color" id="color_{{details[0]}}">
-                                    
-                                    
+
+                                    <div class="p-3 border Harmonic_card_bg_color" id="seconddivcolor_{{details[0]}}">
+
+
                                         <div>
                                             <span class="text-white">{{details[0]}} Count</span>
                                         </div>
                                         <span style="font-size: 30px;" class="text-white"><b>
-                                           
-                                            {{details[1]}}</b></span>
+
+                                                {{details[1]}}</b></span>
                                     </div>
                                 </div>
                             </div>
                             {% endfor %}
-                            
-                            
+
+
                         </div>
-                        <a class="carousel-control-prev bg-transparent w-aut" href="#recipeCarousel" role="button" data-bs-slide="prev">
+                        <a class="carousel-control-prev bg-transparent w-aut" href="#recipeCarousel" role="button"
+                            data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         </a>
-                        <a class="carousel-control-next bg-transparent w-aut" href="#recipeCarousel" role="button" data-bs-slide="next">
+                        <a class="carousel-control-next bg-transparent w-aut" href="#recipeCarousel" role="button"
+                            data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         </a>
                     </div>
-                </div>		
-        </div>
-          
-           
+                </div>
+            </div>
+
+
             <div class="container-fluid mt-2">
                 <div class="row">
                     <form id="filter_graph" method="GET" action="/">
                         <div class="row">
-
                             <div class="col-lg-2">
                                 <div id="from_date" class="input-group date" data-date-format="yyyy-mm-dd">
                                     <input class="form-control" type="text" name="from_date" id="from_date_val"
@@ -134,12 +164,12 @@
 <script src="../static/assets/libs/jquery/jquery.min.js"></script>
 <script>
     try {
-        
+
         var graph_data = '{{ new_data_2|tojson }}';
         var pie_chart = '{{pie_chart|tojson}}';
         var regression_date_graph = '{{ regression_date_graph|tojson }}';
         var devices_regression_count = '{{devices_regression_count|tojson}}';
-       
+
         var total_regression_count = '{{total_regression_count}}';
         var casa_i_cmts_count = '{{i_cmts_count}}';
         var harmony_count = '{{harmony_count}}';
@@ -155,28 +185,29 @@
         new_data = JSON.parse(graph_data)
         devices_regression_count = JSON.parse(devices_regression_count)
         const randColor = () => {
-        return "#" + Math. floor(Math. random()*16777215). toString(16). padStart(6, '0'). toUpperCase();
+            return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
         }
-        for (var i = 0; i < devices_regression_count.length; i++){
+        for (var i = 0; i < devices_regression_count.length; i++) {
             var color = randColor()
             console.log(color)
-            if(color != '#FFFFFF' && color != '#000000'){
-                $('#color_'+devices_regression_count[i][0]).css('background',color)
+            if (color != '#FFFFFF' && color != '#000000') {
+                $('#firstdivcolor_' + devices_regression_count[i][0]).css('background', color)
+                $('#seconddivcolor_' + devices_regression_count[i][0]).css('background', color)
             }
         }
-        
+
         var reg_data = []
         var harmony_data = []
         var cmts_data = []
         var vccap_data = []
         var reg_date = []
-   
+
         for (var i = 0; i < regression_date_graph['data'].length; i++) {
             reg_data.push(regression_date_graph['data'][i]['count'])
             reg_date.push(regression_date_graph['data'][i]['date'])
         }
-       
-        
+
+
     }
     catch (err) {
 
@@ -217,8 +248,8 @@
                     borderWidth: 0
                 }
             },
-            series:new_data['data']
-            
+            series: new_data['data']
+
         });
 
 
@@ -301,20 +332,47 @@
     }
     catch (err) { }
 
-let items = document.querySelectorAll('.carousel .carousel-item')
+    var total_regression_devices = "{{total_regression_devices}}";
+    total_regression_devices = parseInt(total_regression_devices.toString())
+    if (total_regression_devices > 4) {
+        $('#seconddiv').css('display', 'block');
+        let items = document.querySelectorAll('.carousel .carousel-item')
 
-		items.forEach((el) => {
-			const minPerSlide = 4
-			let next = el.nextElementSibling
-			for (var i=1; i<minPerSlide; i++) {
-				if (!next) {
-            // wrap carousel by using first child
-            next = items[0]
-        }
-        let cloneChild = next.cloneNode(true)
-        el.appendChild(cloneChild.children[0])
-        next = next.nextElementSibling
+        items.forEach((el) => {
+            let minPerSlide = 2;
+
+            if (total_regression_devices > 4) {
+                minPerSlide = 4
+            }
+            else {
+                minPerSlide = total_regression_devices;
+            }
+            let next = el.nextElementSibling
+            for (var i = 1; i < minPerSlide; i++) {
+                if (!next) {
+                    // wrap carousel by using first child
+                    next = items[0]
+                }
+                let cloneChild = next.cloneNode(true)
+                el.appendChild(cloneChild.children[0])
+                next = next.nextElementSibling
+            }
+        })
     }
-})
+    else {
+        $('#firstdiv').css('display', 'block');
+
+    }
+
+
+
+    $('#exampleModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget)
+        var recipient = button.data('whatever')
+        var modal = $(this)
+        modal.find('.modal-title').text('New message to ' + recipient)
+        modal.find('.modal-body input').val(recipient)
+    });
+
 </script>
 {% endblock %}

@@ -411,3 +411,26 @@ try{
   catch(err){
   }
 
+
+$(document).on("click", ".edit-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    var device_name = $('#device_'+pk).html();
+    var ip = $('#ip_'+pk).html();
+    var model = $('#model_'+pk).html();
+    var vendor = $('#vendor_'+pk).html();
+    $('input[name="device_name"]').val(device_name);
+    $('input[name="device_ip"]').val(ip);
+    $('input[name="model"]').val(model);
+    $('input[name="vendor"]').val(vendor);
+    $('#edit_device_details_form').attr('action', '/edit_device_details/'+pk);
+    // $("#delete_regression").click(function(){
+    //   $("#delete").attr("action", "/delete_regression/" + pk);
+    // }); 
+});
+
+$(document).on("click", ".open-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    $("#delete_regression").click(function(){
+      $("#delete").attr("action", "/delete_regression/" + pk);
+    }); 
+});

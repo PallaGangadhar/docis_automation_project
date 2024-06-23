@@ -1,36 +1,188 @@
-{% extends 'base.html' %}
+<!doctype html>
+<html lang="en">
 
-{% block content %}
+<head>
+    <meta charset="utf-8" />
+    <title>DOCSIS AUTOMATION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Themesbrand" name="author" />
+    <link rel="shortcut icon" href="../static/images/vodafone.png">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Inline CSS */
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+        }
 
+        .header_background {
+            background-color: red !important; /* Red background color for uniformity */
+            padding: 1em;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-<div class="loginDiv" id="loginDiv">
-  <h1 class="login_text">Login</h1>
-  <form action="{{ url_for('login') }}" method="post">
-    <div class="inputField">
-      <input type="text" id="username" required aria-invalid="false" name="username"/>
-      <label class="button_label">Username</label>
+        .navbar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+
+        .logo-sm img, .logo-lg img {
+            height: 30px;
+        }
+
+        .header-title {
+            font-size: 1.2em;
+            color: #fff;
+            text-align: center; /* Center align the title */
+        }
+
+        .header-item {
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+
+        .header-item a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .header-item a:hover {
+            text-decoration: none;
+        }
+
+        .loginDiv {
+            max-width: 500px; /* Increased size of the login card */
+            margin: auto;
+            padding: 2.5em; /* Increased padding */
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        .login_text {
+            text-align: center;
+            margin-bottom: 1em;
+            font-size: 2em;
+            color: #007bff;
+        }
+
+        .inputField {
+            margin-bottom: 1.5em;
+            position: relative;
+        }
+
+        .inputField input {
+            width: 100%;
+            padding: 0.75em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .inputField label {
+            position: absolute;
+            top: -0.75em;
+            left: 0.75em;
+            background: #fff;
+            padding: 0 0.5em;
+            color: #007bff;
+            font-size: 0.85em;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 1em;
+            text-align: center;
+        }
+
+        .login {
+            width: 100%;
+            padding: 0.75em;
+            background: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .login:hover {
+            background: #0056b3;
+        }
+
+        .bottom {
+            text-align: center;
+            margin-top: 1em;
+        }
+
+        .bottom .btn_green {
+            color: #fff;
+            background-color: #28a745;
+            padding: 0.5em 1em;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .bottom .btn_green:hover {
+            background-color: #218838;
+        }
+
+        .footer-section {
+            background: #dc3545; /* Red background color for uniformity */
+            padding: 1em 0;
+            text-align: center;
+            color: white;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex flex-column h-100">
+        {% include 'header.html' %}
+        <div class="flex-grow-1 d-flex align-items-center justify-content-center">
+            {% block content %}
+            <div class="loginDiv" id="loginDiv">
+                <h1 class="login_text">Login</h1>
+                <form action="{{ url_for('login') }}" method="post">
+                    <div class="inputField">
+                        <input type="text" id="username" name="username" required aria-describedby="usernameHelp" />
+                        <label class="button_label" for="username">Email or Username</label>
+                    </div>
+                    <div class="inputField">
+                        <input type="password" id="password" name="password" required aria-describedby="passwordHelp" />
+                        <label class="button_label" for="password">Password</label>
+                    </div>
+                    <div class="error" aria-errormessage="Invalid username or password." role="alert">
+                        {% if error %}
+                        <p>{{ error }}</p>
+                        {% endif %}
+                    </div>
+                    <button class="login" type="submit" id="submit">Sign In</button>
+                </form>
+                <div class="bottom">
+                    <a href="/register" class="btn_green">Register</a>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+        <div class="footer-section">
+            <p class="footer-text">© 2023 DOCSIS AUTOMATION TOOL. All rights reserved.</p>
+        </div>
     </div>
-    <div class="inputField">
-      <input type="password" id="password" required aria-invalid="false" name="password"/>
-      <label class="button_label">Password</label>
-    </div>
-    <div class="error" aria-errormessage="Invalid username or password." id="error">
-      <p>You have entered an invalid username or password.</p>
-    </div>
-
-    <input type="submit" class="login" value="Sign In"></br></br>
-    
-    <p class="bottom">Don't have an account?  <a class="btn btn-primary btn_green" href="{{url_for('register')}}"> Sign Up here</a></p>
-    {{msgs}}
-    
-    </br></br>
-    
-  </form>
-  
-</div>
-
-
-
-
-
-{% endblock %}
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

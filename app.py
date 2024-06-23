@@ -9,7 +9,7 @@ from db import *
 from send_mail import send_mail_to
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 import re
-from decorators import login_required
+from decorators import login_required,devices_details_render
 import bcrypt
 import threading
 from cryptography.fernet import Fernet
@@ -38,7 +38,6 @@ def background_thread(data):
 def send_chart_details(data):
     pass_tc = data.get('pass')
     fail_tc = data.get('fail')
-    print("pass tc===", pass_tc)
     p=0
     f=0
     pass_count, fail_count, total_count,no_run = select_query_to_get_count_details(reg_id)
@@ -53,9 +52,7 @@ def send_chart_details(data):
 def index():
     total_regression_count = 0
     graph_data={}
-
     data1=[]
-   
     dates=[]
   
     from_date = request.args.get('from_date')
@@ -66,16 +63,12 @@ def index():
         if from_date > to_date:
             flag=True
 
-    if from_date != "" and to_date == "":
-        to_date = from_date
-    elif from_date == "" and to_date != "":
-        from_date = to_date
+    if from_date != "" and to_date == "":to_date = from_date
+    elif from_date == "" and to_date != "":from_date = to_date
 
     if flag == False:
 
         curr, conn=db_connection()
-        curr.execute('SELECT * FROM regression')
-        sample_data=curr.fetchone()
         curr.execute('SELECT count(regression_logs_details.log_id) from  regression_logs_details')
         total_regression_count=curr.fetchone()
         total_regression_count=total_regression_count[0]
@@ -83,9 +76,9 @@ def index():
         devices_details=curr.fetchall()
 
       
-        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details INNER JOIN regression ON regression.regression_id = regression_logs_details.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
+        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details inner JOIN regression ON regression.regression_id = regression_logs_details.regression_id RIGHT JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
         devices_regression_count = curr.fetchall()
-        
+        total_regression_devices = len(devices_regression_count)+1
         if from_date == None and to_date == None or from_date == "" and to_date == "":
             curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
             regression_graph=curr.fetchall()
@@ -156,11 +149,10 @@ def index():
         conn.commit()
         curr.close()
         conn.close()
-        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart)
+        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices)
 
     else:
-        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,error_message=True,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart)
-
+        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,error_message=True,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices)
 
 
 @app.route('/logs', methods=['GET','POST'])
@@ -191,10 +183,6 @@ def tc_execution(device_id):
     conn.close()
     return render_template('tc_execution.html',modules_details=modules_details,testcase_details=testcase_details,device_details=device_details)
 
-@app.route('/harmonic_cmts', methods=['GET','POST'])
-@login_required
-def harmony():
-    return render_template('harmony.html')
 
 @app.route('/modules', methods=['GET','POST'])
 @login_required
@@ -270,6 +258,7 @@ def add_device_details():
         conn.close()
     return render_template('add_device_details.html',error_message=error_message)
 
+
 @app.route('/add_testcase_details', methods=['GET','POST'])
 @login_required
 def add_testcase_details():
@@ -289,10 +278,6 @@ def add_testcase_details():
     
     return render_template('add_testcase_details.html',modules_details=modules_details)
 
-@app.route('/vCCAP', methods=['GET','POST'])
-@login_required
-def vccap():
-    return render_template('vCCAP.html')
 
 @app.route("/connect", methods=['GET','POST'])
 @socketio.event
@@ -325,10 +310,7 @@ def test_disconnect():
 @socketio.on('disconnect')
 def stop():
     if request.method == "POST":
-        # socketio.stop()
         shutdown_server()
-        # requests.post("http://localhost:5000/disconnect", json={"data": ""},headers = {'Content-type': 'application/json'})
-        # os.system("python -m flask run --reload")
     return Response({'msg':''})
 
 
@@ -340,9 +322,11 @@ def add_regression_logs():
         add_regression_details(response)
     return Response({'msg':''})
 
+
 @app.route("/view_regression_details", methods=['GET','POST'])
 @login_required
 def view_regression_details():
+    device_details=header()
     curr,conn=db_connection()
     cmts_type = request.args.get('cmts_type_dropdown')
     search_reg = request.args.get('search_reg')
@@ -506,9 +490,43 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-@app.route('/test_logs/<reg_id>', methods=['GET','POST'])
-def test_logs():
-    return render_template('test_logs.html')
+
+@app.route('/edit_device_details/<int:device_id>', methods=['GET','POST'])
+@login_required
+def edit_device_details(device_id):
+    error_message=None
+    if request.method == "POST":
+        device_name = str(request.form.get('device_name'))
+        device_ip = str(request.form.get('device_ip'))
+        model = str(request.form.get('model'))
+        vendor = str(request.form.get('vendor'))
+        curr, conn=db_connection()
+        
+        try:
+            curr.execute('''UPDATE devices_details SET device_name=%s,ip=%s,model=%s,vendor=%s WHERE device_id = %s''',(device_name,device_ip, model, vendor,device_id) )
+        except Exception as e:
+            pat = re.search("DETAIL:.*", str(e))
+            if pat!= None:
+                error_message=pat.group(0)
+            else:
+                error_message = str(e)
+            
+        conn.commit()
+        curr.close()
+        conn.close()
+        
+    return redirect("/devices")
+
+
+def header():
+    curr, conn=db_connection()
+    curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
+    devices_details=curr.fetchall()
+    conn.commit()
+    curr.close()
+    conn.close()
+    return devices_details
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

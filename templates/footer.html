@@ -1,15 +1,56 @@
-<footer class="footer-section footer_red_bg_color">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <center>
-                <span  class="text-white fs-16">
-                <script>document.write(new Date().getFullYear())</script> 
-                © DOCSIS AUTOMATION
-                </span>
-        </center> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Professional Footer</title>
+    <style>
+        .footer-section {
+            padding: 20px 0;
+            background-color: #d32f2f; /* Dark Red Background */
+            color: #ffffff; /* White Text Color */
+        }
+
+        .footer-section .text-white {
+            font-size: 16px; /* Font Size */
+        }
+
+        @media (max-width: 576px) {
+            .footer-section .text-white {
+                font-size: 14px; /* Smaller Font Size on Small Screens */
+            }
+        }
+
+        .footer-section center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Your main content here -->
+
+    <footer class="footer-section">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <center>
+                        <span class="text-white fs-16">
+                            <script>document.write(new Date().getFullYear())</script>
+                            © DOCSIS AUTOMATION
+                        </span>
+                    </center>
+                </div>
+            </div>
         </div>
-        
-        </div>
-    </div>
-</footer>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -331,16 +331,22 @@ thead{
   margin-top: 5% !important;
 }
 
-.footer-section {
+/* .footer-section {
   bottom: 0;
   padding: 20px calc(24px * .75);
-  /* position: absolute; */
   right: 0;
   color: var(--bs-footer-color);
   height: 40px;
   background-color: var(--bs-footer-bg);
-}
+} */
 
+.footer-section {
+  background: red !important; /* Red background color for uniformity */
+  padding: 1em 0;
+  text-align: center;
+  color: white;
+  width: 100%;
+}
 .fs-16{
   font-size: 16px !important;
 }
@@ -420,7 +426,7 @@ thead{
 }
 
 .side-section{
-  height: 550px;
+  height: 570px;
 }
 
 .charts_section{
@@ -696,9 +702,6 @@ input[aria-invalid="true"] {
   background-color: #EDED00;
 }
 
-
-
-
 .regression_card_bg_color{
   background-color: #45e9a5;
 }
@@ -711,6 +714,12 @@ input[aria-invalid="true"] {
 .text-black{
   color: #000;
 }
+
+#firstdiv, #seconddiv{
+  display: none;
+}
+
+.pointer {cursor: pointer;}
 
 @media (min-width: 768px){
 .d-md-flex {

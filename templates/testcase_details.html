@@ -24,8 +24,7 @@
                                     <th>Testcase Name</th>
                                     <th>Testcase Function</th>
                                     <th>Testcase Reference</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody class="text-center" id="reg_report">
@@ -35,18 +34,7 @@
                                     <td>{{ details[3] }}</td>
                                     <td>{{ details[4] }}</td>
                                     <td>{{ details[5] }}</td>
-                                    <td>
-                                        {% if details[7] == 'Pass' %}
-                                        <span class="btn btn-outline-success btn-sm">{{ details[7] }}</span>
-                                        {% else %}
-                                        <span class="btn btn-outline-danger btn-sm">In Progress</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="view_tc_logs_details/{{ details[0] }}"
-                                            class="btn btn-outline-warning btn-sm">View Logs</a>
-                                        <!-- Other buttons here -->
-                                    </td>
+                                    
                                 </tr>
                                 {% endfor %}
                             </tbody>

@@ -57,102 +57,94 @@ def index():
   
     from_date = request.args.get('from_date')
     to_date = request.args.get('to_date')
-    flag=False
-    
-    if from_date != "" and to_date != "" and from_date != None and to_date != None:
-        if from_date > to_date:
-            flag=True
 
     if from_date != "" and to_date == "":to_date = from_date
     elif from_date == "" and to_date != "":from_date = to_date
+    
+    curr, conn=db_connection()
+    curr.execute('SELECT count(regression_logs_details.log_id) from  regression_logs_details')
+    total_regression_count=curr.fetchone()
+    total_regression_count=total_regression_count[0]
+    curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
+    devices_details=curr.fetchall()
 
-    if flag == False:
-
-        curr, conn=db_connection()
-        curr.execute('SELECT count(regression_logs_details.log_id) from  regression_logs_details')
-        total_regression_count=curr.fetchone()
-        total_regression_count=total_regression_count[0]
-        curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
-        devices_details=curr.fetchall()
-
-      
-        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details inner JOIN regression ON regression.regression_id = regression_logs_details.regression_id RIGHT JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
-        devices_regression_count = curr.fetchall()
-        total_regression_devices = len(devices_regression_count)+1
-        if from_date == None and to_date == None or from_date == "" and to_date == "":
-            curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
-            regression_graph=curr.fetchall()
-            
-            curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC')
-            graph_details = curr.fetchall()
-
-            curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY  devices_details.device_name')
-            pie_chart_details = curr.fetchall()
-
+    
+    curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details inner JOIN regression ON regression.regression_id = regression_logs_details.regression_id RIGHT JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
+    devices_regression_count = curr.fetchall()
+    total_regression_devices = len(devices_regression_count)+1
+    if from_date == None and to_date == None or from_date == "" and to_date == "":
+        curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
+        regression_graph=curr.fetchall()
         
-        elif from_date != None and to_date != None  and from_date != "" and to_date != "":
-            to_date=convert_str_to_date(to_date,"%Y-%m-%d")+datetime.timedelta(days=1)
-            to_date=convert_date_to_str(to_date,"%Y-%m-%d")
-            curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
-            regression_graph=curr.fetchall()
+        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC')
+        graph_details = curr.fetchall()
 
-            curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC")
-            graph_details = curr.fetchall()
+        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY  devices_details.device_name')
+        pie_chart_details = curr.fetchall()
 
-            curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY  devices_details.device_name")
-            pie_chart_details = curr.fetchall()
-            
-           
+    
+    elif from_date != None and to_date != None  and from_date != "" and to_date != "":
+        to_date=convert_str_to_date(to_date,"%Y-%m-%d")+datetime.timedelta(days=1)
+        to_date=convert_date_to_str(to_date,"%Y-%m-%d")
+        curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
+        regression_graph=curr.fetchall()
+
+        curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC")
+        graph_details = curr.fetchall()
+
+        curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY  devices_details.device_name")
+        pie_chart_details = curr.fetchall()
         
-        for i in regression_graph:   
-            date=i[1].strftime("%Y-%m-%d")
-            data1.append({'date':date,'count':i[0]})
-            dates.append(date)
-        graph_data['data']=data1
         
-        new_data =[]
+    
+    for i in regression_graph:   
+        date=i[1].strftime("%Y-%m-%d")
+        data1.append({'date':date,'count':i[0]})
+        dates.append(date)
+    graph_data['data']=data1
+    
+    new_data =[]
+    
+    for graph_detail in graph_details:
+        dt=convert_date_to_str(graph_detail[2],"%Y-%m-%d")
+        new_data.append({'date':dt, 'data':[graph_detail[1]],'name':graph_detail[0]})
+
+    for dt in range(0, len(new_data),1):
+        for ct in range(0, len(dates),1):
+            if dates[ct] not in new_data[dt]['date']:
+                new_data[dt]['data'].insert(ct,0)
+
+    new_graph_data={}
+    new_graph_list_data=[]
+    
+    for i in range(0,len(new_data),1):
+        if new_data[i]['name'] in new_graph_data.keys():
+            new_graph_data[new_data[i]['name']].append(new_data[i]['data'])
+        else:
+            new_graph_data[new_data[i]['name']] = [new_data[i]['data']]
+    
+    new_data_2 ={}
+    new_graph_data = [new_graph_data]
+    for k in range(0,len([new_graph_data]),1):
+        for i in new_graph_data[0].keys():
+            output_list = [sum(pair) for pair in zip(*new_graph_data[k][i])]
+            new_graph_list_data.append({'name':i,'data':output_list})
         
-        for graph_detail in graph_details:
-            dt=convert_date_to_str(graph_detail[2],"%Y-%m-%d")
-            new_data.append({'date':dt, 'data':[graph_detail[1]],'name':graph_detail[0]})
-   
-        for dt in range(0, len(new_data),1):
-            for ct in range(0, len(dates),1):
-                if dates[ct] not in new_data[dt]['date']:
-                    new_data[dt]['data'].insert(ct,0)
 
-        new_graph_data={}
-        new_graph_list_data=[]
-        
-        for i in range(0,len(new_data),1):
-            if new_data[i]['name'] in new_graph_data.keys():
-                new_graph_data[new_data[i]['name']].append(new_data[i]['data'])
-            else:
-                new_graph_data[new_data[i]['name']] = [new_data[i]['data']]
-        
-        new_data_2 ={}
-        new_graph_data = [new_graph_data]
-        for k in range(0,len([new_graph_data]),1):
-            for i in new_graph_data[0].keys():
-                output_list = [sum(pair) for pair in zip(*new_graph_data[k][i])]
-                new_graph_list_data.append({'name':i,'data':output_list})
-         
+    new_data_2['data'] = new_graph_list_data
 
-        new_data_2['data'] = new_graph_list_data
-
-        pie_chart = []
-        for pie in pie_chart_details:
-            per = (pie[1]/total_regression_count)*100
-            pie_chart.append({'name':pie[0], 'y':round(per,2)})
+    pie_chart = []
+    for pie in pie_chart_details:
+        per = (pie[1]/total_regression_count)*100
+        pie_chart.append({'name':pie[0], 'y':round(per,2)})
 
 
-        conn.commit()
-        curr.close()
-        conn.close()
-        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices)
+    conn.commit()
+    curr.close()
+    conn.close()
+    is_data_present=len(regression_graph)
+    return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices,is_data_present=is_data_present)
 
-    else:
-        return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,error_message=True,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices)
 
 
 @app.route('/logs', methods=['GET','POST'])
@@ -170,6 +162,7 @@ def logs():
 @app.route('/tc_execution/<int:device_id>', methods=['GET','POST'])
 @login_required
 def tc_execution(device_id):
+    devices_details=header()
     curr, conn=db_connection()
     curr.execute(f"SELECT * FROM modules_details where device_id={device_id}")
     modules_details=curr.fetchall()
@@ -181,23 +174,26 @@ def tc_execution(device_id):
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('tc_execution.html',modules_details=modules_details,testcase_details=testcase_details,device_details=device_details)
+    return render_template('tc_execution.html',modules_details=modules_details,testcase_details=testcase_details,device_details=device_details,devices_details=devices_details)
 
 
 @app.route('/modules', methods=['GET','POST'])
 @login_required
 def modules():
+    devices_details=header()
     curr, conn=db_connection()
-    curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
+    # curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
+    curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id;")
     modules_details=curr.fetchall()
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('modules.html',modules_details=modules_details)
+    return render_template('modules.html',modules_details=modules_details,devices_details=devices_details)
 
 @app.route('/devices', methods=['GET','POST'])
 @login_required
 def devices():
+    
     curr, conn=db_connection()
     curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
     devices_details=curr.fetchall()
@@ -209,17 +205,21 @@ def devices():
 @app.route('/testcase_details', methods=['GET','POST'])
 @login_required
 def testcase_details():
+    devices_details=header()
     curr, conn=db_connection()
-    curr.execute(f"SELECT * FROM testcase_details ORDER BY testcase_id DESC")
+    # curr.execute(f"SELECT * FROM testcase_details ORDER BY testcase_id DESC")
+    curr.execute('SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id ORDER BY testcase_id ASC;')
+    # curr.execute('SELECT testcase_details.*,devices_details.device_name, modules_details.module_name FROM testcase_details,modules_details, devices_details where devices_details.device_id=modules_details.device_id ORder by testcase_details.testcase_id desc;')
     testcase_details=curr.fetchall()
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('testcase_details.html',testcase_details=testcase_details)
+    return render_template('testcase_details.html',testcase_details=testcase_details,devices_details=devices_details)
 
 @app.route('/add_modules_details', methods=['GET','POST'])
 @login_required
 def add_modules():
+    devices_details=header()
     curr, conn=db_connection()
     if request.method == "POST":
         module = str(request.form.get('module'))
@@ -236,6 +236,7 @@ def add_modules():
 @app.route('/add_device_details', methods=['GET','POST'])
 @login_required
 def add_device_details():
+    devices_details=header()
     error_message=None
     if request.method == "POST":
         device_name = str(request.form.get('device_name'))
@@ -256,12 +257,13 @@ def add_device_details():
         conn.commit()
         curr.close()
         conn.close()
-    return render_template('add_device_details.html',error_message=error_message)
+    return render_template('add_device_details.html',error_message=error_message,devices_details=devices_details)
 
 
 @app.route('/add_testcase_details', methods=['GET','POST'])
 @login_required
 def add_testcase_details():
+    devices_details=header()
     curr, conn=db_connection()
     if request.method == "POST":
         module_id = str(request.form.get('module_id'))
@@ -276,7 +278,7 @@ def add_testcase_details():
     curr.close()
     conn.close()
     
-    return render_template('add_testcase_details.html',modules_details=modules_details)
+    return render_template('add_testcase_details.html',modules_details=modules_details,devices_details=devices_details)
 
 
 @app.route("/connect", methods=['GET','POST'])
@@ -326,7 +328,7 @@ def add_regression_logs():
 @app.route("/view_regression_details", methods=['GET','POST'])
 @login_required
 def view_regression_details():
-    device_details=header()
+    devices_details=header()
     curr,conn=db_connection()
     cmts_type = request.args.get('cmts_type_dropdown')
     search_reg = request.args.get('search_reg')
@@ -361,11 +363,12 @@ def view_regression_details():
     curr.close()
     conn.close()
     
-    return render_template('regression_details.html',regression_details=regression_details,c_type=c_type,status=status)
+    return render_template('regression_details.html',regression_details=regression_details,c_type=c_type,status=status,devices_details=devices_details)
 
 @login_required
 @app.route("/view_tc_logs_details/<int:reg_id>", methods=['GET','POST'])
 def view_tc_logs_details(reg_id):
+    devices_details=header()
     curr,conn=db_connection()
     curr.execute(f'SELECT * FROM regression_logs_details WHERE regression_id={reg_id}')
     tc_logs_details=curr.fetchall()
@@ -374,7 +377,7 @@ def view_tc_logs_details(reg_id):
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('view_tc_logs_details.html',tc_logs_details=tc_logs_details,summary_path=summary_path,reg_id=reg_id)
+    return render_template('view_tc_logs_details.html',tc_logs_details=tc_logs_details,summary_path=summary_path,reg_id=reg_id,devices_details=devices_details)
 
 
 @app.route('/delete_regression/<int:id>', methods=['GET','POST'])
@@ -494,28 +497,70 @@ def logout():
 @app.route('/edit_device_details/<int:device_id>', methods=['GET','POST'])
 @login_required
 def edit_device_details(device_id):
-    error_message=None
+    curr, conn=db_connection()
+    error_message = None
+    update_device_details=curr.execute(f"SELECT * FROM devices_details WHERE device_id={device_id}")
+    update_device_details=curr.fetchone()
     if request.method == "POST":
         device_name = str(request.form.get('device_name'))
         device_ip = str(request.form.get('device_ip'))
         model = str(request.form.get('model'))
         vendor = str(request.form.get('vendor'))
-        curr, conn=db_connection()
-        
         try:
-            curr.execute('''UPDATE devices_details SET device_name=%s,ip=%s,model=%s,vendor=%s WHERE device_id = %s''',(device_name,device_ip, model, vendor,device_id) )
+            curr.execute(f'UPDATE devices_details SET device_name=%s,ip=%s,model=%s,vendor=%s WHERE device_id = %s',(device_name,device_ip, model, vendor,device_id) )
+            conn.commit()
+            curr.close()
+            conn.close()
         except Exception as e:
             pat = re.search("DETAIL:.*", str(e))
             if pat!= None:
                 error_message=pat.group(0)
             else:
                 error_message = str(e)
-            
-        conn.commit()
-        curr.close()
-        conn.close()
+        if error_message != None:
+            return render_template('edit_device_details.html',update_device_details = update_device_details,error_message=error_message)
+        else:
+            return redirect(url_for('devices'))
+      
+    conn.commit()
+    curr.close()
+    conn.close()
         
-    return redirect("/devices")
+    return render_template('edit_device_details.html',update_device_details = update_device_details,error_message=error_message)
+
+@app.route('/edit_testcase_details/<int:testcase_id>', methods=['GET','POST'])
+@login_required
+def edit_testcase_details(testcase_id):
+    curr, conn=db_connection()
+    error_message = None
+    update_testcase_details=curr.execute(f"SELECT * FROM testcase_details WHERE testcase_id={testcase_id}")
+    update_testcase_details=curr.fetchone()
+    if request.method == "POST":
+        testcase_number = str(request.form.get('testcase_number'))
+        testcase_name = str(request.form.get('testcase_name'))
+        testcase_function = str(request.form.get('testcase_function'))
+        try:
+            curr.execute(f'UPDATE testcase_details SET testcase_number=%s,testcase_name=%s,testcase_function=%s WHERE testcase_id = %s',(testcase_number,testcase_name, testcase_function,testcase_id) )
+            conn.commit()
+            curr.close()
+            conn.close()
+        except Exception as e:
+            pat = re.search("DETAIL:.*", str(e))
+            if pat!= None:
+                error_message=pat.group(0)
+            else:
+                error_message = str(e)
+        if error_message != None:
+            return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message)
+        else:
+            return redirect(url_for('testcase_details'))
+      
+    conn.commit()
+    curr.close()
+    conn.close()
+        
+    return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message)
+
 
 
 def header():

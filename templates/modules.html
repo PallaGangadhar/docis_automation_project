@@ -1,92 +1,96 @@
 {% extends 'base.html' %}
-{%block content%}
+
+{% block title %}Module Details{% endblock %}
+
+{% block content %}
 
 <div>
-  <!-- main body -->
-  <div class="row">
-    <div class="col-xl-12 mb-30">
-      <div class="table-card table-card-statistics h-100">
-        <div class="table-card-body">
-          <div class="p-3 regression_scroll_table div_shadow">
-            <div class="row">
-              <div class="col-sm-2 col-md-8">
-                <button type="button" class="btn btn-primary">
-                  <a href="/add_modules_details" class="text-white">Add Modules</a>
-                </button>
-                
-              </div>
+    <!-- main body -->
+    <div class="row">
+        <div class="col-xl-12 mb-30">
+            <div class="table-card table-card-statistics h-100">
+                <div class="table-card-body">
+                    <div class="p-3 regression_scroll_table div_shadow">
+                        <div class="row">
+                            <div class="col-sm-2 col-md-8">
+                                <button type="button" class="btn btn-primary">
+                                    <a href="/add_modules_details" class="text-white">Add Modules</a>
+                                </button>
+                            </div>
+                        </div>
+                        <table class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey"
+                            id="regression_details_datatable">
+                            <thead class="table-light text-center">
+                                <tr class="text-dark">
+                                    <th>Module Name</th>
+                                    <th>Device Name</th> <!-- Added Device Name column -->
+                                    <th>Action</th> <!-- Added Action column -->
+                                </tr>
+                            </thead>
+                            <tbody class="text-center" id="reg_report">
+                                {% for details in modules_details %}
+                                <tr class="fs-14">
+                                    <td>{{ details[2] }}</td> <!-- Assuming details[5] contains Device Name -->
+                                    <td>{{ details[0] }}</td>
+                                    <td>
+                                        <!-- Edit button -->
+                                        <a href="#" class="btn btn-info">
+                                            <i class="fas fa-edit"></i> <!-- Edit icon -->
+                                        </a>
+                                        <!-- Delete button -->
+                                        <button type="button" class="btn btn-danger delete-button"
+                                            data-toggle="modal" data-target="#myModal">
+                                            <i class="fas fa-trash-alt"></i> <!-- Delete icon -->
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <table
-            class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey"
-            id="regression_details_datatable">
-
-            <thead class="table-light text-center">
-              <tr class="text-dark">
-                <th>Module Name</th>
-                
-
-                <!-- <th></th> -->
-              </tr>
-            </thead>
-            <tbody class="text-center" id="reg_report">
-              {% for details in modules_details %}
-              <tr class="fs-14">
-                <td>{{details[2]}}</td>
-              </tr>
-              {% endfor %}
-
-
-            </tbody>
-          </table>
-
-            <div>
-              
-            </div>
-          </div>
-          
         </div>
-      </div>
     </div>
-  </div>
 
-  <!--=================================
-footer -->
-  <!--=================================
-footer -->
-</div>
-
-<!-- The Modal -->
-<div class="modal" id="myModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h4 class="modal-title">Are you sure you want to delete?</h4>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <!-- Modal body -->
-      <div class="modal-body">
-        Once you delete it, it will not revert back..
-      </div>
-
-      <!-- Modal footer -->
-      <div class="modal-footer">
-        <form name="" id="delete" method="post">
-
-          <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="delete_regression">Yes</button>
-        </form>
-        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-      </div>
-
+    <!-- The Modal -->
+    <div class="modal" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Are you sure you want to delete?</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    Once you delete it, it will not revert back..
+                </div>
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <form name="" id="delete" method="post">
+                        <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="delete_regression">Yes</button>
+                    </form>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
-
 
 <script>
+    // JavaScript to handle delete button clicks and show modal
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.delete-button');
 
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                // Handle delete button click event here
+                // For example, show the modal for confirmation
+                $('#myModal').modal('show');
+            });
+        });
+    });
 </script>
+
 {% endblock %}

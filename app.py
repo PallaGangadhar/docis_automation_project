@@ -170,7 +170,6 @@ def tc_execution(device_id):
     testcase_details = curr.fetchall()
     curr.execute(f"SELECT * FROM devices_details where device_id={device_id}")
     device_details = curr.fetchone()
-    
     conn.commit()
     curr.close()
     conn.close()
@@ -183,7 +182,7 @@ def modules():
     devices_details=header()
     curr, conn=db_connection()
     # curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
-    curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id;")
+    curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id ORDER BY modules_id DESC;")
     modules_details=curr.fetchall()
     conn.commit()
     curr.close()
@@ -208,7 +207,7 @@ def testcase_details():
     devices_details=header()
     curr, conn=db_connection()
     # curr.execute(f"SELECT * FROM testcase_details ORDER BY testcase_id DESC")
-    curr.execute('SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id ORDER BY testcase_id ASC;')
+    curr.execute('SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id ORDER BY testcase_id DESC;')
     # curr.execute('SELECT testcase_details.*,devices_details.device_name, modules_details.module_name FROM testcase_details,modules_details, devices_details where devices_details.device_id=modules_details.device_id ORder by testcase_details.testcase_id desc;')
     testcase_details=curr.fetchall()
     conn.commit()
@@ -497,6 +496,7 @@ def logout():
 @app.route('/edit_device_details/<int:device_id>', methods=['GET','POST'])
 @login_required
 def edit_device_details(device_id):
+    devices_details=header()
     curr, conn=db_connection()
     error_message = None
     update_device_details=curr.execute(f"SELECT * FROM devices_details WHERE device_id={device_id}")
@@ -518,7 +518,7 @@ def edit_device_details(device_id):
             else:
                 error_message = str(e)
         if error_message != None:
-            return render_template('edit_device_details.html',update_device_details = update_device_details,error_message=error_message)
+            return render_template('edit_device_details.html',update_device_details = update_device_details,error_message=error_message,devices_details=devices_details)
         else:
             return redirect(url_for('devices'))
       
@@ -526,11 +526,12 @@ def edit_device_details(device_id):
     curr.close()
     conn.close()
         
-    return render_template('edit_device_details.html',update_device_details = update_device_details,error_message=error_message)
+    return render_template('edit_device_details.html',update_device_details = update_device_details,error_message=error_message,devices_details=devices_details)
 
 @app.route('/edit_testcase_details/<int:testcase_id>', methods=['GET','POST'])
 @login_required
 def edit_testcase_details(testcase_id):
+    devices_details=header()
     curr, conn=db_connection()
     error_message = None
     update_testcase_details=curr.execute(f"SELECT * FROM testcase_details WHERE testcase_id={testcase_id}")
@@ -539,8 +540,9 @@ def edit_testcase_details(testcase_id):
         testcase_number = str(request.form.get('testcase_number'))
         testcase_name = str(request.form.get('testcase_name'))
         testcase_function = str(request.form.get('testcase_function'))
+        testcase_reference = str(request.form.get('testcase_reference'))
         try:
-            curr.execute(f'UPDATE testcase_details SET testcase_number=%s,testcase_name=%s,testcase_function=%s WHERE testcase_id = %s',(testcase_number,testcase_name, testcase_function,testcase_id) )
+            curr.execute(f'UPDATE testcase_details SET testcase_number=%s,testcase_name=%s,testcase_function=%s,testcase_reference=%s WHERE testcase_id = %s',(testcase_number,testcase_name, testcase_function,testcase_reference,testcase_id) )
             conn.commit()
             curr.close()
             conn.close()
@@ -551,7 +553,7 @@ def edit_testcase_details(testcase_id):
             else:
                 error_message = str(e)
         if error_message != None:
-            return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message)
+            return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message,devices_details=devices_details)
         else:
             return redirect(url_for('testcase_details'))
       
@@ -559,7 +561,66 @@ def edit_testcase_details(testcase_id):
     curr.close()
     conn.close()
         
-    return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message)
+    return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message,devices_details=devices_details)
+
+@app.route('/edit_modules_details/<int:module_id>', methods=['GET','POST'])
+@login_required
+def edit_module_details(module_id):
+    devices_details=header()
+    curr, conn=db_connection()
+    update_module_details=curr.execute(f"SELECT * FROM modules_details WHERE modules_id={module_id}")
+    update_module_details=curr.fetchone()
+    error_message = None
+    if request.method == "POST":
+        module_name = str(request.form.get('module'))
+        print("Moduke name====", module_name)
+        print("Moduke name====", module_id)
+       
+        try:
+            curr.execute(f'UPDATE modules_details SET module_name=%s WHERE modules_id = %s',(module_name,module_id) )
+            conn.commit()
+            curr.close()
+            conn.close()
+        except Exception as e:
+            pat = re.search("DETAIL:.*", str(e))
+            if pat!= None:
+                error_message=pat.group(0)
+            else:
+                error_message = str(e)
+        print("Error message===", error_message)
+        
+        return redirect(url_for('modules'))
+      
+    conn.commit()
+    curr.close()
+    conn.close()
+        
+    return render_template('edit_modules_details.html',update_module_details = update_module_details,error_message=error_message,devices_details=devices_details)
+
+
+
+@app.route('/get_device_details_from_modules',  methods=['GET','POST'])
+def get_device_details_from_modules():
+    if request.method == 'POST':
+        device_id = request.form.get('data')
+        curr, conn=db_connection()
+        curr.execute(f"SELECT * FROM devices_details WHERE device_id={device_id}")
+        module_device_details=curr.fetchone()
+        print("====", module_device_details)
+        conn.commit()
+        curr.close()
+        conn.close()
+        return render_template('get_device_details_from_modules.html',module_device_details=module_device_details)
+
+@app.route('/delete_testcase/<int:id>', methods=['GET','POST'])
+def delete_testcase(id):
+    if request.method == "POST":
+        curr,conn=db_connection()
+        curr.execute(f'DELETE FROM testcase_details WHERE testcase_id={id}')
+        conn.commit()
+        curr.close()
+        conn.close()
+        return redirect("/testcase_details")
 
 
 

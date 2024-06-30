@@ -32,21 +32,33 @@
                                 <input type="text" class="form-control" name="testcase_function" placeholder="Testcase Function" required />
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <input type="text" class="form-control" name="testcase_reference" placeholder="Testcase Reference" required />
+                            </div>
+                        </div>
 
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <select class="form-control" name="module_id" required>
+                                <select class="form-control" name="module_id" required id="select_module">
                                     <option value="">-- Select Module --</option>
                                     {% for details in modules_details %}
-                                    <option value="{{ details[1] }}">{{ details[2] }}</option>
+                                    <option value="{{ details[0] }}">{{ details[2] }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12 d-flex justify-content-center">
+                            <div class="col-md-6 text-center">
+                                <a href="/testcase_details" class="btn btn-secondary">Cancel</a>
+                            </div>
+                            <div class="col-md-6 text-center">
                                 <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                        <div class="row mb-3" id="show_device">
+                            <div class="col-md-12">
                             </div>
                         </div>
 
@@ -77,5 +89,23 @@
         </div>
     </div>
 </div>
-
+<script>
+    $(document).ready(function(){
+        $('#select_module').on('change',function(){
+            var value = $('#select_module').val();
+            $.ajax({  
+                url:"/get_device_details_from_modules",  
+                method:"POST",  
+                data:{ "data":value},
+                success:function(data){
+                    $('#show_device').html(data);
+                }  
+                 
+            }); 
+        });
+           
+    
+       
+    })
+</script>
 {% endblock %}

@@ -9,28 +9,19 @@
         <div class="table-card table-card-statistics h-100">
             <div class="table-card-body">
                 <div class="d-block d-md-flex justify-content-between alert alert-success">
-                    <span class="fs-16 fst-italic">Add Module Details</span>
+                    <span class="fs-16 fst-italic">Edit Module Details</span>
                 </div>
 
                 <div class="p-3 regression_scroll_table div_shadow">
-                    <form name="" action="/add_modules_details" method="post">
+                    <form name="" action="/edit_modules_details/{{update_module_details[1]}}" method="post">
 
                         <div class="row mb-3">
                             <div class="col-md-12">
-                                <input type="text" class="form-control" name="module" placeholder="Module Name" required />
+                                <input type="text" class="form-control" name="module" placeholder="Module Name" required value="{{update_module_details[2]}}"/>
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <select class="form-control" name="device_id" required>
-                                    <option value="">-- Select Device --</option>
-                                    {% for details in devices_details %}
-                                    <option value="{{ details[0] }}">{{ details[1] }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
+                        
 
                         <div class="row">
                             <div class="col-md-6 text-center">

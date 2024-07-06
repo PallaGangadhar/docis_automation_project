@@ -18,7 +18,8 @@
                                 </button>
                             </div>
                         </div>
-                        <table class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey"
+                        <table
+                            class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey"
                             id="regression_details_datatable">
                             <thead class="table-light text-center">
                                 <tr class="text-dark">
@@ -42,9 +43,10 @@
                                             <i class="fas fa-edit"></i> <!-- Edit icon -->
                                         </a>
                                         <!-- Delete button -->
-                                        <button type="button" class="btn btn-danger delete-button"
-                                            data-toggle="modal" data-target="#myModal">
-                                            <i class="fas fa-trash-alt"></i> <!-- Delete icon -->
+                                        <button type="button"
+                                            class="btn btn-danger device_delete_open-ConfirmationDialog"
+                                            data-bs-toggle="modal" data-id="{{details[0]}}" data-bs-target="#delete_device">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -57,23 +59,26 @@
         </div>
     </div>
 
-    <!-- The Modal -->
-    <div class="modal" id="myModal">
+    <div class="modal fade" id="delete_device" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <!-- Modal Header -->
+
                 <div class="modal-header">
                     <h4 class="modal-title">Are you sure you want to delete?</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <!-- Modal body -->
+
                 <div class="modal-body">
                     Once you delete it, it will not revert back..
                 </div>
-                <!-- Modal footer -->
+                <div class="modal-body" id="show_details_table">
+                    
+                </div>
+
                 <div class="modal-footer">
-                    <form name="" id="delete" method="post">
-                        <button type="submit" class="btn btn-success" data-bs-dismiss="modal" id="delete_regression">Yes</button>
+                    <form name="" id="delete_device_form" method="post">
+                        <button type="submit" class="btn btn-success" data-bs-dismiss="modal"
+                            id="delete_device">Yes</button>
                     </form>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
                 </div>
@@ -82,19 +87,6 @@
     </div>
 </div>
 
-<script>
-    // JavaScript to handle delete button clicks and show modal
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteButtons = document.querySelectorAll('.delete-button');
 
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                // Handle delete button click event here
-                // For example, show the modal for confirmation
-                $('#myModal').modal('show');
-            });
-        });
-    });
-</script>
 
 {% endblock %}

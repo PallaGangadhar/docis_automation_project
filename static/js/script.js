@@ -434,3 +434,52 @@ $(document).on("click", ".open-ConfirmationDialog", function () {
       $("#delete").attr("action", "/delete_regression/" + pk);
     }); 
 });
+
+
+$(document).on("click", ".tc_delete_open-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    $("#delete_testcase").click(function(){
+      $("#delete_tc_form").attr("action", "/delete_testcase/" + pk);
+    }); 
+});
+
+$(document).on("click", ".modules_delete_open-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    $("#delete_module").click(function(){
+      $("#delete_module_form").attr("action", "/delete_module/" + pk);
+    }); 
+});
+
+$(document).on("click", ".device_delete_open-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    $.ajax({  
+        url:"/show_details_mapped_to_devices",  
+        method:"POST",  
+        data:{ "data":pk},  
+        success:function(data){  
+            $('#show_details_table').html(data);
+        }  
+    });
+    $("#delete_device").click(function(){
+        $("#delete_device_form").attr("action", "/delete_device/" + pk);
+      }); 
+});
+
+$(document).on("click", ".module_delete_open-ConfirmationDialog", function () {
+    var pk = $(this).data('id');
+    $.ajax({  
+        url:"/show_details_mapped_to_modules",  
+        method:"POST",  
+        data:{ "data":pk},  
+        success:function(data){  
+            $('#show_details_table').html(data);
+        }  
+    });
+    $("#delete_module").click(function(){
+        $("#delete_module_form").attr("action", "/delete_module/" + pk);
+      }); 
+});
+
+$('#select_all_regression').on('click', function(){
+    $(".reg_box").prop('checked', $(this).prop('checked'));
+});

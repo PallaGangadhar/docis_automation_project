@@ -43,7 +43,7 @@
                                 <select class="form-control" name="module_id" required id="select_module">
                                     <option value="">-- Select Module --</option>
                                     {% for details in modules_details %}
-                                    <option value="{{ details[0] }}">{{ details[2] }}</option>
+                                    <option value="{{ details[1] }}">{{ details[2] }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

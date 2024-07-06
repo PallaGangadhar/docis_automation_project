@@ -1,0 +1,11 @@
+<div class="row mb-3" id="show_details_table">
+    <div class="col-md-12">
+        {% if testcase_details %}
+        <span>Below testcases are mapped to this modules, if you continue then below data and all regressions assoicated with this module also get delete.</span>
+        <h6>Testcase Details: </h6>
+        {% for details in testcase_details %}
+            <div>{{details[0]}}</div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>

@@ -115,13 +115,13 @@
 
                             <button class="btn btn-primary"><a href="/view_regression_details" class="text-white">View
                                     Regressions</a></button>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                View Device Details
+                            </button>
+            
                         </div>
-                        <div class="table table-bordered mt-3">
-
-                            <button class="btn btn-primary"><a href="/view_regression_details" class="text-white">View
-                                    Regressions</a></button>
-                        </div>
-
+                        
                     </figure>
 
                 </div>
@@ -130,7 +130,42 @@
             </div>
         </div><!--end card-->
     </div><!--end col-->
+    
 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Device Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <table class="table table-bordered mt-2">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center">Device Name</th>
+                        <th scope="col" class="text-center">Device IP</th>
+                        <th scope="col" class="text-center">Modal</th>
+                        <th scope="col" class="text-center">Vendor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="total_tc_count" class="text-center">{{device_details[1]}}</td>
+                        <td id="total_pass_count" class="text-center">{{device_details[2]}}</td>
+                        <td id="total_fail_count" class="text-center">{{device_details[3]}}</td>
+                        <td id="no_run_count" class="text-center">{{device_details[4]}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
 </body>
 
 </html>

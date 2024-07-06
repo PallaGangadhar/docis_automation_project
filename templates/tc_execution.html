@@ -3,6 +3,37 @@
 {% block content %}
 
 
+<!-- Include Bootstrap CSS and FontAwesome icons -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<style>
+  .bg-sleek-blue {
+    background-color: #2c3e50; /* Sleek blue background color */
+  }
+  .text-light {
+    color: #ecf0f1 !important; /* Light text color for better contrast */
+  }
+  .scroll {
+    max-height: 275px; /* Adjust this height as needed */
+    overflow-y: auto;
+  }
+  .checkbox_font {
+    font-size: 0.9rem;
+  }
+  .truncate-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+
+
+
+
+
+
+
+
 <!-- ========== Left Sidebar Start ========== -->
 <div class="h-100 d-flex">
   <div class="side-section">
@@ -60,9 +91,11 @@
 
       <div class="mb-1">
         <div class="button-section d-flex justify-content-between">
-          <button type="button" class="btn btn-success btn-sm" onclick="show_modal('exampleModal');" id="check_tc">
+          <button type="button" class="btn btn-success btn-sm" onclick="show_modal('tc_execution');"  data-bs-toggle="modal">
             <i class="fas fa-play"></i> Run
           </button>
+    
+      </button>
           <button type="button" id="stop" class="btn btn-danger btn-sm" disabled>
             <i class="fas fa-stop"></i> Stop
           </button>
@@ -82,36 +115,6 @@
 </div>
 <!-- Left Sidebar End -->
 
-<!-- Include Bootstrap CSS and FontAwesome icons -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-<style>
-  .bg-sleek-blue {
-    background-color: #2c3e50; /* Sleek blue background color */
-  }
-  .text-light {
-    color: #ecf0f1 !important; /* Light text color for better contrast */
-  }
-  .scroll {
-    max-height: 275px; /* Adjust this height as needed */
-    overflow-y: auto;
-  }
-  .checkbox_font {
-    font-size: 0.9rem;
-  }
-  .truncate-cell {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-</style>
-
-
-
-
-
-
-
 
 <!-- END layout-wrapper -->
 
@@ -120,7 +123,7 @@
 <div class="rightbar-overlay"></div>
 
 <!-- Add Regression Modal -->
-<div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal" id="tc_execution" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -136,7 +139,7 @@
           value="{{device_details[0]}}" />
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" id="run" onclick="run_tc('exampleModal');">Save</button>
+        <button type="submit" class="btn btn-primary" id="run" onclick="run_tc('tc_execution');">Save</button>
       </div>
     </div>
   </div>

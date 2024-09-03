@@ -116,19 +116,18 @@ def select_query_to_get_count_details(reg_id):
    
 # );
 # CREATE TABLE IF NOT EXISTS modules_details(
-#     device_id serial,
+#     device_id serial ,
 #     modules_id serial PRIMARY KEY,
 #     module_name text NOT NULL,
 # CONSTRAINT fk_device FOREIGN KEY(device_id)
 #         REFERENCES devices_details(device_id)
 # );
 # CREATE TABLE IF NOT EXISTS devices_details(
-#     device_id serial,
+#     device_id serial PRIMARY KEY,
 #     device_name text NOT NULL,
 #     ip text NOT NULL,
 #     model text NOT NULL,
-#     vendor text not null,
-# PRIMARY KEY(regression_id)
+#     vendor text not null
 
 # );
 # CREATE TABLE IF NOT EXISTS testcase_details(
@@ -218,3 +217,40 @@ def select_query_to_get_count_details(reg_id):
 # );
 
 # ikpD10@gpa002
+# SELECT testcase_details.testcase_name FROM public.testcase_details,modules_details where testcase_details.modules_id = modules_details.modules_id and modules_details.modules_id=5;
+
+
+# ALTER TABLE modules_details DROP CONSTRAINT fk_device;
+# ALTER TABLE modules_details
+# ADD CONSTRAINT fk_device FOREIGN KEY (device_id)
+# REFERENCES devices_details (device_id) ON DELETE CASCADE;
+
+
+# ALTER TABLE testcase_details DROP CONSTRAINT fk_module;
+# ALTER TABLE testcase_details
+# ADD CONSTRAINT fk_module FOREIGN KEY (modules_id)
+# REFERENCES modules_details (modules_id) ON DELETE CASCADE;
+
+# ALTER TABLE regression DROP CONSTRAINT fk_device;
+# ALTER TABLE regression
+# ADD CONSTRAINT fk_device FOREIGN KEY (device_id)
+# REFERENCES devices_details (device_id) ON DELETE CASCADE;
+
+
+# ALTER TABLE regression_logs_details DROP CONSTRAINT fk_regression;
+# ALTER TABLE regression
+# ADD CONSTRAINT fk_regression FOREIGN KEY (regression_id)
+# REFERENCES regression (regression_id) ON DELETE CASCADE;
+
+
+
+# WITH extracted_digits AS (
+#     SELECT 
+#         REGEXP_REPLACE(execution_time, '\D', '', 'g') AS digits_string
+#     FROM 
+#         regression_logs_details where regression_id=9
+# )
+# SELECT 
+#     SUM(CAST(SUBSTRING(digits_string, 1) AS INTEGER)) AS sum_of_digits
+# FROM 
+#     extracted_digits;

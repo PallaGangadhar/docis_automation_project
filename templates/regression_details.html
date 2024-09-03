@@ -9,7 +9,9 @@
             <div class="table-card table-card-statistics h-100">
                 <div class="table-card-body">
                     <div class="d-block d-md-flex justify-content-between alert alert-success">
-                        <span class="fs-16 fst-italic">Regression Details</span>
+                        <span class="fs-16 fst-italic">Regression Details
+                           
+                        </span>
                     </div>
                     <div class="p-3  div_shadow">
                         <form id="search_form" method="GET" action="/view_regression_details">
@@ -46,6 +48,7 @@
                                         <th>Pass TC</th>
                                         <th>Fail TC</th>
                                         <th>No Run TC</th>
+                                        <th>Total Time</th>
                                         <th>Status</th>
                                         <th>Action
                                             <input type="checkbox" id="select_all_regression"> 
@@ -60,6 +63,7 @@
                                         <td>{{ reg_details[3] }}</td>
                                         <td>{{ reg_details[4] }}</td>
                                         <td>{{ reg_details[5] }}</td>
+                                        <td>{{ reg_details[0]|total_time }} seconds</td>
                                         <td>
                                             {% if reg_details[8] == 'Completed' %}
                                             <span class="badge bg-success">{{ reg_details[8] }}</span>

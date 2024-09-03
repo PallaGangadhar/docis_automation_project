@@ -21,6 +21,38 @@ app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['SECRET_KEY'] = "testkey"
 
+def capitalize_words(s):
+    return ' '.join([word.capitalize() for word in s.split()])
+
+# Register the custom filter with Jinja2
+
+
+
+def total_time(regression_id):
+    curr, conn=db_connection()
+    curr.execute(f'''
+                                                      
+            WITH extracted_numbers AS (
+            SELECT 
+                CAST(REGEXP_REPLACE(execution_time, '[^0-9.]', '', 'g') AS NUMERIC) AS numeric_value
+            FROM 
+                regression_logs_details 
+            WHERE 
+                regression_id = {regression_id}
+        )
+        SELECT 
+            SUM(numeric_value) AS sum_of_numbers
+        FROM 
+            extracted_numbers;
+
+                                                        ''')
+    total_time_for_each_regression=curr.fetchone()[0]
+    conn.commit()
+    curr.close()
+    conn.close()
+    return total_time_for_each_regression
+    
+app.jinja_env.filters['total_time'] = total_time
 
 socketio = SocketIO(app, async_mode=async_mode)
 
@@ -36,6 +68,7 @@ def background_thread(data):
 
 
 def send_chart_details(data):
+    
     pass_tc = data.get('pass')
     fail_tc = data.get('fail')
     p=0
@@ -143,6 +176,7 @@ def index():
     curr.close()
     conn.close()
     is_data_present=len(regression_graph)
+    
     return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices,is_data_present=is_data_present)
 
 
@@ -166,7 +200,8 @@ def tc_execution(device_id):
     curr, conn=db_connection()
     curr.execute(f"SELECT * FROM modules_details where device_id={device_id}")
     modules_details=curr.fetchall()
-    curr.execute(f"SELECT * FROM testcase_details WHERE modules_id in (SELECT modules_id FROM modules_details where device_id={device_id} )")
+    curr.execute(f"SELECT * FROM testcase_details WHERE modules_id in (SELECT modules_id FROM modules_details where device_id={device_id} ) order by testcase_id ASC")
+    # curr.execute(f"SELECT * FROM testcase_details WHERE modules_id in (SELECT modules_id FROM modules_details where device_id={device_id} ) order_by testcase_id ASC")
     testcase_details = curr.fetchall()
     curr.execute(f"SELECT * FROM devices_details where device_id={device_id}")
     device_details = curr.fetchone()
@@ -181,8 +216,16 @@ def tc_execution(device_id):
 def modules():
     devices_details=header()
     curr, conn=db_connection()
-    # curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
-    curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id ORDER BY modules_id DESC;")
+    search_module = request.args.get('search_module')
+    device_type = request.args.get('device_type_dropdown')
+    if search_module != None and search_module != "":
+        search_module="'%"+search_module+"%'"
+        curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id and  LOWER(module_name) LIKE LOWER("+search_module+") ORDER BY modules_id DESC;")
+    elif device_type != None and device_type != "":
+        curr.execute(f"SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id and devices_details.device_id={device_type} ORDER BY modules_id DESC;")
+
+    else:
+        curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id ORDER BY modules_id DESC;")
     modules_details=curr.fetchall()
     conn.commit()
     curr.close()
@@ -192,9 +235,13 @@ def modules():
 @app.route('/devices', methods=['GET','POST'])
 @login_required
 def devices():
-    
     curr, conn=db_connection()
-    curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
+    search_devices = request.args.get('search_device')
+    if search_devices != None and search_devices != "":
+        search_devices="'%"+search_devices+"%'"
+        curr.execute(f"SELECT * FROM devices_details where LOWER(device_name) LIKE LOWER("+search_devices+")ORDER BY device_id DESC")
+    else:   
+        curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
     devices_details=curr.fetchall()
     conn.commit()
     curr.close()
@@ -205,15 +252,31 @@ def devices():
 @login_required
 def testcase_details():
     devices_details=header()
+    tc_name = request.args.get('search_tc')
+    module_type = request.args.get('module_type_dropdown')
+    device_type = request.args.get('device_type_dropdown')
     curr, conn=db_connection()
-    # curr.execute(f"SELECT * FROM testcase_details ORDER BY testcase_id DESC")
-    curr.execute('SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id ORDER BY testcase_id DESC;')
-    # curr.execute('SELECT testcase_details.*,devices_details.device_name, modules_details.module_name FROM testcase_details,modules_details, devices_details where devices_details.device_id=modules_details.device_id ORder by testcase_details.testcase_id desc;')
+    curr.execute('select modules_id,module_name from modules_details')
+    module_details = curr.fetchall()
+    if tc_name != None and tc_name != "":
+        tc_name="'%"+tc_name+"%'"
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and LOWER(testcase_name) LIKE LOWER("+tc_name+") ORDER BY testcase_id DESC;")
+    elif module_type != None and module_type != "":
+        module_type="'"+module_type+"'"
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and modules_details.modules_id={module_type} ORDER BY testcase_id DESC;")
+    elif device_type != None and device_type != '':
+        device_type="'"+device_type+"'"
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} ORDER BY testcase_id DESC;")
+
+    else:
+        curr.execute('SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id ORDER BY testcase_id DESC;')
     testcase_details=curr.fetchall()
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('testcase_details.html',testcase_details=testcase_details,devices_details=devices_details)
+    return render_template('testcase_details.html',testcase_details=testcase_details,devices_details=devices_details,module_details=module_details)
+
+
 
 @app.route('/add_modules_details', methods=['GET','POST'])
 @login_required
@@ -221,8 +284,8 @@ def add_modules():
     devices_details=header()
     curr, conn=db_connection()
     if request.method == "POST":
-        module = str(request.form.get('module'))
-        device_id = str(request.form.get('device_id'))
+        module = str(request.form.get('module')).strip(' ')
+        device_id = str(request.form.get('device_id')).strip(' ')
         curr.execute('''INSERT INTO modules_details(device_id,module_name) VALUES (%s,%s)''',(device_id,module) )
     curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
     devices_details=curr.fetchall()
@@ -238,10 +301,10 @@ def add_device_details():
     devices_details=header()
     error_message=None
     if request.method == "POST":
-        device_name = str(request.form.get('device_name'))
-        device_ip = str(request.form.get('device_ip'))
-        model = str(request.form.get('model'))
-        vendor = str(request.form.get('vendor'))
+        device_name = str(request.form.get('device_name')).strip(' ')
+        device_ip = str(request.form.get('device_ip')).strip(' ')
+        model = str(request.form.get('model')).strip(' ')
+        vendor = str(request.form.get('vendor')).strip(' ')
         curr, conn=db_connection()
         
         try:
@@ -265,11 +328,11 @@ def add_testcase_details():
     devices_details=header()
     curr, conn=db_connection()
     if request.method == "POST":
-        module_id = str(request.form.get('module_id'))
-        testcase_number = str(request.form.get('testcase_number'))
-        testcase_name = str(request.form.get('testcase_name'))
-        testcase_function = str(request.form.get('testcase_function'))
-        testcase_reference=str(request.form.get('testcase_reference'))
+        module_id = str(request.form.get('module_id')).strip(' ')
+        testcase_number = str(request.form.get('testcase_number')).strip(' ')
+        testcase_name = str(request.form.get('testcase_name')).strip(' ')
+        testcase_function = str(request.form.get('testcase_function')).strip(' ')
+        testcase_reference=str(request.form.get('testcase_reference')).strip(' ')
         curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function,testcase_reference) VALUES (%s,%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function,testcase_reference) )
     curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
     modules_details=curr.fetchall()
@@ -327,10 +390,12 @@ def add_regression_logs():
 @app.route("/view_regression_details", methods=['GET','POST'])
 @login_required
 def view_regression_details():
+    example_string = "hello world from flask"
     devices_details=header()
     curr,conn=db_connection()
     cmts_type = request.args.get('cmts_type_dropdown')
     search_reg = request.args.get('search_reg')
+    total_time_for_each_regression=""
     if cmts_type != None and cmts_type != "" and (search_reg == None or search_reg == ""):
         cmts_type="'"+cmts_type+"'"
         curr.execute(f"SELECT * FROM regression WHERE cmts_type="+cmts_type+"ORDER BY date_added DESC")
@@ -346,8 +411,24 @@ def view_regression_details():
 
     else:
         curr.execute('SELECT * FROM regression ORDER BY date_added DESC')
+        # total_time_for_each_regression = curr.execute('''
+                                                      
+        #     WITH extracted_digits AS (
+        #     SELECT 
+        #     REGEXP_REPLACE(execution_time, '\D', '', 'g') AS digits_string
+        #     FROM 
+        #     regression_logs_details where regression_id=9
+        #     )
+        #     SELECT 
+        #     SUM(CAST(SUBSTRING(digits_string, 1) AS INTEGER)) AS sum_of_digits
+        #     FROM 
+        #     extracted_digits;
+
+        #                                                 ''')
+
 
     regression_details=curr.fetchall()
+    print(total_time_for_each_regression)
     
     curr.execute('SELECT cmts_type,status FROM regression')
     c_type_curr=curr.fetchall()
@@ -362,7 +443,8 @@ def view_regression_details():
     curr.close()
     conn.close()
     
-    return render_template('regression_details.html',regression_details=regression_details,c_type=c_type,status=status,devices_details=devices_details)
+    return render_template('regression_details.html',regression_details=regression_details,c_type=c_type,
+                           status=status,devices_details=devices_details,example_string=example_string)
 
 @login_required
 @app.route("/view_tc_logs_details/<int:reg_id>", methods=['GET','POST'])
@@ -602,11 +684,10 @@ def edit_module_details(module_id):
 @app.route('/get_device_details_from_modules',  methods=['GET','POST'])
 def get_device_details_from_modules():
     if request.method == 'POST':
-        device_id = request.form.get('data')
+        module_id = request.form.get('data')
         curr, conn=db_connection()
-        curr.execute(f"SELECT * FROM devices_details WHERE device_id={device_id}")
+        curr.execute(f"SELECT devices_details.device_name FROM devices_details,modules_details where modules_details.device_id=devices_details.device_id and modules_details.modules_id={module_id}")
         module_device_details=curr.fetchone()
-        print("====", module_device_details)
         conn.commit()
         curr.close()
         conn.close()
@@ -633,6 +714,53 @@ def header():
     conn.close()
     return devices_details
 
+@app.route('/show_details_mapped_to_devices',  methods=['GET','POST'])
+def show_details_mapped_to_devices():
+    if request.method == 'POST':
+        device_id = request.form.get('data')
+        print(device_id)
+        curr, conn=db_connection()
+        curr.execute(f"select modules_details.module_name from devices_details, modules_details where modules_details.device_id=devices_details.device_id and devices_details.device_id={device_id}")
+        module_device_details=curr.fetchall()
+        curr.execute(f"select testcase_details.testcase_name from devices_details, testcase_details,modules_details where testcase_details.modules_id=modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_id}")
+        testcase_details=curr.fetchall()
+        conn.commit()
+        curr.close()
+        conn.close()
+        return render_template('show_details_mapped_to_devices.html',module_device_details=module_device_details,testcase_details=testcase_details)
+
+@app.route('/delete_device/<int:id>', methods=['GET','POST'])
+def delete_device(id):
+    if request.method == "POST":
+        curr,conn=db_connection()
+        curr.execute(f'delete from devices_details where device_id={id}')
+        conn.commit()
+        curr.close()
+        conn.close()
+        return redirect("/devices")   
+    
+@app.route('/show_details_mapped_to_modules',  methods=['GET','POST'])
+def show_details_mapped_to_modules():
+    if request.method == 'POST':
+        module_id = request.form.get('data')
+        curr, conn=db_connection()
+        curr.execute(f"select testcase_details.testcase_name from  testcase_details where modules_id={module_id}")
+        testcase_details=curr.fetchall()
+        conn.commit()
+        curr.close()
+        conn.close()
+        return render_template('show_details_mapped_to_modules.html',testcase_details=testcase_details)
+
+
+@app.route('/delete_module/<int:id>', methods=['GET','POST'])
+def delete_module(id):
+    if request.method == "POST":
+        curr,conn=db_connection()
+        curr.execute(f'delete from modules_details where modules_id={id}')
+        conn.commit()
+        curr.close()
+        conn.close()
+        return redirect("/modules")  
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

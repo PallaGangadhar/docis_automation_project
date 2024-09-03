@@ -105,12 +105,16 @@
         var regression_date_graph = '{{ regression_date_graph|tojson }}';
         var devices_regression_count = '{{ devices_regression_count|tojson }}';
         var total_regression_count = '{{ total_regression_count }}';
-        var casa_i_cmts_count = '{{ i_cmts_count }}';
-        var harmony_count = '{{ harmony_count }}';
-        var vccap_count = '{{ vccap_count }}';
-
+        
         regression_date_graph = JSON.parse(regression_date_graph);
-        pie_chart = JSON.parse(pie_chart);
+        var new_data=""
+        try{
+
+            pie_chart = JSON.parse(pie_chart);
+        }
+        catch{
+
+        }
         new_data = JSON.parse(graph_data);
         devices_regression_count = JSON.parse(devices_regression_count);
 
@@ -127,9 +131,6 @@
         }
 
         var reg_data = [];
-        var harmony_data = [];
-        var cmts_data = [];
-        var vccap_data = [];
         var reg_date = [];
 
         for (var i = 0; i < regression_date_graph['data'].length; i++) {
@@ -144,6 +145,12 @@
         Highcharts.chart('bar_chart', {
             chart: {
                 type: 'column'
+            },
+            exporting: {
+                    enabled: false // Disables the context menu
+            },
+            credits: {
+                enabled: false // Disables the Highcharts.com text
             },
             title: {
                 text: 'Regression Report'
@@ -184,6 +191,12 @@
                 //     '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
                 //     'target="_blank">Wikipedia.com</a>'
             },
+            exporting: {
+                    enabled: false // Disables the context menu
+            },
+            credits: {
+                enabled: false // Disables the Highcharts.com text
+            },
             xAxis: {
                 categories: reg_date,
                 accessibility: {
@@ -220,6 +233,12 @@
                 plotBorderWidth: null,
                 plotShadow: false,
                 type: 'pie'
+            },
+            exporting: {
+                    enabled: false // Disables the context menu
+            },
+            credits: {
+                enabled: false // Disables the Highcharts.com text
             },
             title: {
                 text: 'Regression Pie Chart',

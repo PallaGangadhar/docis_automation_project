@@ -23,8 +23,19 @@ $(document).ready(function () {
     });
     $('.modules').click(function(){
         $('#select_module').prop('checked', false);
+        if ($('#select_all').is(':checked') == true){maintain_testcase_selection()}
     });
 });
+
+function maintain_testcase_selection(){
+    module_id_arr = removeDuplicates(module_id_arr)
+    for(let m=0;m<module_id_arr.length;m++){
+        $("input:checkbox[name='testcase_module_"+module_id_arr[m]+"[]']").prop('checked',true);
+    }
+    checkboxes_value_1=count_selected_testcases();
+    $('#total_tc_count').text(checkboxes_value_1.length.toString());
+    $('#tc_count b').text("Total TC Selected: "+checkboxes_value_1.length.toString());
+}
 
 $('#stop').click(function(){ 
     $('#clear_logs').prop('disabled', false);
@@ -125,7 +136,13 @@ try{
                     text: '',
                     // align: 'cenet'
                 },
-               
+                exporting: {
+                    enabled: false // Disables the context menu
+                },
+                credits: {
+                    enabled: false // Disables the Highcharts.com text
+                },
+                
                 plotOptions: {
                     pie: {
                         allowPointSelect: true,
@@ -184,6 +201,7 @@ $("#select_module").click(function () {
     $(".modules").prop('checked', $(this).prop('checked'));
     $("#select_all").prop('checked', false);
     select_testcases()
+    
 });
 
 
@@ -210,6 +228,7 @@ function select_testcases(){
         check_module_id =   $(this).attr("id");		
     });
     
+    
     $("input:checkbox[name='modules[]']:not(:checked)").each(function(){   
         unchecked_module = $(this).attr("id");
         uncheckboxes_value.push($(this).attr("id"));
@@ -226,6 +245,11 @@ function select_testcases(){
             remove_err_ele(uncheckboxes_value, modules[i]);
         }
         
+    }
+    module_id_arr = removeDuplicates(module_id_arr)
+    for(let k=0;k<uncheckboxes_value.length;k++){
+        unchecked_module_id = uncheckboxes_value[k].replace ( /[^\d.]/g, '' );
+        remove_err_ele(module_id_arr, unchecked_module_id)
     }
     
 }
@@ -287,7 +311,6 @@ function run_tc(div_id){
             $('#check_tc').prop('disabled', true);
             $('#tc_count b').text("Total TC Selected: "+total_tc_selected);
             $('#total_tc_count').text(total_tc_selected);
-            console.log(total_tc_selected)
             $.ajax({  
                 url:"/logs",  
                 method:"POST",  
@@ -331,6 +354,7 @@ function count_selected_testcases(){
                 }  
             }); 
         }
+    
     return checkboxes_value_1;
 }
 
@@ -483,3 +507,36 @@ $(document).on("click", ".module_delete_open-ConfirmationDialog", function () {
 $('#select_all_regression').on('click', function(){
     $(".reg_box").prop('checked', $(this).prop('checked'));
 });
+
+try{
+    var selected_module=window.location.href.split('?')[1].split('=')[1].split('&')[0]
+    var selected_device=window.location.href.split('?')[1].split('&')[1].split('=')[1]
+    var search_tc=window.location.href.split('?')[1].split('&')[2].split('=')[1]
+    selected_value = selected_value.replace("+"," ")
+    $("#module_type_filter").val(selected_module);
+    $("#device_type_filter").val(selected_device);
+    search_tc = search_tc.replace(/[+]/g,' ');
+    $("#search_tc").val(search_tc);
+  }
+  catch(err){
+  }
+
+
+try{
+    var selected_device=window.location.href.split('?')[1].split('=')[1].split('&')[0]
+    var search_module=window.location.href.split('?')[1].split('&')[1].split('=')[1]
+    $("#device_type_filter").val(selected_device);
+    search_module = search_module.replace(/[+]/g,' ');
+    $("#search_module").val(search_module);
+  }
+  catch(err){
+}
+
+
+try{
+    var search_device=window.location.href.split('?')[1].split('=')[1].split('&')[0]
+    search_device = search_device.replace(/[+]/g,' ');
+    $("#search_device").val(search_device);
+  }
+  catch(err){
+}

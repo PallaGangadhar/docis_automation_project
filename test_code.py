@@ -1,7 +1,9 @@
 from utlity import send_req
 import requests
 import texttable as tt
-from db import update_regression_summary_path
+from db import update_regression_summary_path, db_connection
+import os
+from datetime import datetime
 
 tab = tt.Texttable()
 row=None
@@ -59,6 +61,7 @@ Md62:0/0.0
      45  Apr 24 2024       1  100     0d0h0m      2d22h29m    2d22h29m    0d0h0m      0d0h0m      0d0h0m    
      47  Apr 24 2024       1  100     0d0h0m      2d22h28m    2d22h28m    0d0h0m      0d0h0m      0d0h0m    
  ==========================================================================================================="""
+    # tab.add_row(['Ottmar Hitzfeld', 'Borussia Dortmund, Bayern Munich','1997 and 2001'])
     tab.add_row(['Ottmar Hitzfeld', 'Borussia Dortmund, Bayern Munich','1997 and 2001'])
 
     send_req("\n\n########### Executed command: show clock #################\n\n")
@@ -70,7 +73,7 @@ Md62:0/0.0
     send_req("====== TABLE ====================")
     
     send_req("TestStep:Pass")
-    table_summary("001","TC 1","FAiL","N/A","12 seconds","a.txt")
+    table_summary("001","TC 1","FAiL","N/A","12.5 seconds","a.txt")
     requests.post("http://localhost:5000/charts", json={"pass":1, "fail":0},headers = {'Content-type': 'application/json'})
 
 def TC_2():
@@ -83,10 +86,8 @@ def TC_2():
     tab.add_row(['Ernst Happel', 'Feyenoord, Hamburg', '1970 and 1983'])
 
     send_req("\n\n########### Test Case 2 #################\n\n")
-    for i in output.splitlines():
-        print(i)
-        send_req(i)
-    table_summary("012","TC 2","PASS","N/A","5 seconds","a.txt")
+    send_req(output)
+    table_summary("012","TC 2","PASS","N/A","5.5 seconds","a.txt")
     requests.post("http://localhost:5000/charts", json={"pass":1, "fail":0},headers = {'Content-type': 'application/json'})
 
 def TC_3():
@@ -117,8 +118,7 @@ def TC_4():
     tab.add_row(['Gangadhar', 'Gpalla, Inter Milan', '000 and 000'])
 
     send_req("\n\n########### Test Case 2 #################\n\n")
-    for i in output.splitlines():
-        send_req(i)
+    send_req(output)
     table_summary("4","Tc 4","PASS","N/A","1 seconds","a.txt")
     requests.post("http://localhost:5000/charts", json={"pass":1, "fail":0},headers = {'Content-type': 'application/json'})
 
@@ -153,7 +153,20 @@ def TC_6():
 
 
 def call_after_execution(r_id):
-    file = open("static\\files\\abc.txt", "w")
+    # folder_name = 
+    curr, conn=db_connection()
+    curr.execute(f"select regression_name from regression where regression_id={r_id}")
+    regression_name = curr.fetchone()
+    conn.commit()
+    curr.close()
+    conn.close()
+    regression_name = regression_name[0].replace(' ','_')
+    current_datetime = datetime.now()
+    datetime_string = current_datetime.strftime("%Y-%m-%d %H-%M-%S")
+    print("Current Date and Time:", datetime_string.replace(' ','_'))
+    folder_name=f"static\\files\\{regression_name}_{datetime_string}"
+    os.makedirs(folder_name, exist_ok=True)
+    file = open(f"{folder_name}\\abc.txt", "w")
     file.truncate(0)
     file.write("\n********** SUMMARY **********")
     print(tab.draw())

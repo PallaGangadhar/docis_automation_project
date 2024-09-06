@@ -1,17 +1,14 @@
 from flask import Flask, render_template, request, Response, redirect, session, url_for
 from flask_socketio import SocketIO, emit
-from flask_mail import Mail, Message
-import os
 import datetime
 from test_code import *
-from utlity import genearate_list_of_dict,convert_date_to_str,convert_str_to_date
+from utlity import convert_date_to_str,convert_str_to_date
 from db import *
 from send_mail import send_mail_to
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+
 import re
-from decorators import login_required,devices_details_render
+from decorators import login_required
 import bcrypt
-import threading
 from cryptography.fernet import Fernet
 
 

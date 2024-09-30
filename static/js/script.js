@@ -56,14 +56,16 @@ $('#clear_logs').click(function(){
 
 $(document).ready(function() {
     var socket = io();
-
-    socket.on('connect', function() {
-        
+    socket.on('connect', function() {        
         socket.emit('my_event', {data: 'I\'m connected!'});
     });
 
-   
-    socket.on('my_response', function(msg, cb) {
+    window.setInterval(function() {
+        var elem = document.getElementById('log');
+        elem.scrollTop = elem.scrollHeight;
+      }, 5000);
+    
+      socket.on('my_response', function(msg, cb) {
         var color = 'black';
         if (msg.data.includes('TestStep') == true  && msg.data.includes('Pass') == true){
             color="green"
@@ -506,6 +508,13 @@ $(document).on("click", ".module_delete_open-ConfirmationDialog", function () {
 
 $('#select_all_regression').on('click', function(){
     $(".reg_box").prop('checked', $(this).prop('checked'));
+    $("input:checkbox[name='reg_box']:checked").each(function(){    
+        testcase_id.push($(this).val());  
+    });
+    
+    
+
+    
 });
 
 try{

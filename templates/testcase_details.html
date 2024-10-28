@@ -17,9 +17,23 @@
                                     <a href="/add_testcase_details" class="text-white">Add Testcase</a>
                                 </button>
                             </div>
+                            <div class="col-sm-2 col-xl-12">
+                                <form id="" method="POST" action="/testcase_file_upload" enctype="multipart/form-data">
+                                <div class="upload-container">
+                                    <label for="file-upload" class="custom-file-upload">
+                                        Choose File
+                                    </label>
+                                    <input id="file-upload" type="file" name="testcase_file_upload" />
+                                    <input type="submit" id="" class="btn btn-primary me-2" value="Submit" />
+                                </div>
+                                <a href="/static/uploads/testcase_failed.txt"
+                                                class="btn btn-outline-warning btn-sm">Failed to Upload TC</a>
+                            </form>
+                            </div>
 
                         </div>
                         <div class="p-3">
+                            
                             <form id="search_form" method="GET" action="/testcase_details">
                                 <div class="row">
                                     <div class="col-sm-2">
@@ -55,6 +69,7 @@
                                     </div>
                                 </div>
                             </form>
+                            
                             <div class="mt-3">
                                 <table
                                     class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey"
@@ -92,12 +107,15 @@
                                                     data-bs-target="#delete_tc">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
+                                                <a href="/copy_testcase/{{details[0]}}" class="btn btn-success">
+                                                    <i class="fas fa-copy"></i> <!-- Edit icon -->
+                                                </a>
                                             </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                               
+
                             </div>
                         </div>
                     </div>

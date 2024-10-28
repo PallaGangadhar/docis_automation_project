@@ -60,10 +60,10 @@ $(document).ready(function() {
         socket.emit('my_event', {data: 'I\'m connected!'});
     });
 
-    window.setInterval(function() {
-        var elem = document.getElementById('log');
-        elem.scrollTop = elem.scrollHeight;
-      }, 5000);
+    // window.setInterval(function() {
+    //     var elem = document.getElementById('log');
+    //     elem.scrollTop = elem.scrollHeight;
+    //   },0.1);
     
       socket.on('my_response', function(msg, cb) {
         var color = 'black';
@@ -76,7 +76,6 @@ $(document).ready(function() {
         var eachLine = msg.data.split('\n');
         
         for(var i = 0, l = eachLine.length; i < l; i++) {
-            // console.log('Line ' + (i+1) + ': ' + eachLine[i]);
             $('#log').append('<div style="color:'+color+'">' + $('<div/>').append( eachLine[i].trim().replace(/ /g, "&nbsp;")).html());
         }
         if (cb)

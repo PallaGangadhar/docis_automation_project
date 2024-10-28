@@ -1,0 +1,2 @@
+13.To Check SNMP V2 - V4 and V6 Accessibility from NetSim with No ACL
+11.To Check SSH Access - V4 and V6 Accessibility from NetSim with No ACL

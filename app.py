@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, redirect, session, url_for
+from flask import Flask, render_template, request, Response, redirect, session, url_for, send_file
 from flask_socketio import SocketIO, emit
 import datetime
 from test_code import *
@@ -10,18 +10,35 @@ import re
 from decorators import login_required
 import bcrypt
 from cryptography.fernet import Fernet
-
+from datetime import datetime
+import pandas as pd
+from generate_html import generate_html_file
 
 async_mode = None
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['SECRET_KEY'] = "testkey"
+app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 
 def capitalize_words(s):
     return ' '.join([word.capitalize() for word in s.split()])
 
 # Register the custom filter with Jinja2
+
+# curr, conn=db_connection()
+# curr.execute(f"select regression_name,date_added from regression order by regression_id desc limit 1")
+# details = curr.fetchone()
+# conn.commit()
+# curr.close()
+# conn.close()
+# regression_name = details[0].replace(' ','_')
+# date_time = details[1]
+# print(regression_name, date_time)
+# dt_obj = date_time
+# dt_obj = date_time.replace(microsecond=0)
+# formatted_date = dt_obj.strftime("%Y-%m-%d %H:%M:%S").replace(' ','_')
+
 
 
 
@@ -97,7 +114,6 @@ def index():
     total_regression_count=total_regression_count[0]
     curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
     devices_details=curr.fetchall()
-
     
     curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details inner JOIN regression ON regression.regression_id = regression_logs_details.regression_id RIGHT JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
     devices_regression_count = curr.fetchall()
@@ -109,7 +125,7 @@ def index():
         curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC')
         graph_details = curr.fetchall()
 
-        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY  devices_details.device_name')
+        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name ORDER BY devices_details.device_name')
         pie_chart_details = curr.fetchall()
 
     
@@ -122,7 +138,7 @@ def index():
         curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC")
         graph_details = curr.fetchall()
 
-        curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY  devices_details.device_name")
+        curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY devices_details.device_name ORDER BY devices_details.device_name")
         pie_chart_details = curr.fetchall()
         
         
@@ -153,14 +169,14 @@ def index():
         else:
             new_graph_data[new_data[i]['name']] = [new_data[i]['data']]
     
-    new_data_2 ={}
+    new_data_2 = {}
     new_graph_data = [new_graph_data]
     for k in range(0,len([new_graph_data]),1):
         for i in new_graph_data[0].keys():
             output_list = [sum(pair) for pair in zip(*new_graph_data[k][i])]
             new_graph_list_data.append({'name':i,'data':output_list})
         
-
+    new_graph_list_data = sorted(new_graph_list_data, key=lambda x:x['name'])
     new_data_2['data'] = new_graph_list_data
 
     pie_chart = []
@@ -168,7 +184,7 @@ def index():
         per = (pie[1]/total_regression_count)*100
         pie_chart.append({'name':pie[0], 'y':round(per,2)})
 
-
+    
     conn.commit()
     curr.close()
     conn.close()
@@ -255,6 +271,8 @@ def testcase_details():
     curr, conn=db_connection()
     curr.execute('select modules_id,module_name from modules_details')
     module_details = curr.fetchall()
+
+
     if tc_name != None and tc_name != "":
         tc_name="'%"+tc_name+"%'"
         curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and LOWER(testcase_name) LIKE LOWER("+tc_name+") ORDER BY testcase_id DESC;")
@@ -450,12 +468,16 @@ def view_tc_logs_details(reg_id):
     curr,conn=db_connection()
     curr.execute(f'SELECT * FROM regression_logs_details WHERE regression_id={reg_id}')
     tc_logs_details=curr.fetchall()
-    curr.execute(f"SELECT summary_path FROM regression WHERE regression_id={reg_id}")
-    summary_path=curr.fetchone()
+    curr.execute(f"SELECT regression_name, date_added, summary_path FROM regression WHERE regression_id={reg_id}")
+    data=curr.fetchone()
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('view_tc_logs_details.html',tc_logs_details=tc_logs_details,summary_path=summary_path,reg_id=reg_id,devices_details=devices_details)
+    date_time = data[1]
+    dt_obj = date_time
+    dt_obj = date_time.replace(microsecond=0)
+    formatted_date = dt_obj.strftime("%Y-%m-%d_%H:%M:%S")
+    return render_template('view_tc_logs_details.html',tc_logs_details=tc_logs_details,summary_path=data[2],reg_id=reg_id,devices_details=devices_details,regression_name=data[0], date_added=formatted_date)
 
 
 @app.route('/delete_regression/<int:id>', methods=['GET','POST'])
@@ -652,8 +674,6 @@ def edit_module_details(module_id):
     error_message = None
     if request.method == "POST":
         module_name = str(request.form.get('module'))
-        print("Moduke name====", module_name)
-        print("Moduke name====", module_id)
        
         try:
             curr.execute(f'UPDATE modules_details SET module_name=%s WHERE modules_id = %s',(module_name,module_id) )
@@ -700,8 +720,6 @@ def delete_testcase(id):
         conn.close()
         return redirect("/testcase_details")
 
-
-
 def header():
     curr, conn=db_connection()
     curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
@@ -715,12 +733,12 @@ def header():
 def show_details_mapped_to_devices():
     if request.method == 'POST':
         device_id = request.form.get('data')
-        print(device_id)
         curr, conn=db_connection()
         curr.execute(f"select modules_details.module_name from devices_details, modules_details where modules_details.device_id=devices_details.device_id and devices_details.device_id={device_id}")
         module_device_details=curr.fetchall()
         curr.execute(f"select testcase_details.testcase_name from devices_details, testcase_details,modules_details where testcase_details.modules_id=modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_id}")
         testcase_details=curr.fetchall()
+        
         conn.commit()
         curr.close()
         conn.close()
@@ -758,6 +776,98 @@ def delete_module(id):
         curr.close()
         conn.close()
         return redirect("/modules")  
+
+@app.route('/testcase_file_upload', methods=['GET', 'POST'])
+def testcase_file_upload():
+    if request.method == 'POST':
+        # Check if the post request has the file part
+        file = request.files['testcase_file_upload']
+        # If user does not select a file, browser submits an empty part
+        if file.filename == '':
+            return 'No selected file', 400
+        
+        if file:
+            filename = file.filename
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            # Save file to the uploads directory
+            file.save(file_path)
+            
+            # Insert file metadata into the database
+            curr,conn=db_connection()
+            curr.execute('INSERT INTO file_uploads (filename, file_path) VALUES (%s, %s)', (filename, file_path))
+            conn.commit()
+
+            # Add testcase in sheet
+            curr.execute("SELECT file_path FROM public.file_uploads ORDER BY id DESC LIMIT 1")
+            file_upload = curr.fetchone()
+            file = pd.read_excel(file_upload[0])
+            
+            # device_names = file['Device Name'].to_list()
+            modules_id_list = []
+            failed_tc_list = []
+            module_names = file['Module Name'].to_list()
+            testcase_number_list = file['Testcase Number'].to_list()
+            testcase_name_list = file['Testcase Name'].to_list()
+            testcase_function_list = file['Testcase Function'].to_list()
+            testcase_reference_list = file['Test Reference'].to_list()
+            
+            for m_name, tc_name in zip(module_names, testcase_name_list):
+                try:
+                    curr.execute(f"SELECT modules_id FROM modules_details WHERE module_name='{m_name}'")
+                    get_module_id = curr.fetchone()
+                    modules_id_list.append(get_module_id[0])
+                    
+                except:
+                    failed_tc_list.append(tc_name)
+
+            with open("static/uploads\\testcase_failed.txt","w") as f:
+                for tc_name in failed_tc_list:
+                    f.write(str(tc_name)+"\n")
+
+            # file['device_id'] = devices_id_list
+            for module_id, testcase_number, testcase_name, testcase_function, testcase_reference in zip(modules_id_list, testcase_number_list, testcase_name_list, testcase_function_list, testcase_reference_list):
+                curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function,testcase_reference) VALUES (%s,%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function,testcase_reference) )
+            conn.commit()
+            
+            curr.execute('DELETE FROM file_uploads;')
+            conn.commit()
+            curr.close()
+            conn.close()
+
+            if os.path.exists(file_upload[0]):
+                os.remove(file_upload[0])
+                print(f"{file_upload[0]} has been deleted successfully.")
+            else:
+                print(f"{file_upload[0]} does not exist.")
+            
+            return redirect("/testcase_details")
+
+        return redirect("/testcase_details")
+
+
+@app.route('/generate_html/<int:reg_id>', methods=['GET', 'POST'])
+def generate_html(reg_id):
+    input_file_path = 'ganga.txt'
+    output_file_path = 'static\\html_logs\\ganga.html'
+    generate_html_file(input_file_path, output_file_path)
+    return send_file(output_file_path)
+
+@app.route('/copy_testcase/<int:reg_id>', methods=['GET', 'POST'])
+def copy_testcase(reg_id):
+    curr,conn=db_connection()
+    curr.execute(f'SELECT * FROM testcase_details WHERE testcase_id={reg_id}')
+    get_testcase_detail = curr.fetchone()
+    module_id = str(get_testcase_detail[1]).strip(' ')
+    testcase_number = str(get_testcase_detail[2]).strip(' ')
+    testcase_name = str(get_testcase_detail[3]).strip(' ')
+    testcase_function = str(get_testcase_detail[4]).strip(' ')
+    testcase_reference = str(get_testcase_detail[5]).strip(' ')
+    curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function,testcase_reference) VALUES (%s,%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function,testcase_reference) )
+    conn.commit()
+    curr.close()
+    conn.close()
+    return redirect("/testcase_details")
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

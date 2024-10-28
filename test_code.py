@@ -380,29 +380,30 @@ def TC_6():
 
 def call_after_execution(r_id):
     # folder_name = 
-    curr, conn=db_connection()
-    curr.execute(f"select regression_name, regression_id from regression where regression_id={r_id}")
-    data = curr.fetchone()
-    conn.commit()
-    curr.close()
-    conn.close()
-    regression_name = data[0].replace(' ','_')
-    regression_id = str(data[1])
+    # curr, conn=db_connection()
+    # curr.execute(f"select regression_name, regression_id from regression where regression_id={r_id}")
+    # data = curr.fetchone()
+    # conn.commit()
+    # curr.close()
+    # conn.close()
+    # regression_name = data[0].replace(' ','_')
+    # regression_id = str(data[1])
     # print("regression_name[0] ===", data[1])
     # current_datetime = datetime.now()
     # datetime_string = current_datetime.strftime("%Y-%m-%d %H-%M-%S")
     # print("Current Date and Time:", datetime_string.replace(' ','_'))
     # folder_name=f"static\\files\\{regression_name}_{datetime_string}"
-    folder_name=f"static\\files\\{regression_name}_{regression_id}"
-    print(f"Folder name=== {folder_name}")
-    os.makedirs(folder_name, exist_ok=True)
-    file = open(f"{folder_name}\\abc.txt", "w")
-    file.truncate(0)
-    file.write("\n********** SUMMARY **********")
-    print(tab.draw())
-    file.write(tab.draw())
-    update_regression_summary_path(r_id,"abc.txt")
-    tab.reset()
-    file.close()
+    # folder_name=f"static\\files\\{regression_name}_{regression_id}"
+    # print(f"Folder name=== {folder_name}")
+    # os.makedirs(folder_name, exist_ok=True)
+    # file = open(f"{folder_name}\\abc.txt", "w")
+    # file.truncate(0)
+    # file.write("\n********** SUMMARY **********")
+    # print(tab.draw())
+    # file.write(tab.draw())
+    # update_regression_summary_path(r_id,"abc.txt")
+    # tab.reset()
+    # file.close()
+    pass
     
 

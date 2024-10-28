@@ -116,6 +116,7 @@
 
         }
         new_data = JSON.parse(graph_data);
+        console.log(new_data)
         devices_regression_count = JSON.parse(devices_regression_count);
 
         const randColor = () => {
@@ -140,7 +141,7 @@
     } catch (err) {
         console.error(err);
     }
-
+    
     try {
         Highcharts.chart('bar_chart', {
             chart: {

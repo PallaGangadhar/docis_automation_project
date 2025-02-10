@@ -63,7 +63,12 @@
                                         <td>{{ reg_details[3] }}</td>
                                         <td>{{ reg_details[4] }}</td>
                                         <td>{{ reg_details[5] }}</td>
-                                        <td>{{ reg_details[0]|total_time }} seconds</td>
+                                        <td>
+                                            {% if  reg_details[0]|total_time  == None %}NA
+                                            {% else %}
+                                            {{ reg_details[0]|total_time }} seconds
+                                            {% endif %}
+                                        </td>
                                         <td>
                                             {% if reg_details[8] == 'Completed' %}
                                             <span class="badge bg-success">{{ reg_details[8] }}</span>
@@ -72,6 +77,14 @@
                                             {% endif %}
                                         </td>
                                         <td>
+                                            <!-- <form name="" method="GET" action="/generate_html/{{ reg_details[0] }}"> -->
+                                                <!-- <button class="btn btn-outline-success btn-sm open-ConfirmationDialog">
+                                                    <i class="fa fa-file" aria-hidden="true" type="'submit"></i>
+                                                </button> -->
+                                            <!-- </form> -->
+                                            <a href="/generate_html/{{ reg_details[0] }}"
+                                                class="btn btn-outline-warning btn-sm fa fa-file"></a>
+
                                             <a href="view_tc_logs_details/{{ reg_details[0] }}"
                                                 class="btn btn-outline-warning btn-sm">View TC details</a>
                                             <button class="btn btn-outline-danger btn-sm open-ConfirmationDialog"

@@ -2,9 +2,11 @@ import requests
 import time
 import secrets
 import datetime
+from flask import request
+
 def send_req(message):
-    # time.sleep(0.3)
-    requests.post("http://localhost:5000/connect", json={"data": message},headers = {'Content-type': 'application/json'})
+    query_string = request.url.split('?')[1]
+    requests.post("http://localhost:5000/send_message", json={"data": message, 'query_string':query_string},headers = {'Content-type': 'application/json'})
     
 def generate_key():
     ''' genearate key '''

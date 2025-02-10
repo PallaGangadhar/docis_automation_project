@@ -54,26 +54,37 @@ $('#clear_logs').click(function(){
     location.reload();
 });
 
+
 $(document).ready(function() {
-    var socket = io();
-    socket.on('connect', function() {        
-        socket.emit('my_event', {data: 'I\'m connected!'});
+    // var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var socket = io.connect('http://' + document.domain + ':' + location.port, {
+        reconnection: true,         // Enable reconnection
+        reconnectionAttempts: 5,     // Number of reconnection attempts
+        reconnectionDelay: 1000      // Delay between reconnection attempts
     });
 
-    // window.setInterval(function() {
-    //     var elem = document.getElementById('log');
-    //     elem.scrollTop = elem.scrollHeight;
-    //   },0.1);
+    // Register session after initial connection
+    socket.on('connect', function() {
+        socket.emit('register_session', { url: window.location.href });
+    });
+
+    // Re-register session after reconnection
+    socket.on('reconnect', function(attempt) {
+        console.log('Reconnected to server after attempt', attempt);
+        socket.emit('register_session', { url: window.location.href });
+    });
     
-      socket.on('my_response', function(msg, cb) {
+      socket.on('message', function(msg, cb) {
         var color = 'black';
-        if (msg.data.includes('TestStep') == true  && msg.data.includes('Pass') == true){
+        var url = window.location.href.split("?")[1]
+      
+        if (msg.msg.includes('TestStep') == true  && msg.msg.includes('Pass') == true){
             color="green"
         }
-        else if(msg.data.includes('TestStep') == true  && msg.data.includes('FAIL') == true){
+        else if(msg.msg.includes('TestStep') == true  && msg.msg.includes('FAIL') == true){
             color="red"
         }
-        var eachLine = msg.data.split('\n');
+        var eachLine = msg.msg.split('\n');
         
         for(var i = 0, l = eachLine.length; i < l; i++) {
             $('#log').append('<div style="color:'+color+'">' + $('<div/>').append( eachLine[i].trim().replace(/ /g, "&nbsp;")).html());
@@ -87,9 +98,7 @@ $(document).ready(function() {
         var pass_per = 0.0
         var fail_per = 0.0
         var no_run_per = 0.0
-
-        // pass = pass + msg.pass_tc
-        // fail = fail + msg.fail_tc
+        console.log(msg)
         total = msg.pass_tc + msg.fail_tc
         total_tc_selected=msg.total_count
         
@@ -121,6 +130,8 @@ $(document).ready(function() {
           socket.emit('client disconnected')
     });
 });
+
+
 
 // function show_charts(pass_per, fail_per, pass, fail){
 try{
@@ -312,11 +323,12 @@ function run_tc(div_id){
             $('#check_tc').prop('disabled', true);
             $('#tc_count b').text("Total TC Selected: "+total_tc_selected);
             $('#total_tc_count').text(total_tc_selected);
+            var random_string = generateRandomAlphanumeric(15);
+            window.location.href = "/tc_execution/"+device_id+"?"+random_string
             $.ajax({  
-                url:"/logs",  
+                url:"/tc_execution/"+device_id+"?"+random_string,
                 method:"POST",  
-                data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type,"device_id":device_id },  
-                 
+                data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type,"device_id":device_id,'random_string':random_string }
             }); 
            
             
@@ -548,3 +560,16 @@ try{
   }
   catch(err){
 }
+
+
+function generateRandomAlphanumeric(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
+// Example usage:
+ // Adjust length as needed

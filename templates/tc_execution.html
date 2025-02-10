@@ -2,10 +2,6 @@
 
 {% block content %}
 
-
-<!-- Include Bootstrap CSS and FontAwesome icons -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 <style>
   .bg-sleek-blue {
     background-color: #2c3e50; /* Sleek blue background color */
@@ -133,7 +129,7 @@
       </div>
       <div class="modal-body">
         <input type="text" class="form-control" placeholder="Enter Regression name" id="regression_name" />
-        <input type="hidden" class="form-control" name="cmts_type" placeholder="Enter Regression name" id=""
+        <input type="hidden" class="form-control" name="cmts_type" placeholder="" id=""
           value="{{device_details[1]}}" />
           <input type="hidden" class="form-control" name="device_id" id=""
           value="{{device_details[0]}}" />
@@ -146,7 +142,4 @@
 </div>
 
 
-<script>
-
-</script>
 {% endblock %}

@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, Response, redirect, session, url_for, send_file
+from flask import Flask, render_template, request, Response, redirect, session, url_for
 from flask_socketio import SocketIO, emit
-import datetime
-from test_code import *
+from CASA import *
+from Arris import *
 from utlity import convert_date_to_str,convert_str_to_date
 from db import *
 from send_mail import send_mail_to
@@ -9,36 +9,19 @@ from send_mail import send_mail_to
 import re
 from decorators import login_required
 import bcrypt
-from cryptography.fernet import Fernet
-from datetime import datetime
-import pandas as pd
-from generate_html import generate_html_file
+from datetime import timedelta
 
 async_mode = None
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['SECRET_KEY'] = "testkey"
-app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 
 def capitalize_words(s):
     return ' '.join([word.capitalize() for word in s.split()])
 
-# Register the custom filter with Jinja2
 
-# curr, conn=db_connection()
-# curr.execute(f"select regression_name,date_added from regression order by regression_id desc limit 1")
-# details = curr.fetchone()
-# conn.commit()
-# curr.close()
-# conn.close()
-# regression_name = details[0].replace(' ','_')
-# date_time = details[1]
-# print(regression_name, date_time)
-# dt_obj = date_time
-# dt_obj = date_time.replace(microsecond=0)
-# formatted_date = dt_obj.strftime("%Y-%m-%d %H:%M:%S").replace(' ','_')
-
+app.config['SESSION_TYPE'] = 'filesystem'
 
 
 
@@ -76,22 +59,21 @@ def shutdown_server():
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
 
-def background_thread(data):
-    socketio.emit('my_response',
-                    {'data': str(data)})
-
 
 def send_chart_details(data):
-    
     pass_tc = data.get('pass')
     fail_tc = data.get('fail')
+    query_string = data.get('query_string')
+    session_id = get_sesson_id(query_string)
+    reg_id = get_resgression_id(query_string)
     p=0
     f=0
     pass_count, fail_count, total_count,no_run = select_query_to_get_count_details(reg_id)
     p=int(pass_count)+pass_tc
     f=int(fail_count)+fail_tc
     update_regression(pass_tc, fail_tc, reg_id)
-    socketio.emit('charts_details',{'pass_tc':p, 'fail_tc':f,'r_id':reg_id,'total_count':total_count})
+    socketio.emit('charts_details',{'pass_tc':p, 'fail_tc':f,'r_id':reg_id,'total_count':total_count,'sid':session_id}, room=session_id)
+
 
 
 @app.route('/', methods=['GET','POST'])
@@ -130,7 +112,7 @@ def index():
 
     
     elif from_date != None and to_date != None  and from_date != "" and to_date != "":
-        to_date=convert_str_to_date(to_date,"%Y-%m-%d")+datetime.timedelta(days=1)
+        to_date=convert_str_to_date(to_date,"%Y-%m-%d")+timedelta(days=1)
         to_date=convert_date_to_str(to_date,"%Y-%m-%d")
         curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
         regression_graph=curr.fetchall()
@@ -190,25 +172,37 @@ def index():
     conn.close()
     is_data_present=len(regression_graph)
     
+    # return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices,is_data_present=is_data_present)
     return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices,is_data_present=is_data_present)
 
 
-
-@app.route('/logs', methods=['GET','POST'])
-@login_required
-def logs():
-    if request.method == "POST":
-        global reg_id
-        reg_id=add_regression(request)
-        tc = request.form.get('data')
-        for tc_name in tc.split(','):
-            eval(tc_name + "()")
-        call_after_execution(reg_id)
-    return render_template('logs.html')
+# @app.route('/logs', methods=['GET','POST'])
+# @login_required
+# def logs():
+#     if request.method == "POST":
+#         global reg_id
+        
+#         reg_id=add_regression(request)
+#         tc = request.form.get('data')
+        
+#         for tc_name in tc.split(','):
+#             eval(tc_name + "()")
+#         call_after_execution(reg_id)
+#     return render_template('logs.html')
 
 @app.route('/tc_execution/<int:device_id>', methods=['GET','POST'])
 @login_required
 def tc_execution(device_id):
+    if request.method == "POST":
+        global reg_id
+        reg_id=add_regression(request)
+        tc = request.form.get('data')
+        device_type = request.form.get('cmts_type')
+        for tc_name in tc.split(','):
+            eval(tc_name + "()")
+            
+        # RDP_call_after_execution()
+        eval(device_type + "_call_after_execution()")
     devices_details=header()
     curr, conn=db_connection()
     curr.execute(f"SELECT * FROM modules_details where device_id={device_id}")
@@ -271,8 +265,6 @@ def testcase_details():
     curr, conn=db_connection()
     curr.execute('select modules_id,module_name from modules_details')
     module_details = curr.fetchall()
-
-
     if tc_name != None and tc_name != "":
         tc_name="'%"+tc_name+"%'"
         curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and LOWER(testcase_name) LIKE LOWER("+tc_name+") ORDER BY testcase_id DESC;")
@@ -349,6 +341,7 @@ def add_testcase_details():
         testcase_function = str(request.form.get('testcase_function')).strip(' ')
         testcase_reference=str(request.form.get('testcase_reference')).strip(' ')
         curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function,testcase_reference) VALUES (%s,%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function,testcase_reference) )
+        
     curr.execute(f"SELECT * FROM modules_details ORDER BY modules_id DESC")
     modules_details=curr.fetchall()
     conn.commit()
@@ -358,21 +351,34 @@ def add_testcase_details():
     return render_template('add_testcase_details.html',modules_details=modules_details,devices_details=devices_details)
 
 
-@app.route("/connect", methods=['GET','POST'])
-@socketio.event
-def connect():
-    if request.method == "POST":
-        data=request.json.get('data')
-        socketio.start_background_task(background_thread, data)
-        return Response({'msg':"Hi"})
-    else:
-        emit('my_response', {'data': ''})
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    message = request.json.get('data')
+    query_string = request.json.get('query_string')
+    session_id = get_sesson_id(query_string)
+    if session_id:
+        socketio.emit('message', {'msg': f'{message}', 'sid':session_id}, room=session_id)
+        return {'status': 'success', 'message': message}
+    return {'status': 'error', 'message': 'User not connected'}, 400
+
+@socketio.on('connect')
+def handle_connect():
+    try:
+        browser_url = request.headers.get('Referer')
+        query_string = browser_url.split('?')[1]
+        add_regression_session(request.sid, query_string)
+    except:
+        pass
+
+
 
 @app.route("/charts", methods=['GET','POST'])
 @socketio.event
 def charts():    
     if request.method == "POST":
         data=request.json
+        print("Chart data===", data)
         send_chart_details(data)
         return Response({'msg':"Hi"})
     else:
@@ -381,7 +387,7 @@ def charts():
 @app.route("/disconnect", methods=['GET','POST'])
 @socketio.on('disconnect')
 def test_disconnect():
-    print('Client disconnected')
+    # print('Client disconnected')
     emit('client disconnected','a client disconnected but I dont know who')
 
 
@@ -397,7 +403,6 @@ def stop():
 def add_regression_logs():
     if request.method == "POST":
         response=request.json
-        response['r_id']=reg_id
         add_regression_details(response)
     return Response({'msg':''})
 
@@ -410,7 +415,7 @@ def view_regression_details():
     curr,conn=db_connection()
     cmts_type = request.args.get('cmts_type_dropdown')
     search_reg = request.args.get('search_reg')
-    total_time_for_each_regression=""
+    
     if cmts_type != None and cmts_type != "" and (search_reg == None or search_reg == ""):
         cmts_type="'"+cmts_type+"'"
         curr.execute(f"SELECT * FROM regression WHERE cmts_type="+cmts_type+"ORDER BY date_added DESC")
@@ -426,24 +431,10 @@ def view_regression_details():
 
     else:
         curr.execute('SELECT * FROM regression ORDER BY date_added DESC')
-        # total_time_for_each_regression = curr.execute('''
-                                                      
-        #     WITH extracted_digits AS (
-        #     SELECT 
-        #     REGEXP_REPLACE(execution_time, '\D', '', 'g') AS digits_string
-        #     FROM 
-        #     regression_logs_details where regression_id=9
-        #     )
-        #     SELECT 
-        #     SUM(CAST(SUBSTRING(digits_string, 1) AS INTEGER)) AS sum_of_digits
-        #     FROM 
-        #     extracted_digits;
-
-        #                                                 ''')
 
 
     regression_details=curr.fetchall()
-    print(total_time_for_each_regression)
+    
     
     curr.execute('SELECT cmts_type,status FROM regression')
     c_type_curr=curr.fetchall()
@@ -460,6 +451,7 @@ def view_regression_details():
     
     return render_template('regression_details.html',regression_details=regression_details,c_type=c_type,
                            status=status,devices_details=devices_details,example_string=example_string)
+
 
 @login_required
 @app.route("/view_tc_logs_details/<int:reg_id>", methods=['GET','POST'])
@@ -496,7 +488,7 @@ def delete_regression(id):
 def send_mail(reg_id):
     if request.method == "POST":
         email= request.form.get('emails')
-        print("Email===>",email)
+        
         curr,conn=db_connection()
         curr.execute(f'SELECT summary_path FROM regression WHERE regression_id={reg_id}')
         summary_path = curr.fetchone()
@@ -637,13 +629,20 @@ def edit_testcase_details(testcase_id):
     error_message = None
     update_testcase_details=curr.execute(f"SELECT * FROM testcase_details WHERE testcase_id={testcase_id}")
     update_testcase_details=curr.fetchone()
+    
+    curr.execute(f"SELECT modules_id, module_name from modules_details WHERE modules_id = {update_testcase_details[1]}")
+    selected_module = curr.fetchone()
+    
+    curr.execute(f"SELECT * FROM modules_details WHERE modules_id <> {update_testcase_details[1]}")
+    modules_details = curr.fetchall()
     if request.method == "POST":
         testcase_number = str(request.form.get('testcase_number'))
         testcase_name = str(request.form.get('testcase_name'))
         testcase_function = str(request.form.get('testcase_function'))
         testcase_reference = str(request.form.get('testcase_reference'))
+        module_id = str(request.form.get('module_id'))
         try:
-            curr.execute(f'UPDATE testcase_details SET testcase_number=%s,testcase_name=%s,testcase_function=%s,testcase_reference=%s WHERE testcase_id = %s',(testcase_number,testcase_name, testcase_function,testcase_reference,testcase_id) )
+            curr.execute(f'UPDATE testcase_details SET modules_id = %s, testcase_number=%s,testcase_name=%s,testcase_function=%s,testcase_reference=%s WHERE testcase_id = %s',(module_id, testcase_number,testcase_name, testcase_function,testcase_reference,testcase_id) )
             conn.commit()
             curr.close()
             conn.close()
@@ -654,7 +653,7 @@ def edit_testcase_details(testcase_id):
             else:
                 error_message = str(e)
         if error_message != None:
-            return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message,devices_details=devices_details)
+            return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message,devices_details=devices_details, selected_module=selected_module, modules_details=modules_details)
         else:
             return redirect(url_for('testcase_details'))
       
@@ -662,7 +661,9 @@ def edit_testcase_details(testcase_id):
     curr.close()
     conn.close()
         
-    return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message,devices_details=devices_details)
+    return render_template('edit_testcase_details.html',update_testcase_details = update_testcase_details,error_message=error_message,devices_details=devices_details, selected_module=selected_module, modules_details=modules_details)
+
+
 
 @app.route('/edit_modules_details/<int:module_id>', methods=['GET','POST'])
 @login_required
@@ -674,7 +675,7 @@ def edit_module_details(module_id):
     error_message = None
     if request.method == "POST":
         module_name = str(request.form.get('module'))
-       
+        
         try:
             curr.execute(f'UPDATE modules_details SET module_name=%s WHERE modules_id = %s',(module_name,module_id) )
             conn.commit()
@@ -686,7 +687,7 @@ def edit_module_details(module_id):
                 error_message=pat.group(0)
             else:
                 error_message = str(e)
-        print("Error message===", error_message)
+                
         
         return redirect(url_for('modules'))
       
@@ -738,7 +739,6 @@ def show_details_mapped_to_devices():
         module_device_details=curr.fetchall()
         curr.execute(f"select testcase_details.testcase_name from devices_details, testcase_details,modules_details where testcase_details.modules_id=modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_id}")
         testcase_details=curr.fetchall()
-        
         conn.commit()
         curr.close()
         conn.close()
@@ -776,99 +776,10 @@ def delete_module(id):
         curr.close()
         conn.close()
         return redirect("/modules")  
-
-@app.route('/testcase_file_upload', methods=['GET', 'POST'])
-def testcase_file_upload():
-    if request.method == 'POST':
-        # Check if the post request has the file part
-        file = request.files['testcase_file_upload']
-        # If user does not select a file, browser submits an empty part
-        if file.filename == '':
-            return 'No selected file', 400
-        
-        if file:
-            filename = file.filename
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            
-            # Save file to the uploads directory
-            file.save(file_path)
-            
-            # Insert file metadata into the database
-            curr,conn=db_connection()
-            curr.execute('INSERT INTO file_uploads (filename, file_path) VALUES (%s, %s)', (filename, file_path))
-            conn.commit()
-
-            # Add testcase in sheet
-            curr.execute("SELECT file_path FROM public.file_uploads ORDER BY id DESC LIMIT 1")
-            file_upload = curr.fetchone()
-            file = pd.read_excel(file_upload[0])
-            
-            # device_names = file['Device Name'].to_list()
-            modules_id_list = []
-            failed_tc_list = []
-            module_names = file['Module Name'].to_list()
-            testcase_number_list = file['Testcase Number'].to_list()
-            testcase_name_list = file['Testcase Name'].to_list()
-            testcase_function_list = file['Testcase Function'].to_list()
-            testcase_reference_list = file['Test Reference'].to_list()
-            
-            for m_name, tc_name in zip(module_names, testcase_name_list):
-                try:
-                    curr.execute(f"SELECT modules_id FROM modules_details WHERE module_name='{m_name}'")
-                    get_module_id = curr.fetchone()
-                    modules_id_list.append(get_module_id[0])
-                    
-                except:
-                    failed_tc_list.append(tc_name)
-
-            with open("static/uploads\\testcase_failed.txt","w") as f:
-                for tc_name in failed_tc_list:
-                    f.write(str(tc_name)+"\n")
-
-            # file['device_id'] = devices_id_list
-            for module_id, testcase_number, testcase_name, testcase_function, testcase_reference in zip(modules_id_list, testcase_number_list, testcase_name_list, testcase_function_list, testcase_reference_list):
-                curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function,testcase_reference) VALUES (%s,%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function,testcase_reference) )
-            conn.commit()
-            
-            curr.execute('DELETE FROM file_uploads;')
-            conn.commit()
-            curr.close()
-            conn.close()
-
-            if os.path.exists(file_upload[0]):
-                os.remove(file_upload[0])
-                print(f"{file_upload[0]} has been deleted successfully.")
-            else:
-                print(f"{file_upload[0]} does not exist.")
-            
-            return redirect("/testcase_details")
-
-        return redirect("/testcase_details")
+    
 
 
-@app.route('/generate_html/<int:reg_id>', methods=['GET', 'POST'])
-def generate_html(reg_id):
-    input_file_path = 'ganga.txt'
-    output_file_path = 'static\\html_logs\\ganga.html'
-    generate_html_file(input_file_path, output_file_path)
-    return send_file(output_file_path)
-
-@app.route('/copy_testcase/<int:reg_id>', methods=['GET', 'POST'])
-def copy_testcase(reg_id):
-    curr,conn=db_connection()
-    curr.execute(f'SELECT * FROM testcase_details WHERE testcase_id={reg_id}')
-    get_testcase_detail = curr.fetchone()
-    module_id = str(get_testcase_detail[1]).strip(' ')
-    testcase_number = str(get_testcase_detail[2]).strip(' ')
-    testcase_name = str(get_testcase_detail[3]).strip(' ')
-    testcase_function = str(get_testcase_detail[4]).strip(' ')
-    testcase_reference = str(get_testcase_detail[5]).strip(' ')
-    curr.execute('''INSERT INTO testcase_details(modules_id,testcase_number,testcase_name,testcase_function,testcase_reference) VALUES (%s,%s,%s,%s,%s)''',(module_id,testcase_number,testcase_name,testcase_function,testcase_reference) )
-    conn.commit()
-    curr.close()
-    conn.close()
-    return redirect("/testcase_details")
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True,host="0.0.0.0",port=5000)
 

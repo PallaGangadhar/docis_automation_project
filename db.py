@@ -24,9 +24,10 @@ def add_regression(request):
     total_tc_selected = request.form.get('total_tc_selected')
     cmts_type = request.form.get('cmts_type')
     device_id = request.form.get('device_id')
+    regression_string = request.form.get('random_string')
     r_id=0
-    curr.execute('''INSERT INTO regression(regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type,device_id) VALUES (%s, %s, %s, %s,%s,%s,%s,%s) RETURNING regression_id''',
-                  (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type,device_id))
+    curr.execute('''INSERT INTO regression(regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type,device_id, regression_string) VALUES (%s, %s, %s, %s,%s,%s,%s,%s, %s) RETURNING regression_id''',
+                  (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type,device_id,regression_string))
 
 
     r_id = curr.fetchone()
@@ -99,7 +100,43 @@ def select_query_to_get_count_details(reg_id):
     return pass_count, fail_count, total_count,no_run
 
 
+def add_regression_session(session_id, regression_string):
+    curr,conn=db_connection()
+    # curr.execute('''INSERT INTO regression_session(session_id,) VALUES (%s,) ''',
+    #               (session_id))
+    curr.execute('''INSERT INTO regression_session (session_id, regression_string) VALUES (%s, %s)''', (session_id,regression_string))
+    conn.commit()
+    curr.close()
+    conn.close()
 
+
+def get_sesson_id(regression_string):
+    curr,conn=db_connection()
+    curr.execute(f"SELECT CASE WHEN EXISTS ("+\
+            "SELECT 1 "+\
+            "FROM regression_session "+\
+            "WHERE regression_string = %s"+\
+        ") THEN 'True'"+\
+        "ELSE 'False'"+\
+    "END AS result;", (regression_string,))
+    is_exists = curr.fetchone()[0]
+    print("is exists===", is_exists)
+    if is_exists == 'True':
+        curr.execute("SELECT session_id FROM public.regression_session WHERE regression_string = %s", (regression_string,))
+        session_id = curr.fetchone()[0]
+        conn.commit()
+    curr.close()
+    conn.close()
+    return session_id
+
+def get_resgression_id(regression_string):
+    curr,conn=db_connection()
+    curr.execute("SELECT regression_id FROM public.regression WHERE regression_string = %s", (regression_string,))
+    regression_id = curr.fetchone()[0]
+    conn.commit()
+    curr.close()
+    conn.close()
+    return regression_id
 
 # CREATE TABLE IF NOT EXISTS user_info(
 #     user_id serial,

@@ -17,14 +17,28 @@ $('#TC').on("click","button", function(){
         });
 });
 
+console.log(window.location.href)
+var color='red'
+$('#log').append('<div style="color:'+color+'">' + $('<div/>').append(window.location.href).html());
 $(document).ready(function () {
     $('.testcases').click(function(){
         $('#select_all').prop('checked', false);
     });
     $('.modules').click(function(){
         $('#select_module').prop('checked', false);
+        if ($('#select_all').is(':checked') == true){maintain_testcase_selection()}
     });
 });
+
+function maintain_testcase_selection(){
+    module_id_arr = removeDuplicates(module_id_arr)
+    for(let m=0;m<module_id_arr.length;m++){
+        $("input:checkbox[name='testcase_module_"+module_id_arr[m]+"[]']").prop('checked',true);
+    }
+    checkboxes_value_1=count_selected_testcases();
+    $('#total_tc_count').text(checkboxes_value_1.length.toString());
+    $('#tc_count b').text("Total TC Selected: "+checkboxes_value_1.length.toString());
+}
 
 $('#stop').click(function(){ 
     $('#clear_logs').prop('disabled', false);
@@ -45,14 +59,16 @@ $('#clear_logs').click(function(){
 
 $(document).ready(function() {
     var socket = io();
-
-    socket.on('connect', function() {
-        
+    socket.on('connect', function() {        
         socket.emit('my_event', {data: 'I\'m connected!'});
     });
 
-   
-    socket.on('my_response', function(msg, cb) {
+    // window.setInterval(function() {
+    //     var elem = document.getElementById('log');
+    //     elem.scrollTop = elem.scrollHeight;
+    //   },0.1);
+    
+      socket.on('my_response', function(msg, cb) {
         var color = 'black';
         if (msg.data.includes('TestStep') == true  && msg.data.includes('Pass') == true){
             color="green"
@@ -63,7 +79,6 @@ $(document).ready(function() {
         var eachLine = msg.data.split('\n');
         
         for(var i = 0, l = eachLine.length; i < l; i++) {
-            // console.log('Line ' + (i+1) + ': ' + eachLine[i]);
             $('#log').append('<div style="color:'+color+'">' + $('<div/>').append( eachLine[i].trim().replace(/ /g, "&nbsp;")).html());
         }
         if (cb)
@@ -125,7 +140,13 @@ try{
                     text: '',
                     // align: 'cenet'
                 },
-               
+                exporting: {
+                    enabled: false // Disables the context menu
+                },
+                credits: {
+                    enabled: false // Disables the Highcharts.com text
+                },
+                
                 plotOptions: {
                     pie: {
                         allowPointSelect: true,
@@ -184,6 +205,7 @@ $("#select_module").click(function () {
     $(".modules").prop('checked', $(this).prop('checked'));
     $("#select_all").prop('checked', false);
     select_testcases()
+    
 });
 
 
@@ -210,6 +232,7 @@ function select_testcases(){
         check_module_id =   $(this).attr("id");		
     });
     
+    
     $("input:checkbox[name='modules[]']:not(:checked)").each(function(){   
         unchecked_module = $(this).attr("id");
         uncheckboxes_value.push($(this).attr("id"));
@@ -232,6 +255,7 @@ function select_testcases(){
         unchecked_module_id = uncheckboxes_value[k].replace ( /[^\d.]/g, '' );
         remove_err_ele(module_id_arr, unchecked_module_id)
     }
+    
 }
 
 $('#check_tc').click(function(){  
@@ -291,12 +315,13 @@ function run_tc(div_id){
             $('#check_tc').prop('disabled', true);
             $('#tc_count b').text("Total TC Selected: "+total_tc_selected);
             $('#total_tc_count').text(total_tc_selected);
-         
             $.ajax({  
                 url:"/logs",  
                 method:"POST",  
                 data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type,"device_id":device_id },  
-                 
+                success:function(res){
+                    window.location.href = "/tc_execution/"+device_id+"?asdsfsdfdf"
+                }
             }); 
            
             
@@ -335,6 +360,7 @@ function count_selected_testcases(){
                 }  
             }); 
         }
+    
     return checkboxes_value_1;
 }
 
@@ -486,6 +512,13 @@ $(document).on("click", ".module_delete_open-ConfirmationDialog", function () {
 
 $('#select_all_regression').on('click', function(){
     $(".reg_box").prop('checked', $(this).prop('checked'));
+    $("input:checkbox[name='reg_box']:checked").each(function(){    
+        testcase_id.push($(this).val());  
+    });
+    
+    
+
+    
 });
 
 try{

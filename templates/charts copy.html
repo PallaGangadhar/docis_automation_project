@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Professional Table and Chart</title>
+    <style>
+        .charts_section {
+            width: 90%;
+            margin-left: 8.5%;
+        }
+
+        .highcharts-figure {
+            margin: 0;
+        }
+
+        .table th,
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: bold;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .btn-custom {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            color: #fff;
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        .btn-custom a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .btn-custom a:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .test-report-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .view-regressions-btn {
+            margin-top: 20px;
+            /* Adjust as needed */
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="col-lg-4 col-sm-12">
+        <div class="card charts_section">
+            <div class="card">
+                <span id="tc_count" class="d-block mb-3 text-center"><b>Total Test Cases Selected: 0</b></span>
+                <div class="d-flex justify-content-center">
+                    <figure class="highcharts-figure col-sm-12 col-md-12">
+                        <div id="container"></div>
+                        <h5 class="test-report-header mt-3">Test Report</h5>
+                        <table class="table table-bordered mt-2">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-center">Total</th>
+                                    <th scope="col" class="text-center">Passed</th>
+                                    <th scope="col" class="text-center">Failed</th>
+                                    <th scope="col" class="text-center">Not Run</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="total_tc_count" class="text-center">0</td>
+                                    <td id="total_pass_count" class="text-center">0</td>
+                                    <td id="total_fail_count" class="text-center">0</td>
+                                    <td id="no_run_count" class="text-center">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="table table-bordered mt-3">
+
+                            <button class="btn btn-primary"><a href="/view_regression_details" class="text-white">View
+                                    Regressions</a></button>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#device_de_popup">
+                                View Device Details
+                            </button>
+            
+                        </div>
+                        
+                    </figure>
+
+                </div>
+
+
+            </div>
+        </div><!--end card-->
+    </div><!--end col-->
+    
+
+<!-- Modal -->
+<!-- <div class="modal fade" id="device_de_popup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Device Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <table class="table table-bordered mt-2">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center">Device Name</th>
+                        <th scope="col" class="text-center">Device IP</th>
+                        <th scope="col" class="text-center">Modal</th>
+                        <th scope="col" class="text-center">Vendor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="total_tc_count" class="text-center">{{device_details[1]}}</td>
+                        <td id="total_pass_count" class="text-center">{{device_details[2]}}</td>
+                        <td id="total_fail_count" class="text-center">{{device_details[3]}}</td>
+                        <td id="no_run_count" class="text-center">{{device_details[4]}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div> -->
+</body>
+
+</html>

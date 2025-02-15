@@ -6,6 +6,7 @@
     <div class="bg-img bg-cover">
         <div class="page-content page_content_scroll">
             <div class="container-fluid px-6">
+                {% if is_data_present != 0 %}
                 <div class="container-fluid mt-2">
                     <div class="row">
                         <div class="col-sm-6 col-md-6">
@@ -37,6 +38,21 @@
                     </div><!--end row-->
                 </div> <!-- container-fluid -->
 
+                
+                {% else %}
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <figure class="highcharts-figure">
+                                <div class="d-block d-md-flex justify-content-between alert alert-danger">
+                                    <span class="fs-16 fst-italic">No Data for Selected Date Range.Please select
+                                        different date range</span>
+                                </div>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
                 <div class="container-fluid mt-2">
                     <div class="row">
                         <form id="filter_graph" method="GET" action="/">
@@ -45,14 +61,16 @@
                                     <div id="from_date" class="input-group date" data-date-format="yyyy-mm-dd">
                                         <input class="form-control" type="text" name="from_date" id="from_date_val"
                                             autocomplete="off" placeholder="From Date" />
-                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                        <span class="input-group-addon"><i
+                                                class="glyphicon glyphicon-calendar"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
                                     <div id="to_date" class="input-group date" data-date-format="yyyy-mm-dd">
                                         <input class="form-control" type="text" name="to_date" id="to_date_val"
                                             autocomplete="off" placeholder="To Date" />
-                                        <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                        <span class="input-group-addon"><i
+                                                class="glyphicon glyphicon-calendar"></i></span>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -64,23 +82,21 @@
                         </form>
                     </div>
                 </div>
-
             </div> <!-- container-fluid -->
 
         </div> <!-- End Page-content -->
 
     </div>
 </div>
-<script src="../static/assets/libs/jquery/jquery.min.js"></script>
-<script src="../static/js/highchart.js"></script>
+
+
+    <script src="../static/assets/libs/jquery/jquery.min.js"></script>
+    <script src="../static/js/highchart.js"></script>
     <script src="../static/js/data.js"></script>
     <script src="../static/js/drilldown.js"></script>
     <script src="../static/js/exporting.js"></script>
     <script src="../static/js/export-data.js"></script>
     <script src="../static/js/accessibility.js"></script>
-
-<script src="../static/assets/libs/jquery/jquery.min.js"></script>
-
 <script>
     try {
         var graph_data = '{{ new_data_2|tojson }}';
@@ -88,13 +104,18 @@
         var regression_date_graph = '{{ regression_date_graph|tojson }}';
         var devices_regression_count = '{{ devices_regression_count|tojson }}';
         var total_regression_count = '{{ total_regression_count }}';
-        var casa_i_cmts_count = '{{ i_cmts_count }}';
-        var harmony_count = '{{ harmony_count }}';
-        var vccap_count = '{{ vccap_count }}';
-
+        
         regression_date_graph = JSON.parse(regression_date_graph);
-        pie_chart = JSON.parse(pie_chart);
+        var new_data=""
+        try{
+
+            pie_chart = JSON.parse(pie_chart);
+        }
+        catch{
+
+        }
         new_data = JSON.parse(graph_data);
+        console.log(new_data)
         devices_regression_count = JSON.parse(devices_regression_count);
 
         const randColor = () => {
@@ -110,9 +131,6 @@
         }
 
         var reg_data = [];
-        var harmony_data = [];
-        var cmts_data = [];
-        var vccap_data = [];
         var reg_date = [];
 
         for (var i = 0; i < regression_date_graph['data'].length; i++) {
@@ -122,14 +140,20 @@
     } catch (err) {
         console.error(err);
     }
-
+    
     try {
         Highcharts.chart('bar_chart', {
             chart: {
                 type: 'column'
             },
+            exporting: {
+                    enabled: false // Disables the context menu
+            },
+            credits: {
+                enabled: false // Disables the Highcharts.com text
+            },
             title: {
-                text: 'Regression Summary'
+                text: 'Regression Report'
             },
             xAxis: {
                 categories: reg_date,
@@ -155,23 +179,23 @@
                     borderWidth: 0
                 }
             },
-            series: new_data['data'],
-            credits: {
-                enabled: false
-            },
-            exporting: {
-                enabled: false
-            }
+            series: new_data['data']
         });
 
         Highcharts.chart('line_chart', {
             title: {
-                text: 'Regression Summary'
+                // text: 'Monthly Average Temperature'
             },
             subtitle: {
                 // text: 'Source: ' +
                 //     '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
                 //     'target="_blank">Wikipedia.com</a>'
+            },
+            exporting: {
+                    enabled: false // Disables the context menu
+            },
+            credits: {
+                enabled: false // Disables the Highcharts.com text
             },
             xAxis: {
                 categories: reg_date,
@@ -200,13 +224,7 @@
                     }
                 }
             },
-            series: new_data['data'],
-            credits: {
-                enabled: false
-            },
-            exporting: {
-                enabled: false
-            }
+            series: new_data['data']
         });
 
         Highcharts.chart('regression_pie_chart', {
@@ -216,8 +234,14 @@
                 plotShadow: false,
                 type: 'pie'
             },
+            exporting: {
+                    enabled: false // Disables the context menu
+            },
+            credits: {
+                enabled: false // Disables the Highcharts.com text
+            },
             title: {
-                text: 'Regression Summary',
+                text: 'Regression Pie Chart',
                 align: 'center'
             },
             tooltip: {
@@ -242,60 +266,54 @@
                 name: 'Brands',
                 colorByPoint: true,
                 data: pie_chart
-            }],
-            credits: {
-                enabled: false
-            },
-            exporting: {
-                enabled: false
-            }
+            }]
         });
+
     } catch (err) {
         console.error(err);
     }
 
     var total_regression_devices = "{{ total_regression_devices }}";
-    total_regression_devices = parseInt(total_regression_devices.toString());
+    total_regression_devices = parseInt(total_regression_devices.toString())
 
     if (total_regression_devices > 4) {
         $('#seconddiv').css('display', 'block');
 
-        let items = document.querySelectorAll('.carousel .carousel-item');
+        let items = document.querySelectorAll('.carousel .carousel-item')
 
         items.forEach((el) => {
             let minPerSlide = 2;
 
             if (total_regression_devices > 4) {
-                minPerSlide = 4;
+                minPerSlide = 4
             } else {
                 minPerSlide = total_regression_devices;
             }
 
-            let next = el.nextElementSibling;
+            let next = el.nextElementSibling
 
             for (var i = 1; i < minPerSlide; i++) {
                 if (!next) {
-                    next = items[0];
+                    next = items[0]
                 }
 
-                let cloneChild = next.cloneNode(true);
-                el.appendChild(cloneChild.children[0]);
-                next = next.nextElementSibling;
+                let cloneChild = next.cloneNode(true)
+                el.appendChild(cloneChild.children[0])
+                next = next.nextElementSibling
             }
-        });
+        })
+
     } else {
         $('#firstdiv').css('display', 'block');
     }
 
     $('#exampleModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget);
-        var recipient = button.data('whatever');
-        var modal = $(this);
-        modal.find('.modal-title').text('New message to ' + recipient);
-        modal.find('.modal-body input').val(recipient);
+        var button = $(event.relatedTarget)
+        var recipient = button.data('whatever')
+        var modal = $(this)
+        modal.find('.modal-title').text('New message to ' + recipient)
+        modal.find('.modal-body input').val(recipient)
     });
 </script>
-
-
 
 {% endblock %}

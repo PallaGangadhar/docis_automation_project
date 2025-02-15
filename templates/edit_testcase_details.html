@@ -43,16 +43,16 @@
                             </div>
                         </div>
 
-                        <!-- <div class="row mb-3">
+                        <div class="row mb-3">
                             <div class="col-md-12">
-                                <select class="form-control" name="module_id" required>
-                                    <option value="">-- Select Module --</option>
+                                <select class="form-control" name="module_id" required id="select_module">
+                                    <option value="{{selected_module[0]}}" selected>{{selected_module[1]}}</option>
                                     {% for details in modules_details %}
                                     <option value="{{ details[1] }}">{{ details[2] }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
-                        </div> -->
+                        </div>
 
                         <div class="row">
                             <div class="col-md-12 d-flex justify-content-center">

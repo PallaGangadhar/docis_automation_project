@@ -14,15 +14,18 @@
                         </span>
                     </div>
                     <div class="p-3  div_shadow">
-                        <form id="search_form" method="GET" action="/view_regression_details">
+                        <form id="search_form" method="POST" action="/view_regression_details">
                             <div class="row">
                                 <div class="col-sm-3">
                                     <select name="cmts_type_dropdown" class="form-select form-select-lg form-select-sm mb-3"
                                         id="cmts_type_filter">
                                         <option value="">-- SELECT --</option>
-                                        {% for type in c_type %}
+                                        <!-- {% for type in c_type %}
                                         <option value="{{ type }}">{{ type }}</option>
-                                        {% endfor %}
+                                        {% endfor %} -->
+                                        {% for details in devices_details %}
+                                            <option value="{{ details[1] }}">{{ details[1] }}</option>
+                                            {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-sm-3">

@@ -11,57 +11,32 @@
             <div class="table-card table-card-statistics h-100">
                 <div class="table-card-body">
                     <div class="p-3 div_shadow">
-                        <!-- <div class="row">
-                            <div class="col-sm-2 col-md-8">
-                                <button type="button" class="btn btn-primary">
-                                    <a href="/add_testcase_details" class="text-white">Add Testcase</a>
-                                </button>
-                            </div>
-                            <div class="col-sm-2 col-xl-12">
-                                <form id="" method="POST" action="/testcase_file_upload" enctype="multipart/form-data">
-                                <div class="upload-container">
-                                    <label for="file-upload" class="custom-file-upload">
-                                        Choose File
-                                    </label>
-                                    <input id="file-upload" type="file" name="testcase_file_upload" />
-                                    <input type="submit" id="" class="btn btn-primary me-2" value="Submit" />
-                                </div>
-                                <a href="/static/uploads/testcase_failed.txt"
-                                                class="btn btn-outline-warning btn-sm">Failed to Upload TC</a>
-                            </form>
-                            </div>
-
-                        </div> -->
                         <div class="p-3">
                             
                             <form id="search_form" method="GET" action="/testcase_details">
                                 <div class="row">
                                     <div class="col-sm-2">
-                                        <select name="module_type_dropdown"
-                                            class="form-select form-select-lg form-select-sm mb-3"
-                                            id="module_type_filter">
-                                            <option value="">-- SELECT --</option>
-                                            {% for details in module_details %}
-                                            <option value="{{ details[0] }}">{{ details[1] }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="col-sm-2">
                                         <select name="device_type_dropdown"
                                             class="form-select form-select-lg form-select-sm mb-3"
                                             id="device_type_filter">
-                                            <option value="">-- SELECT --</option>
+                                            <option value="">-- SELECT DEVICE --</option>
                                             {% for details in devices_details %}
                                             <option value="{{ details[0] }}">{{ details[1] }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                     <div class="col-sm-2">
+                                        <select name="module_type_dropdown" class="form-select form-select-lg form-select-sm mb-3"  id="module_type_filter">
+                                            <option value="">-- SELECT MODULE --</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="col-sm-2">
                                         <input type="text" class="form-control" name="search_tc"
                                             placeholder="Enter testcase name" id="search_tc">
                                     </div>
                                     <div class="col-sm-6 d-flex align-items-end justify-content-end">
-                                        <input type="submit" id="" class="btn btn-primary me-2" value="Search" />
+                                        <input type="submit" id="search_button" class="btn btn-primary me-2" value="Search" />
                                         <input type="button" class="btn btn-secondary me-2" value="Clear Filter"
                                             onclick="clear_filter()" />
                                         <!-- <input type="button" class="btn btn-danger" value="Delete Selected Regression"
@@ -150,7 +125,9 @@
     </div>
 </div>
 
+<script>
 
+</script>
 
 
 {% endblock %}

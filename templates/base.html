@@ -89,6 +89,14 @@
                 $("#delete").attr("action", "/delete_regression/" + pk);
             });
         });
+
+        $("#regression_name").keypress(function(event) {
+            if (event.which === 13) {  // 13 is the key code for Enter
+                event.preventDefault(); 
+                run_tc('tc_execution');
+                
+            }
+        });
     </script>
 </body>
 </html>

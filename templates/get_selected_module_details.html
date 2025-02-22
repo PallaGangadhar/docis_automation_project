@@ -1,0 +1,13 @@
+<div class="col-sm-2" id="module_type_filter">
+    <select name="module_type_dropdown"
+        class="form-select form-select-lg form-select-sm mb-3"
+        >
+        <option value="">-- SELECT MODULE --</option>
+        {% for details in module_device_details %}
+            <option value="{{ details[0] }}">{{ details[1] }}</option>
+        {% endfor %}
+        {% if module_details != "" %}
+            <option value="{{ module_details[0] }}" selected>{{ module_details[1] }}</option>
+        {% endif %}
+</select>
+</div>

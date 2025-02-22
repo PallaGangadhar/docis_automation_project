@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, redirect, session, url_for
+from flask import Flask, render_template, request, Response, redirect, session, url_for, send_file
 from flask_socketio import SocketIO, emit
 from CASA import *
 from Arris import *
@@ -10,6 +10,7 @@ import re
 from decorators import login_required
 import bcrypt
 from datetime import timedelta
+from generate_html import generate_html_file
 
 async_mode = None
 
@@ -83,13 +84,23 @@ def index():
     graph_data={}
     data1=[]
     dates=[]
-  
+    
+    date_error_message = ""
     from_date = request.args.get('from_date')
     to_date = request.args.get('to_date')
 
-    if from_date != "" and to_date == "":to_date = from_date
-    elif from_date == "" and to_date != "":from_date = to_date
+    if from_date == None and to_date == None:
+        to_date = datetime.strftime(datetime.now()+timedelta(days=1), "%Y-%m-%d")
+        from_date = datetime.now()-timedelta(days=10)
+        from_date = datetime.strftime(from_date, "%Y-%m-%d")
+    else:
+        if from_date != "" and to_date != "":
+            to_date=convert_str_to_date(to_date,"%Y-%m-%d")+timedelta(days=1)
+            to_date=convert_date_to_str(to_date,"%Y-%m-%d")
+        else:
+            date_error_message = "Please select end date."
     
+    # if date_error_message == "":
     curr, conn=db_connection()
     curr.execute('SELECT count(regression_logs_details.log_id) from  regression_logs_details')
     total_regression_count=curr.fetchone()
@@ -100,28 +111,28 @@ def index():
     curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details inner JOIN regression ON regression.regression_id = regression_logs_details.regression_id RIGHT JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
     devices_regression_count = curr.fetchall()
     total_regression_devices = len(devices_regression_count)+1
-    if from_date == None and to_date == None or from_date == "" and to_date == "":
-        curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
-        regression_graph=curr.fetchall()
-        
-        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC')
-        graph_details = curr.fetchall()
 
-        curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name ORDER BY devices_details.device_name')
-        pie_chart_details = curr.fetchall()
+    # if from_date == None and to_date == None or from_date == "" and to_date == "":
+    #     curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
+    #     regression_graph=curr.fetchall()
+        
+    #     curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC')
+    #     graph_details = curr.fetchall()
+
+    #     curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name ORDER BY devices_details.device_name')
+    #     pie_chart_details = curr.fetchall()
 
     
-    elif from_date != None and to_date != None  and from_date != "" and to_date != "":
-        to_date=convert_str_to_date(to_date,"%Y-%m-%d")+timedelta(days=1)
-        to_date=convert_date_to_str(to_date,"%Y-%m-%d")
-        curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
-        regression_graph=curr.fetchall()
+    # elif from_date != None and to_date != None  and from_date != "" and to_date != "":
+    
+    curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
+    regression_graph=curr.fetchall()
 
-        curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC")
-        graph_details = curr.fetchall()
+    curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC")
+    graph_details = curr.fetchall()
 
-        curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY devices_details.device_name ORDER BY devices_details.device_name")
-        pie_chart_details = curr.fetchall()
+    curr.execute(f"SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id AND regression.date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY devices_details.device_name ORDER BY devices_details.device_name")
+    pie_chart_details = curr.fetchall()
         
         
     
@@ -171,9 +182,15 @@ def index():
     curr.close()
     conn.close()
     is_data_present=len(regression_graph)
+    if is_data_present == 0:
+        date_error_message = "No Data Found for the selected date range or for last 10 days."
+    return render_template('index.html',total_regression_count=total_regression_count,
+                        regression_date_graph=graph_data,devices_details=devices_details,
+                        devices_regression_count=devices_regression_count,
+                        new_data_2=new_data_2,pie_chart=pie_chart,
+                        total_regression_devices=total_regression_devices,is_data_present=is_data_present,
+                        date_error_message=date_error_message)
     
-    # return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices,is_data_present=is_data_present)
-    return render_template('index.html',total_regression_count=total_regression_count,regression_date_graph=graph_data,devices_details=devices_details,devices_regression_count=devices_regression_count,new_data_2=new_data_2,pie_chart=pie_chart,total_regression_devices=total_regression_devices,is_data_present=is_data_present)
 
 
 # @app.route('/logs', methods=['GET','POST'])
@@ -262,26 +279,51 @@ def testcase_details():
     tc_name = request.args.get('search_tc')
     module_type = request.args.get('module_type_dropdown')
     device_type = request.args.get('device_type_dropdown')
+    
     curr, conn=db_connection()
-    curr.execute('select modules_id,module_name from modules_details')
-    module_details = curr.fetchall()
-    if tc_name != None and tc_name != "":
-        tc_name="'%"+tc_name+"%'"
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and LOWER(testcase_name) LIKE LOWER("+tc_name+") ORDER BY testcase_id DESC;")
-    elif module_type != None and module_type != "":
-        module_type="'"+module_type+"'"
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and modules_details.modules_id={module_type} ORDER BY testcase_id DESC;")
-    elif device_type != None and device_type != '':
-        device_type="'"+device_type+"'"
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} ORDER BY testcase_id DESC;")
+    if tc_name == None or tc_name == "":
+        tc_name = ""
+    if module_type == None or module_type == "":
+        module_type = ""
+    if device_type == None or device_type == "":
+        device_type = ""
+    
+    print("tc name===", tc_name)
+    print("module_type===", module_type)
+    print("device_type===", device_type)
 
+    if tc_name != "":
+        tc_name="'%"+tc_name+"%'"
+    
+    if device_type != "":
+        device_type="'"+device_type+"'"
+    
+    if module_type != "":
+        module_type="'"+module_type+"'"
+        
+    if tc_name != "" and module_type == "" and \
+      device_type == "":
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and LOWER(testcase_name) LIKE LOWER("+tc_name+") ORDER BY testcase_id DESC;")
+
+    elif  device_type != '' and  tc_name == "" and module_type == '':
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} ORDER BY testcase_id DESC;")
+    
+    elif  tc_name == "" and device_type != "" and module_type != "" :
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} and modules_details.modules_id={module_type}  ORDER BY testcase_id DESC;")
+
+    elif tc_name != "" and device_type != "" and   module_type == "" :
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} and LOWER(testcase_name) LIKE LOWER("+tc_name+")  ORDER BY testcase_id DESC;")
+
+    elif tc_name != "" and device_type != "" and  module_type != "":
+        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} and modules_details.modules_id={module_type} and LOWER(testcase_name) LIKE LOWER("+tc_name+")  ORDER BY testcase_id DESC;")
+    
     else:
         curr.execute('SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id ORDER BY testcase_id DESC;')
     testcase_details=curr.fetchall()
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('testcase_details.html',testcase_details=testcase_details,devices_details=devices_details,module_details=module_details)
+    return render_template('testcase_details.html',testcase_details=testcase_details,devices_details=devices_details)
 
 
 
@@ -410,9 +452,9 @@ def add_regression_logs():
 @app.route("/view_regression_details", methods=['GET','POST'])
 @login_required
 def view_regression_details():
-    example_string = "hello world from flask"
-    devices_details=header()
     curr,conn=db_connection()
+    curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
+    devices_details=curr.fetchall()
     cmts_type = request.args.get('cmts_type_dropdown')
     search_reg = request.args.get('search_reg')
     
@@ -430,27 +472,16 @@ def view_regression_details():
         curr.execute(f"SELECT * FROM regression WHERE LOWER(regression_name) LIKE LOWER("+search_reg+") and cmts_type="+cmts_type+" ORDER BY date_added DESC")
 
     else:
-        curr.execute('SELECT * FROM regression ORDER BY date_added DESC')
+        curr.execute('SELECT * FROM regression ORDER BY date_added DESC LIMIT 1')
 
 
     regression_details=curr.fetchall()
-    
-    
-    curr.execute('SELECT cmts_type,status FROM regression')
-    c_type_curr=curr.fetchall()
-    
-    c_type=[]
-    status=[]
-    for i in c_type_curr:
-        [c_type.append(i[0]) if i[0] not in c_type else None]
-        [status.append(i[1]) if i[1] not in status else None]
-
+  
     conn.commit()
     curr.close()
     conn.close()
     
-    return render_template('regression_details.html',regression_details=regression_details,c_type=c_type,
-                           status=status,devices_details=devices_details,example_string=example_string)
+    return render_template('regression_details.html',regression_details=regression_details,devices_details=devices_details)
 
 
 @login_required
@@ -777,8 +808,51 @@ def delete_module(id):
         conn.close()
         return redirect("/modules")  
     
+@app.route('/get_module_details',  methods=['GET','POST'])
+def get_module_details():
+    if request.method == 'POST':
+        device_id = request.form.get('data')
+        curr, conn=db_connection()
+        curr.execute(f"select modules_id, module_name from modules_details where device_id={device_id}")
+        module_device_details=curr.fetchall()
+        conn.commit()
+        curr.close()
+        conn.close()
+        return render_template('get_module_details.html',module_device_details=module_device_details)
 
+@app.route('/get_selected_module_details',  methods=['GET','POST'])
+def get_selected_module_details():
+    module_device_details = module_details = ""
+    if request.method == 'POST':
+        module_id = request.form.get('module_id')
+        device_id = request.form.get('device_id')
+        curr, conn=db_connection()
+        if module_id != "" and device_id != "":
+            curr.execute(f"select modules_id, module_name from modules_details where modules_id={module_id}")
+            module_details=curr.fetchone()
+            curr.execute(f"select modules_id, module_name from modules_details where device_id={device_id} and modules_id != {module_id}")
+            module_device_details=curr.fetchall()
 
+        elif module_id == "" and device_id != "":
+            curr.execute(f"select modules_id, module_name from modules_details where device_id={device_id}")
+            module_device_details=curr.fetchall()
+        conn.commit()
+        curr.close()
+        conn.close()
+        
+        return render_template('get_selected_module_details.html',module_device_details=module_device_details,
+                               module_details = module_details)
+
+@app.route('/generate_html/<int:reg_id>', methods=['GET', 'POST'])
+def generate_html(reg_id):
+    output_file_path = 'static\\html_logs\\ganga.html'
+    # curr,conn=db_connection()
+    # curr.execute(f"SELECT summary_path FROM regression WHERE regression_id={reg_id}")
+    # input_file = curr.fetchone()[0]
+    input_file = "C:\\Users\\GANGADHAR PALLA\\Documents\\CMTS_Automation_Project\\CMTS_New_UI_dev\\ganga.txt"
+    print("input file ", input_file)
+    generate_html_file(input_file, output_file_path)
+    return send_file(output_file_path)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True,host="0.0.0.0",port=5000)

@@ -45,8 +45,7 @@
                         <div class="col-lg-12">
                             <figure class="highcharts-figure">
                                 <div class="d-block d-md-flex justify-content-between alert alert-danger">
-                                    <span class="fs-16 fst-italic">No Data for Selected Date Range.Please select
-                                        different date range</span>
+                                    <span class="fs-16 fst-italic">{{date_error_message}}</span>
                                 </div>
                             </figure>
                         </div>
@@ -60,7 +59,7 @@
                                 <div class="col-lg-2">
                                     <div id="from_date" class="input-group date" data-date-format="yyyy-mm-dd">
                                         <input class="form-control" type="text" name="from_date" id="from_date_val"
-                                            autocomplete="off" placeholder="From Date" />
+                                            autocomplete="off" placeholder="From Date" required/>
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-calendar"></i></span>
                                     </div>
@@ -68,7 +67,7 @@
                                 <div class="col-lg-2">
                                     <div id="to_date" class="input-group date" data-date-format="yyyy-mm-dd">
                                         <input class="form-control" type="text" name="to_date" id="to_date_val"
-                                            autocomplete="off" placeholder="To Date" />
+                                            autocomplete="off" placeholder="To Date" required/>
                                         <span class="input-group-addon"><i
                                                 class="glyphicon glyphicon-calendar"></i></span>
                                     </div>
@@ -98,222 +97,227 @@
     <script src="../static/js/export-data.js"></script>
     <script src="../static/js/accessibility.js"></script>
 <script>
-    try {
-        var graph_data = '{{ new_data_2|tojson }}';
-        var pie_chart = '{{ pie_chart|tojson }}';
-        var regression_date_graph = '{{ regression_date_graph|tojson }}';
-        var devices_regression_count = '{{ devices_regression_count|tojson }}';
-        var total_regression_count = '{{ total_regression_count }}';
-        
-        regression_date_graph = JSON.parse(regression_date_graph);
-        var new_data=""
-        try{
-
-            pie_chart = JSON.parse(pie_chart);
-        }
-        catch{
-
-        }
-        new_data = JSON.parse(graph_data);
-        console.log(new_data)
-        devices_regression_count = JSON.parse(devices_regression_count);
-
-        const randColor = () => {
-            return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
-        }
-
-        for (var i = 0; i < devices_regression_count.length; i++) {
-            var color = randColor();
-            if (color != '#FFFFFF' && color != '#000000') {
-                $('#firstdivcolor_' + devices_regression_count[i][0]).css('background', color);
-                $('#seconddivcolor_' + devices_regression_count[i][0]).css('background', color);
-            }
-        }
-
-        var reg_data = [];
-        var reg_date = [];
-
-        for (var i = 0; i < regression_date_graph['data'].length; i++) {
-            reg_data.push(regression_date_graph['data'][i]['count']);
-            reg_date.push(regression_date_graph['data'][i]['date']);
-        }
-    } catch (err) {
-        console.error(err);
-    }
+    var date_error_message = '{{date_error_message}}'
     
-    try {
-        Highcharts.chart('bar_chart', {
-            chart: {
-                type: 'column'
-            },
-            exporting: {
-                    enabled: false // Disables the context menu
-            },
-            credits: {
-                enabled: false // Disables the Highcharts.com text
-            },
-            title: {
-                text: 'Regression Report'
-            },
-            xAxis: {
-                categories: reg_date,
-                crosshair: true
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: 'Count'
-                }
-            },
-            tooltip: {
-                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-                footerFormat: '</table>',
-                shared: true,
-                useHTML: true
-            },
-            plotOptions: {
-                column: {
-                    pointPadding: 0.2,
-                    borderWidth: 0
-                }
-            },
-            series: new_data['data']
-        });
+    if (date_error_message == ''){
+        
+        try {
+            var graph_data = '{{ new_data_2|tojson }}';
+            var pie_chart = '{{ pie_chart|tojson }}';
+            var regression_date_graph = '{{ regression_date_graph|tojson }}';
+            var devices_regression_count = '{{ devices_regression_count|tojson }}';
+            var total_regression_count = '{{ total_regression_count }}';
+            
+            regression_date_graph = JSON.parse(regression_date_graph);
+            var new_data=""
+            try{
 
-        Highcharts.chart('line_chart', {
-            title: {
-                // text: 'Monthly Average Temperature'
-            },
-            subtitle: {
-                // text: 'Source: ' +
-                //     '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
-                //     'target="_blank">Wikipedia.com</a>'
-            },
-            exporting: {
-                    enabled: false // Disables the context menu
-            },
-            credits: {
-                enabled: false // Disables the Highcharts.com text
-            },
-            xAxis: {
-                categories: reg_date,
-                accessibility: {
-                    description: ''
+                pie_chart = JSON.parse(pie_chart);
+            }
+            catch{
+
+            }
+            new_data = JSON.parse(graph_data);
+            console.log(new_data)
+            devices_regression_count = JSON.parse(devices_regression_count);
+
+            const randColor = () => {
+                return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
+            }
+
+            for (var i = 0; i < devices_regression_count.length; i++) {
+                var color = randColor();
+                if (color != '#FFFFFF' && color != '#000000') {
+                    $('#firstdivcolor_' + devices_regression_count[i][0]).css('background', color);
+                    $('#seconddivcolor_' + devices_regression_count[i][0]).css('background', color);
                 }
-            },
-            yAxis: {
-                title: {
-                    text: ''
+            }
+
+            var reg_data = [];
+            var reg_date = [];
+
+            for (var i = 0; i < regression_date_graph['data'].length; i++) {
+                reg_data.push(regression_date_graph['data'][i]['count']);
+                reg_date.push(regression_date_graph['data'][i]['date']);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+        
+        try {
+            Highcharts.chart('bar_chart', {
+                chart: {
+                    type: 'column'
                 },
-                labels: {
-                    format: '{value}'
-                }
-            },
-            tooltip: {
-                crosshairs: true,
-                shared: true
-            },
-            plotOptions: {
-                spline: {
-                    marker: {
-                        radius: 4,
-                        lineColor: '#666666',
-                        lineWidth: 1
+                exporting: {
+                        enabled: false // Disables the context menu
+                },
+                credits: {
+                    enabled: false // Disables the Highcharts.com text
+                },
+                title: {
+                    text: 'Regression Report'
+                },
+                xAxis: {
+                    categories: reg_date,
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Count'
                     }
-                }
-            },
-            series: new_data['data']
-        });
-
-        Highcharts.chart('regression_pie_chart', {
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie'
-            },
-            exporting: {
-                    enabled: false // Disables the context menu
-            },
-            credits: {
-                enabled: false // Disables the Highcharts.com text
-            },
-            title: {
-                text: 'Regression Pie Chart',
-                align: 'center'
-            },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
                     }
+                },
+                series: new_data['data']
+            });
+
+            Highcharts.chart('line_chart', {
+                title: {
+                    // text: 'Monthly Average Temperature'
+                },
+                subtitle: {
+                    // text: 'Source: ' +
+                    //     '<a href="https://en.wikipedia.org/wiki/List_of_cities_by_average_temperature" ' +
+                    //     'target="_blank">Wikipedia.com</a>'
+                },
+                exporting: {
+                        enabled: false // Disables the context menu
+                },
+                credits: {
+                    enabled: false // Disables the Highcharts.com text
+                },
+                xAxis: {
+                    categories: reg_date,
+                    accessibility: {
+                        description: ''
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    },
+                    labels: {
+                        format: '{value}'
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: new_data['data']
+            });
+
+            Highcharts.chart('regression_pie_chart', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
+                },
+                exporting: {
+                        enabled: false // Disables the context menu
+                },
+                credits: {
+                    enabled: false // Disables the Highcharts.com text
+                },
+                title: {
+                    text: 'Regression Pie Chart',
+                    align: 'center'
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Brands',
+                    colorByPoint: true,
+                    data: pie_chart
+                }]
+            });
+
+        } catch (err) {
+            console.error(err);
+        }
+
+        var total_regression_devices = "{{ total_regression_devices }}";
+        total_regression_devices = parseInt(total_regression_devices.toString())
+
+        if (total_regression_devices > 4) {
+            $('#seconddiv').css('display', 'block');
+
+            let items = document.querySelectorAll('.carousel .carousel-item')
+
+            items.forEach((el) => {
+                let minPerSlide = 2;
+
+                if (total_regression_devices > 4) {
+                    minPerSlide = 4
+                } else {
+                    minPerSlide = total_regression_devices;
                 }
-            },
-            series: [{
-                name: 'Brands',
-                colorByPoint: true,
-                data: pie_chart
-            }]
+
+                let next = el.nextElementSibling
+
+                for (var i = 1; i < minPerSlide; i++) {
+                    if (!next) {
+                        next = items[0]
+                    }
+
+                    let cloneChild = next.cloneNode(true)
+                    el.appendChild(cloneChild.children[0])
+                    next = next.nextElementSibling
+                }
+            })
+
+        } else {
+            $('#firstdiv').css('display', 'block');
+        }
+
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget)
+            var recipient = button.data('whatever')
+            var modal = $(this)
+            modal.find('.modal-title').text('New message to ' + recipient)
+            modal.find('.modal-body input').val(recipient)
         });
-
-    } catch (err) {
-        console.error(err);
     }
-
-    var total_regression_devices = "{{ total_regression_devices }}";
-    total_regression_devices = parseInt(total_regression_devices.toString())
-
-    if (total_regression_devices > 4) {
-        $('#seconddiv').css('display', 'block');
-
-        let items = document.querySelectorAll('.carousel .carousel-item')
-
-        items.forEach((el) => {
-            let minPerSlide = 2;
-
-            if (total_regression_devices > 4) {
-                minPerSlide = 4
-            } else {
-                minPerSlide = total_regression_devices;
-            }
-
-            let next = el.nextElementSibling
-
-            for (var i = 1; i < minPerSlide; i++) {
-                if (!next) {
-                    next = items[0]
-                }
-
-                let cloneChild = next.cloneNode(true)
-                el.appendChild(cloneChild.children[0])
-                next = next.nextElementSibling
-            }
-        })
-
-    } else {
-        $('#firstdiv').css('display', 'block');
-    }
-
-    $('#exampleModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget)
-        var recipient = button.data('whatever')
-        var modal = $(this)
-        modal.find('.modal-title').text('New message to ' + recipient)
-        modal.find('.modal-body input').val(recipient)
-    });
 </script>
 
 {% endblock %}

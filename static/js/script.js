@@ -327,8 +327,10 @@ function run_tc(div_id){
             window.location.href = "/tc_execution/"+device_id+"?"+random_string
             $.ajax({  
                 url:"/tc_execution/"+device_id+"?"+random_string,
+                // url:"/tc_execution/"+device_id,
                 method:"POST",  
                 data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type,"device_id":device_id,'random_string':random_string }
+                // data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type,"device_id":device_id }
             }); 
            
             
@@ -573,3 +575,42 @@ function generateRandomAlphanumeric(length) {
 
 // Example usage:
  // Adjust length as needed
+ try{
+ $('#device_type_filter').on('change',function(){
+    var device_id = this.value;
+    $.ajax({  
+        url:"/get_module_details",  
+        method:"POST",  
+        data:{ "data":device_id},  
+        success:function(data){  
+            $('#module_type_filter').html(data);
+        }  
+    });
+ });
+}
+catch(err){}
+
+ try{
+        var url = window.location.href
+        module_id = ""
+        device_id = ""
+        try{
+            module_id = url.split('module_type_dropdown=')[1].split('&')[0]
+        }
+        catch(err){}
+        try{
+            device_id = url.split('device_type_dropdown=')[1].split('&')[0]
+        }
+        catch(err){}
+        $.ajax({  
+        url:"/get_selected_module_details",  
+        method:"POST",  
+        data:{ "module_id":module_id,'device_id':device_id},
+        success:function(data){
+            $('#module_type_filter').html(data);
+        }
+    });
+    
+}
+catch(err){}
+

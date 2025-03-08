@@ -48,7 +48,7 @@
                             <div class="mt-3">
                                 <table
                                     class="table center-aligned-table mb-0 table-striped table-bordered rounded table-responsive-md table_boder_light_grey"
-                                    id="regression_details_datatable">
+                                    >
                                     <thead class="table-light text-center">
                                         <tr class="text-dark">
                                             <th>Testcase Number</th>
@@ -61,7 +61,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="text-center" id="reg_report">
-                                        {% for details in testcase_details %}
+                                        {% for details in testcase_offset_details %}
                                         <tr class="fs-14">
                                             <td>{{ details[2] }}</td> <!-- Assuming details[2] is Testcase Number -->
                                             <td>{{ details[3] }}</td> <!-- Assuming details[3] is Testcase Name -->
@@ -90,7 +90,9 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-
+                                <div class="mt-3">
+                                    {{ pagination.links }}
+                                </div>
                             </div>
                         </div>
                     </div>

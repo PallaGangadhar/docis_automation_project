@@ -2,16 +2,18 @@ from flask import Flask, render_template, request, Response, redirect, session, 
 from flask_socketio import SocketIO, emit
 from CASA import *
 from Arris import *
-from utlity import convert_date_to_str,convert_str_to_date
+from utlity import *
 from db import *
 from send_mail import send_mail_to
 
 import re
 from decorators import login_required
 import bcrypt
-from datetime import timedelta
+from datetime import timedelta, datetime
 from generate_html import generate_html_file
+from flask_paginate import Pagination, get_page_args
 
+per_page = 5
 async_mode = None
 
 app = Flask(__name__)
@@ -60,7 +62,6 @@ def shutdown_server():
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
 
-
 def send_chart_details(data):
     pass_tc = data.get('pass')
     fail_tc = data.get('fail')
@@ -74,8 +75,6 @@ def send_chart_details(data):
     f=int(fail_count)+fail_tc
     update_regression(pass_tc, fail_tc, reg_id)
     socketio.emit('charts_details',{'pass_tc':p, 'fail_tc':f,'r_id':reg_id,'total_count':total_count,'sid':session_id}, room=session_id)
-
-
 
 @app.route('/', methods=['GET','POST'])
 @login_required
@@ -111,19 +110,6 @@ def index():
     curr.execute('SELECT devices_details.device_name, count(regression_logs_details.*) FROM regression_logs_details inner JOIN regression ON regression.regression_id = regression_logs_details.regression_id RIGHT JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name')
     devices_regression_count = curr.fetchall()
     total_regression_devices = len(devices_regression_count)+1
-
-    # if from_date == None and to_date == None or from_date == "" and to_date == "":
-    #     curr.execute('SELECT count(*),DATE(date_added) as reg_date FROM regression GROUP BY DATE(date_added) ORDER BY reg_date DESC')
-    #     regression_graph=curr.fetchall()
-        
-    #     curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id),DATE(regression.date_added)  as reg_date from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY DATE(regression.date_added), devices_details.device_id ORDER BY reg_date DESC')
-    #     graph_details = curr.fetchall()
-
-    #     curr.execute('SELECT devices_details.device_name, count(regression_logs_details.regression_id) from  regression INNER JOIN regression_logs_details ON regression_logs_details.regression_id = regression.regression_id INNER JOIN devices_details ON regression.device_id = devices_details.device_id GROUP BY devices_details.device_name ORDER BY devices_details.device_name')
-    #     pie_chart_details = curr.fetchall()
-
-    
-    # elif from_date != None and to_date != None  and from_date != "" and to_date != "":
     
     curr.execute(f"SELECT count(*),DATE(date_added) as reg_date FROM regression WHERE date_added BETWEEN '{from_date}' AND '{to_date}' GROUP BY DATE(date_added) ORDER BY reg_date DESC")
     regression_graph=curr.fetchall()
@@ -242,35 +228,48 @@ def modules():
     curr, conn=db_connection()
     search_module = request.args.get('search_module')
     device_type = request.args.get('device_type_dropdown')
-    if search_module != None and search_module != "":
-        search_module="'%"+search_module+"%'"
-        curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id and  LOWER(module_name) LIKE LOWER("+search_module+") ORDER BY modules_id DESC;")
-    elif device_type != None and device_type != "":
-        curr.execute(f"SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id and devices_details.device_id={device_type} ORDER BY modules_id DESC;")
-
-    else:
-        curr.execute("SELECT devices_details.device_name,modules_id, module_name FROM public.modules_details, devices_details where devices_details.device_id=modules_details.device_id ORDER BY modules_id DESC;")
-    modules_details=curr.fetchall()
+    total_details = get_table_total_details(
+        **{'table_name':'modules_details','search_module':search_module,'device_type':device_type}
+    )
+    page, _, _ = get_page_args(page_parameter='page', per_page_parameter='per_page')
+    offset = (page - 1) * per_page
+    offset_details = get_offset_details(
+        **{'table_name':'modules_details','offset':offset, 'per_page':per_page, 'search_module':search_module,'device_type':device_type}
+    )
+    pagination = Pagination(page=page, per_page=per_page, total=total_details, css_framework='bootstrap4')
+    print("offset_details === ", offset_details)
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('modules.html',modules_details=modules_details,devices_details=devices_details)
+    return render_template('modules.html',
+                           pagination=pagination,
+                           offset_details=offset_details,
+                           devices_details=devices_details
+                           )
 
 @app.route('/devices', methods=['GET','POST'])
 @login_required
 def devices():
+    devices_details=header()
     curr, conn=db_connection()
     search_devices = request.args.get('search_device')
-    if search_devices != None and search_devices != "":
-        search_devices="'%"+search_devices+"%'"
-        curr.execute(f"SELECT * FROM devices_details where LOWER(device_name) LIKE LOWER("+search_devices+")ORDER BY device_id DESC")
-    else:   
-        curr.execute(f"SELECT * FROM devices_details ORDER BY device_id DESC")
-    devices_details=curr.fetchall()
+    total_details = get_table_total_details(
+        **{'table_name':'devices_details','search_devices':search_devices}
+    )
+    page, _, _ = get_page_args(page_parameter='page', per_page_parameter='per_page')
+    offset = (page - 1) * per_page
+    offset_details = get_offset_details(
+        **{'table_name':'devices_details','offset':offset, 'per_page':per_page, 'search_devices':search_devices}
+    )
+    pagination = Pagination(page=page, per_page=per_page, total=total_details, css_framework='bootstrap4')
     conn.commit()
     curr.close()
     conn.close()
-    return render_template('device_details.html',devices_details=devices_details)
+    return render_template('device_details.html',
+                           pagination=pagination,
+                           offset_details=offset_details,
+                           devices_details=devices_details
+                           )
 
 @app.route('/testcase_details', methods=['GET','POST'])
 @login_required
@@ -280,51 +279,29 @@ def testcase_details():
     module_type = request.args.get('module_type_dropdown')
     device_type = request.args.get('device_type_dropdown')
     
-    curr, conn=db_connection()
-    if tc_name == None or tc_name == "":
-        tc_name = ""
-    if module_type == None or module_type == "":
-        module_type = ""
-    if device_type == None or device_type == "":
-        device_type = ""
-    
-    print("tc name===", tc_name)
-    print("module_type===", module_type)
-    print("device_type===", device_type)
-
-    if tc_name != "":
-        tc_name="'%"+tc_name+"%'"
-    
-    if device_type != "":
-        device_type="'"+device_type+"'"
-    
-    if module_type != "":
-        module_type="'"+module_type+"'"
-        
-    if tc_name != "" and module_type == "" and \
-      device_type == "":
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and LOWER(testcase_name) LIKE LOWER("+tc_name+") ORDER BY testcase_id DESC;")
-
-    elif  device_type != '' and  tc_name == "" and module_type == '':
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} ORDER BY testcase_id DESC;")
-    
-    elif  tc_name == "" and device_type != "" and module_type != "" :
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} and modules_details.modules_id={module_type}  ORDER BY testcase_id DESC;")
-
-    elif tc_name != "" and device_type != "" and   module_type == "" :
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} and LOWER(testcase_name) LIKE LOWER("+tc_name+")  ORDER BY testcase_id DESC;")
-
-    elif tc_name != "" and device_type != "" and  module_type != "":
-        curr.execute(f"SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id and devices_details.device_id={device_type} and modules_details.modules_id={module_type} and LOWER(testcase_name) LIKE LOWER("+tc_name+")  ORDER BY testcase_id DESC;")
-    
-    else:
-        curr.execute('SELECT testcase_details.*,modules_details.module_name,devices_details.device_name FROM public.testcase_details,modules_details,devices_details where testcase_details.modules_id = modules_details.modules_id and modules_details.device_id=devices_details.device_id ORDER BY testcase_id DESC;')
-    testcase_details=curr.fetchall()
-    conn.commit()
-    curr.close()
-    conn.close()
-    return render_template('testcase_details.html',testcase_details=testcase_details,devices_details=devices_details)
-
+    total_testcase_details = get_table_total_details(
+        **{'table_name':'testcase_details','tc_name':tc_name,'module_type':module_type, 'device_type':device_type}
+    )
+    page, _, _ = get_page_args(page_parameter='page', per_page_parameter='per_page')
+    offset = (page - 1) * per_page
+    print("offset and per page ====", offset, page, per_page)
+    testcase_offset_details = get_offset_details(
+        **{
+            'table_name':'testcase_details',
+           'offset':offset,
+           'per_page':per_page,
+           'tc_name':tc_name,
+           'module_type':module_type,
+           'device_type':device_type
+        }
+    )
+    pagination = Pagination(page=page, per_page=per_page, total=total_testcase_details, css_framework='bootstrap4')
+    return render_template(
+        'testcase_details.html',
+        testcase_offset_details=testcase_offset_details,
+        devices_details=devices_details,
+        pagination=pagination
+        )
 
 
 @app.route('/add_modules_details', methods=['GET','POST'])
@@ -389,9 +366,7 @@ def add_testcase_details():
     conn.commit()
     curr.close()
     conn.close()
-    
     return render_template('add_testcase_details.html',modules_details=modules_details,devices_details=devices_details)
-
 
 
 @app.route('/send_message', methods=['POST'])
@@ -413,14 +388,11 @@ def handle_connect():
     except:
         pass
 
-
-
 @app.route("/charts", methods=['GET','POST'])
 @socketio.event
 def charts():    
     if request.method == "POST":
         data=request.json
-        print("Chart data===", data)
         send_chart_details(data)
         return Response({'msg':"Hi"})
     else:
@@ -457,32 +429,21 @@ def view_regression_details():
     devices_details=curr.fetchall()
     cmts_type = request.args.get('cmts_type_dropdown')
     search_reg = request.args.get('search_reg')
-    
-    if cmts_type != None and cmts_type != "" and (search_reg == None or search_reg == ""):
-        cmts_type="'"+cmts_type+"'"
-        curr.execute(f"SELECT * FROM regression WHERE cmts_type="+cmts_type+"ORDER BY date_added DESC")
 
-    elif search_reg != None and search_reg != "" and (cmts_type == None or cmts_type == ""):
-        search_reg="'%"+search_reg+"%'"
-        curr.execute(f"SELECT * FROM regression WHERE LOWER(regression_name) LIKE LOWER("+search_reg+")ORDER BY date_added DESC")
-        
-    elif search_reg != None and search_reg != "" and cmts_type != None and cmts_type != "" :
-        search_reg="'%"+search_reg+"%'"
-        cmts_type="'"+cmts_type+"'"
-        curr.execute(f"SELECT * FROM regression WHERE LOWER(regression_name) LIKE LOWER("+search_reg+") and cmts_type="+cmts_type+" ORDER BY date_added DESC")
-
-    else:
-        curr.execute('SELECT * FROM regression ORDER BY date_added DESC LIMIT 1')
-
-
-    regression_details=curr.fetchall()
-  
-    conn.commit()
+    total_regression_details = get_table_total_details(
+        **{'table_name':'regression','cmts_type':cmts_type, 'search_reg':search_reg}
+    )
+    page, _, _ = get_page_args(page_parameter='page', per_page_parameter='per_page')
+    offset = (page - 1) * per_page
+    print("offset and per page ====", offset, page, per_page)
+    offset_reg_details = get_offset_details(
+        **{'table_name':'regression','offset':offset, 'per_page':per_page,'cmts_type':cmts_type, 'search_reg':search_reg}
+    )
+    pagination = Pagination(page=page, per_page=per_page, total=total_regression_details, css_framework='bootstrap4')
     curr.close()
     conn.close()
-    
-    return render_template('regression_details.html',regression_details=regression_details,devices_details=devices_details)
-
+    return render_template('regression_details.html', devices_details=devices_details,
+                           offset_reg_details=offset_reg_details, pagination=pagination)
 
 @login_required
 @app.route("/view_tc_logs_details/<int:reg_id>", methods=['GET','POST'])

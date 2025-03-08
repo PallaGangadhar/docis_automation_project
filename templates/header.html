@@ -131,10 +131,10 @@
                 </div>
                 <div class="dropdown d-inline-block">
                     <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border: none !important;">
                         <i class="fa fa-fw fa-bars d-block d-sm-block d-md-block d-lg-none"></i>
-                        <span class="d-none d-xl-inline-block ms-1 f-16 text-white" key="t-henry">Devices</span>
-                        <i class="mdi mdi-chevron-down d-none d-xl-inline-block f-16 text-white"></i>
+                        <span class="d-none d-xl-inline-block ms-1 f-16 text-white btn btn-success mx-2" key="t-henry">Devices</span>
+                        
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         {% for details in devices_details %}
@@ -142,11 +142,12 @@
                         {% endfor %}
                     </div>
                 </div>
+                
                 <div class="dropdown d-inline-block">
-                    <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-database settings" aria-hidden="true"></i> <!-- Changed to database icon -->
-                    </button>
+
+                    <button class="btn btn-warning mx-2"  id="page-header-user-dropdown"  
+                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border: none !important;">
+                    <i class="fas fa-database"></i> Database</button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item" href="/devices">Devices</a>
                         <a class="dropdown-item" href="/modules">Modules</a>

@@ -1,148 +1,10 @@
+{% extends 'base.html' %}
 
-    <style>
-        /* Inline CSS */
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-            background-color: #f8f9fa;
-        }
+{% block title %}Test Case Details{% endblock %}
 
-        .header_background {
-            background-color: red !important; /* Red background color for uniformity */
-            padding: 1em;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #fff;
-        }
-
-        .logo-sm img, .logo-lg img {
-            height: 30px;
-        }
-
-        .header-title {
-            font-size: 1.2em;
-            color: #fff;
-            text-align: center; /* Center align the title */
-        }
-
-        .header-item {
-            display: flex;
-            align-items: center;
-            color: #fff;
-        }
-
-        .header-item a {
-            color: #fff;
-            text-decoration: none;
-        }
-
-        .header-item a:hover {
-            text-decoration: none;
-        }
-
-        .loginDiv {
-            max-width: 500px; /* Increased size of the login card */
-            margin: auto;
-            padding: 2.5em; /* Increased padding */
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
-        }
-
-        .login_text {
-            text-align: center;
-            margin-bottom: 1em;
-            font-size: 2em;
-            color: #007bff;
-        }
-
-        .inputField {
-            margin-bottom: 1.5em;
-            position: relative;
-        }
-
-        .inputField input {
-            width: 100%;
-            padding: 0.75em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1em;
-        }
-
-        .inputField label {
-            position: absolute;
-            top: -0.75em;
-            left: 0.75em;
-            background: #fff;
-            padding: 0 0.5em;
-            color: #007bff;
-            font-size: 0.85em;
-        }
-
-        .error {
-            color: red;
-            margin-bottom: 1em;
-            text-align: center;
-        }
-
-        .login {
-            width: 100%;
-            padding: 0.75em;
-            background: #007bff;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            font-size: 1em;
-            cursor: pointer;
-        }
-
-        .login:hover {
-            background: #0056b3;
-        }
-
-        .bottom {
-            text-align: center;
-            margin-top: 1em;
-        }
-
-        .bottom .btn_green {
-            color: #fff;
-            background-color: #28a745;
-            padding: 0.5em 1em;
-            border-radius: 4px;
-            text-decoration: none;
-        }
-
-        .bottom .btn_green:hover {
-            background-color: #218838;
-        }
-
-        .footer-section {
-            background: #dc3545; /* Red background color for uniformity */
-            padding: 1em 0;
-            text-align: center;
-            color: white;
-            width: 100%;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="d-flex flex-column h-100">
-        {% include 'header.html' %}
+{% block content %}
+    
         <div class="flex-grow-1 d-flex align-items-center justify-content-center">
-            {% block content %}
             <div class="loginDiv" id="loginDiv">
                 <h1 class="login_text">Login</h1>
                 <form action="{{ url_for('login') }}" method="post">
@@ -165,10 +27,6 @@
                     <a href="/register" class="btn_green">Register</a>
                 </div>
             </div>
-            {% endblock %}
-        </div>
-        <div class="footer-section">
-            <p class="footer-text">© 2023 DOCSIS AUTOMATION TOOL. All rights reserved.</p>
-        </div>
-    </div>
-
+   
+        {% endblock %}
+  

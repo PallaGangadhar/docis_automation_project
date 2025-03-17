@@ -127,36 +127,8 @@ def index():
         data1.append({'date':date,'count':i[0]})
         dates.append(date)
     graph_data['data']=data1
+    print("graph_data====>", graph_data)
     
-    new_data =[]
-    
-    for graph_detail in graph_details:
-        dt=convert_date_to_str(graph_detail[2],"%Y-%m-%d")
-        new_data.append({'date':dt, 'data':[graph_detail[1]],'name':graph_detail[0]})
-
-    for dt in range(0, len(new_data),1):
-        for ct in range(0, len(dates),1):
-            if dates[ct] not in new_data[dt]['date']:
-                new_data[dt]['data'].insert(ct,0)
-
-    new_graph_data={}
-    new_graph_list_data=[]
-    
-    for i in range(0,len(new_data),1):
-        if new_data[i]['name'] in new_graph_data.keys():
-            new_graph_data[new_data[i]['name']].append(new_data[i]['data'])
-        else:
-            new_graph_data[new_data[i]['name']] = [new_data[i]['data']]
-    
-    new_data_2 = {}
-    new_graph_data = [new_graph_data]
-    for k in range(0,len([new_graph_data]),1):
-        for i in new_graph_data[0].keys():
-            output_list = [sum(pair) for pair in zip(*new_graph_data[k][i])]
-            new_graph_list_data.append({'name':i,'data':output_list})
-        
-    new_graph_list_data = sorted(new_graph_list_data, key=lambda x:x['name'])
-    new_data_2['data'] = new_graph_list_data
 
     pie_chart = []
     for pie in pie_chart_details:
@@ -172,8 +144,7 @@ def index():
         date_error_message = "No Data Found for the selected date range or for last 10 days."
     return render_template('index.html',total_regression_count=total_regression_count,
                         regression_date_graph=graph_data,devices_details=devices_details,
-                        devices_regression_count=devices_regression_count,
-                        new_data_2=new_data_2,pie_chart=pie_chart,
+                        devices_regression_count=devices_regression_count,pie_chart=pie_chart,
                         total_regression_devices=total_regression_devices,is_data_present=is_data_present,
                         date_error_message=date_error_message)
     

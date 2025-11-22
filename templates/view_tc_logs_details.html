@@ -10,48 +10,50 @@
               <span class="fs-16 fst-italic">TestCase Details</span>
           </div>
         </div>
-        <div class="p-3 regression_scroll_table" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-            
+        <div class="p-3" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+          <label class="btn btn-outline-success btn-sm" id="multiple_case">Re Run Multiple case?</label>
+          <input type="button" value="ReRun" class="btn btn-outline-success btn-sm" id="rereun_mutltiple_tc"/>
           <table class="table center-aligned-table mb-0 rounded table-responsive-md" id="regression_details_datatable">
             <thead class="table-light text-center">
               <tr class="text-dark">
-                <th>Testcase No</th>
+                <th>Testcase Number</th>
+                <th>Testcase Reference</th>
                 <th>Testcase Name</th>
-                <th >Failed In</th>
-                <th >Execution Time</th>
-                <th >Status</th>
-                <th >Action</th>
+                <th>Failed In</th>
+                <th>Execution Time</th>
+                <th>Status</th>
+                <th>Action</th>
                 <!-- <th></th> -->
               </tr>
             </thead>
             <tbody class="text-center" id="reg_report">
               {% for log_details in tc_logs_details %}
               <tr class="fs-14">
+                <td>{{log_details[0]}}</td>
                 <td>{{log_details[2]}}</td>
+                <td>{{log_details[1]}}</td>
                 <td>{{log_details[3]}}</td>
-                <td>{{log_details[5]}}</td>
-                <td>{{log_details[6]}}</td>
+                <td>{{log_details[4]}}</td>
                 <td>
-                  {% if log_details[4] == 'PASS' %}
-                    <label class="btn btn-outline-success btn-sm">{{log_details[4]}}</label>
+                  {% if log_details[5] == 'PASS' %}
+                    <label class="btn btn-outline-success btn-sm">{{log_details[5]}}</label>
                   {% else %}
-                  <label class="btn btn-outline-danger btn-sm">{{log_details[4]}}</label>
+                  <label class="btn btn-outline-danger btn-sm">{{log_details[5]}}</label>
                   {% endif %}
                 </td>
                 <td>
                   <!-- <a href="../static/Logs/{{regression_name}}_{{date_added}}/{{log_details[7]}}" class="btn btn-outline-warning btn-sm"  target="_blank">View Logs</a> -->
                   <a href="../static/Logs/{{regression_name}}_{{date_added}}/file1.txt" class="btn btn-outline-warning btn-sm"  target="_blank">View Logs</a>
-                  
+                 
+                  <form>
+                    <input type="hidden" name="tc_id" value="{{log_details[7]}} "/>
+                    <input type="hidden" name="log_id" value="{{log_details[8]}}"/>
+                    <!-- <input type="button" value="ReRun" class="btn btn-outline-success btn-sm" class="rereun_tc"/> -->
+                    <input type="checkbox" name="rereun_mutltiple_tc" value="{{log_details[7]}},{{log_details[8]}},{{reg_id}}" style="visibility: hidden;"/> 
+                  </form>
                 </td>
-                <!-- <td class="td_text_center delete_icon"> 
-                  
-                </td> -->
               </tr>
-
-              
                 {% endfor %}
-              
-              
             </tbody>
           </table>
         </div>

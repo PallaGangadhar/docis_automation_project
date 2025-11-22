@@ -1,172 +1,152 @@
+<style>
+    /* Professional styling for Live Logs section */
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-    <style>
-        /* Professional styling for Live Logs section */
-        .card {
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+    .card-body {
+        padding: 1.5rem;
+    }
 
-        .card-body {
-            padding: 1.5rem;
-        }
+    .alert-custom {
+        background-color: #f5f5f5;
+        /* Light gray background color */
+        border: 1px solid #ccc;
+        /* Gray border color */
+        color: #333;
+        /* Dark text color */
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        /* Reduced font size */
+    }
 
-        .alert-custom {
-            background-color: #f5f5f5; /* Light gray background color */
-            border: 1px solid #ccc; /* Gray border color */
-            color: #333; /* Dark text color */
-            border-radius: 8px;
-            padding: 0.75rem;
-            font-size: 0.9rem; /* Reduced font size */
-        }
+    .logs-title {
+        font-size: 1.25rem;
+        /* Reduced font size */
+        font-weight: bold;
+        color: #333;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
 
-        .logs-title {
-            font-size: 1.25rem; /* Reduced font size */
-            font-weight: bold;
-            color: #333;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-            text-align: left;
-        }
+    .logs-content {
+        background-color: #ffffff;
+        /* White background for logs content */
+        border: 1px solid #e0e0e0;
+        /* Light gray border */
+        border-radius: 8px;
+        padding: 0.75rem;
+        /* Adjusted padding */
+        font-size: 0.9rem;
+        /* Reduced font size */
+        height: 300px;
+        /* Adjust height as needed */
+        overflow-y: auto;
+    }
 
-        .logs-content {
-            background-color: #ffffff; /* White background for logs content */
-            border: 1px solid #e0e0e0; /* Light gray border */
-            border-radius: 8px;
-            padding: 0.75rem; /* Adjusted padding */
-            font-size: 0.9rem; /* Reduced font size */
-            height: 300px; /* Adjust height as needed */
-            overflow-y: auto;
-        }
+    .logs-content::-webkit-scrollbar {
+        width: 10px;
+    }
 
-        .logs-content::-webkit-scrollbar {
-            width: 10px;
-        }
+    .logs-content::-webkit-scrollbar-thumb {
+        background-color: #007bff;
+        /* Blue scrollbar thumb */
+        border-radius: 10px;
+    }
 
-        .logs-content::-webkit-scrollbar-thumb {
-            background-color: #007bff; /* Blue scrollbar thumb */
-            border-radius: 10px;
-        }
+    /* Styling for Charts section */
+    .charts-section {
+        background-color: #f8f9fa;
+        /* Light gray background color */
+        border: 1px solid #e0e0e0;
+        /* Light gray border */
+        border-radius: 8px;
+        padding: 2rem;
+    }
 
-        /* Styling for Charts section */
-        .charts-section {
-            background-color: #f8f9fa; /* Light gray background color */
-            border: 1px solid #e0e0e0; /* Light gray border */
-            border-radius: 8px;
-            padding: 2rem;
-        }
+    .test-report-header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
 
-        .test-report-header {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
+    .btn-custom {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
 
-        .btn-custom {
-            color: #fff;
-            background-color: #007bff;
-            border-color: #007bff;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
+    .btn-custom:hover {
+        color: #fff;
+        background-color: #0056b3;
+        border-color: #004085;
+    }
 
-        .btn-custom:hover {
-            color: #fff;
-            background-color: #0056b3;
-            border-color: #004085;
-        }
+    .btn-custom a {
+        color: #fff;
+        text-decoration: none;
+    }
 
-        .btn-custom a {
-            color: #fff;
-            text-decoration: none;
-        }
+    .btn-custom a:hover {
+        color: #fff;
+        text-decoration: none;
+    }
 
-        .btn-custom a:hover {
-            color: #fff;
-            text-decoration: none;
-        }
+    .highcharts-figure {
+        margin: 0;
+    }
 
-        .highcharts-figure {
-            margin: 0;
-        }
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
 
-        .table th, .table td {
-            text-align: center;
-            vertical-align: middle;
-        }
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: bold;
+    }
 
-        .table thead th {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            font-weight: bold;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-    </style>
+    .table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
 </head>
+
 <body>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card" style="width: 106%">
-                <div class="card-body">
-                    <div class="alert alert-custom d-sm-flex flex-wrap align-items-center">
-                        <h4 class="logs-title mb-4">Live Logs</h4>
-                    </div>
-                    <div id="log" class="logs-content"></div>
-                </div>
+    <div class="col-md-7">
+        <div class="section-box bg-warning"><h5>Live Logs</h5></div>
+        <div class="section-box log-content" style="height: 500px;">
+            <p>India hold an advantage over New Zealand in their ODI head-to-head record....India hold an
+                advantage over New Zealand in their ODI head-to-head record...India hold an advantage over New
+                Zealand in their ODI head-to-head record...India hold an advantage over New Zealand in their ODI
+                head-to-head record...India hold an advantage over New Zealand in their ODI head-to-head
+                record...India hold an advantage over New Zealand in their ODI head-to-head record...India hold
+                an advantage over New Zealand in their ODI head-to-head record...India hold an advantage over
+                New Zealand in their ODI head-to-head record...India hold an advantage over New Zealand in their
+                ODI head-to-head record...India hold an advantage over New Zealand in their ODI head-to-head
+                record...India hold an advantage over New Zealand in their ODI head-to-head record...</p>
+        </div>
+
+        <div class="section-box" >
+            <div class="section-box log-content" style="height: 400px;">
+            {% include 'charts.html' %}
             </div>
-        </div><!--end col-->
+        </div>
+    </div>
+    <!-- <script src="../static/js/jquery.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootsrap.min.js"></script> -->
 
-        {% include 'charts.html' %}
-    </div><!--end row-->
-</div>
-<script src="../static/js/jquery.js"></script>
-<script src="../static/js/popper.min.js"></script>
-<script src="../static/js/bootsrap.min.js"></script>
-
-<!-- Highcharts scripts -->
-
-<script>
-    // Sample data for the chart, replace with your actual data
-    const data = [
-        { name: 'Pass', y: 0 },
-        { name: 'Fail', y: 0 },
-        { name: 'No Run', y: 0 }
-    ];
-
-    Highcharts.chart('container', {
-        chart: {
-            type: 'pie'
-        },
-        title: {
-            text: 'Test Report'
-        },
-        accessibility: {
-            point: {
-                valueSuffix: '%'
-            }
-        },
-        plotOptions: {
-            pie: {
-                dataLabels: {
-                    enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                }
-            }
-        },
-        colors: ['#4caf50', '#f44336', '#ffc107'], // Custom colors for the pie chart
-        series: [{
-            name: 'Tests',
-            colorByPoint: true,
-            data: data
-        }]
-    });
-</script>
-
+    <!-- Highcharts scripts -->

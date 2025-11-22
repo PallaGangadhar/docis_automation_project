@@ -104,3 +104,47 @@ def generate_html_file(input_file_path, output_file_path):
 # if __name__ == "__main__":
 #     main()
 
+import json
+from pathlib import Path
+
+def json_to_html_file(data, output_path, title="Testcase Summary"):
+    # Accepts JSON string or Python object (list/dict)
+    if isinstance(data, str):
+        parsed = json.loads(data)
+    else:
+        parsed = data
+
+
+    if not parsed:
+        html_table = "<p>No data</p>"
+    else:
+        # Ensure it's a list
+        rows = parsed if isinstance(parsed, list) else [parsed]
+        # Collect all columns
+        columns = list(rows[0].keys())
+        print(columns)
+        
+        # Build HTML
+        html_table = "<table border='1'>\n<tr>"
+        html_table += "".join(f"<th>{col}</th>" for col in columns)
+        html_table += "</tr>\n"
+        for row in rows:
+            html_table += "<tr>"
+            html_table += "".join(f"<td>{row.get(col,'')}</td>" for col in columns)
+            html_table += "</tr>\n"
+        html_table += "</table>"
+
+        full_html = f"""<!doctype html>
+    <html>
+    <head>
+    <meta charset="utf-8"/>
+    <title>{title}</title>
+    </head>
+    <body>
+    <h2>{title}</h2>
+    {html_table}
+    </body>
+    </html>"""
+
+    Path(output_path).write_text(full_html, encoding="utf-8")
+    return output_path

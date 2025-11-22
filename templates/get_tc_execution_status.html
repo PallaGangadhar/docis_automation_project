@@ -1,0 +1,30 @@
+<table class="table table-hover" id="summary_table_{{tab_name}}">
+    <thead>
+        <tr>
+            <th>Testcase Number</th>
+            <th>Testcase Name</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tc in testcase_tab_details %}
+        <tr id="{{active_tab|generate_random_alphanumeric}}">
+            <td>{{tc[0]}}</td>
+            <td>{{tc[1]}} </td>
+            {% if tc[2] | get_tc_status(reg_id) == 'PASS' %}
+
+            <td> <button class='btn btn-outline-success btn-sm'>PASS</button></td>
+            {% elif tc[2] | get_tc_status(reg_id) == 'FAIL' %}
+            <td> <button class='btn btn-outline-danger btn-sm'>FAIL</button></td>
+            {% else %}
+            <td> <button class='btn btn-outline-warning btn-sm'>InProgress</button></td>
+
+            {% endif %}
+
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="mt-3 summary_table">
+    {{ pagination.links }}
+</div>

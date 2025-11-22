@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+  .bg-sleek-blue {
+    background-color: #2c3e50;
+    /* Sleek blue background color */
+  }
+
+  .text-light {
+    color: #ecf0f1 !important;
+    /* Light text color for better contrast */
+  }
+
+  .scroll {
+    max-height: 275px;
+    overflow-y: auto;
+  }
+
+  .checkbox_font {
+    font-size: 0.9rem;
+  }
+
+  .truncate-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #tabContentTemplate {
+    max-height: calc(110vh - 100px);
+    /* Adjust depending on navbar/footer */
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  /* Remove top margin above logs */
+  .section-box.bg-warning {
+    margin-top: 0 !important;
+    padding: 8px 12px;
+    font-weight: bold;
+  }
+
+  /* Make log content scrollable and take more height */
+  .log-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  #main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tab-pane {
+    overflow-y: auto;
+  }
+
+  .scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    max-height: 100vh;
+  }
+
+  .charts_section {
+    width: 90%;
+    margin-left: 8.5%;
+  }
+
+  .highcharts-figure {
+    margin: 0;
+  }
+
+  .table th,
+  .table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+  }
+
+  .table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  .btn-custom {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .btn-custom:hover {
+    color: #fff;
+    background-color: #0056b3;
+    border-color: #004085;
+  }
+
+  .btn-custom a {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .btn-custom a:hover {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .test-report-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .card {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+
+  .view-regressions-btn {
+    margin-top: 20px;
+    /* Adjust as needed */
+    text-align: center;
+  }
+</style>
+
+<div class="scroll">
+
+  <div id="main" class="mt-5">
+    <div class="header">
+      <button class="btn btn-sm btn-light float-start" onclick="toggleSidebar()">☰</button>
+      <span>Header</span>
+      <span class="float-end">User1 | Theme | Logout</span>
+    </div>
+
+    <div class="container-fluid">
+      <!-- Add Job Button -->
+
+      <!-- Tab Content -->
+      <div class="tab-content p-3" id="myTabContent">
+        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+          <div class="tab-body-content"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template -->
+  <template id="tabContentTemplate">
+
+
+    <div class="col-md-12">
+      <div class="section-box bg-warning">
+        <h5>Live Logs</h5>
+      </div>
+      <div class="section-box log-content" style="height: 500px;" id="log_content">
+        <p></p>
+      </div>
+
+      <div class="section-box">
+        <div class="section-box log-content" style="height: 400px;">
+          <span id="tc_count" class="d-block mb-3 text-center"><b>Total Test Cases Selected: {{total_rerun_count}}</b></span>
+          <div class="d-flex justify-content-center">
+            <figure class="highcharts-figure col-sm-6 col-md-6">
+              <div id="chart_container"></div>
+            </figure>
+
+            <div class="col-sm-6 col-md-6">
+              <h5 class="test-report-header mt-3">Test Report</h5>
+              <table class="table table-bordered table-striped mt-2">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-center">Total</th>
+                    <th scope="col" class="text-center">Passed</th>
+                    <th scope="col" class="text-center">Failed</th>
+                    <th scope="col" class="text-center">Not Run</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="total_tc_count" class="text-center">{{total_rerun_count}}</td>
+                    <td id="total_pass_count" class="text-center">0</td>
+                    <td id="total_fail_count" class="text-center">0</td>
+                    <td id="no_run_count" class="text-center">0</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="table table-bordered mt-3">
+
+                <button class="btn btn-primary"><a href="/view_regression_details" class="text-white">View
+                    Regressions</a></button>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#device_de_popup">
+                  View Device Details
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Modal -->
+          <div class="modal fade" id="device_de_popup" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Device Details</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <table class="table table-bordered mt-2">
+                    <thead>
+                      <tr>
+                        <th scope="col" class="text-center">Device Name</th>
+                        <th scope="col" class="text-center">Device IP</th>
+                        <th scope="col" class="text-center">Modal</th>
+                        <th scope="col" class="text-center">Vendor</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if device_details %}
+                      <tr>
+                        <td class="text-center">{{device_details[1]}}</td>
+                        <td class="text-center">{{device_details[2]}}</td>
+                        <td class="text-center">{{device_details[3]}}</td>
+                        <td class="text-center">{{device_details[4]}}</td>
+                      </tr>
+                      {% endif %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+</div>
+
+<!-- <div class="section-box mt-3">
+  <h5>Summary Table</h5>
+  <div class="table-responsive">
+    <table class="table table-hover" id="rerun_summary_table">
+      <thead>
+
+        <tr>
+          <th>Testcase Number</th>
+          <th>Testcase Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tc in get_tc_details%}
+        <td>{{tc[0]}}</td>
+        <td>{{tc[1]}} </td>
+        <td>In Progress</td>
+        
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+</div> -->
+
+</template>
+
+
+</div>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const template = document.getElementById('tabContentTemplate').content;
+    document.querySelectorAll('.tab-body-content').forEach(container => {
+      const clone = document.importNode(template, true);
+      container.appendChild(clone);
+      //createCharts(container);
+    });
+  });
+
+
+  let tabCount = 1;
+
+  function addJobTab() {
+    tabCount++;
+    const tabId = `tab${tabCount}`;
+    const tabList = document.getElementById('myTab');
+    const tabContent = document.getElementById('myTabContent');
+
+    // Create new tab button
+    const newTabBtn = document.createElement('li');
+    newTabBtn.classList.add('nav-item');
+    newTabBtn.innerHTML = `
+    <button class="nav-link" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">
+      Job ${tabCount}
+    </button>
+  `;
+    tabList.appendChild(newTabBtn);
+
+    // Create new tab content pane
+    const newTabPane = document.createElement('div');
+    newTabPane.classList.add('tab-pane', 'fade');
+    newTabPane.id = tabId;
+    newTabPane.setAttribute('role', 'tabpanel');
+
+    // Clone template
+    const template = document.getElementById('tabContentTemplate');
+    const clone = template.content.cloneNode(true);
+    const tempContainer = document.createElement('div');
+    tempContainer.appendChild(clone);
+
+    // let newHTML = tempContainer.innerHTML
+
+    //   // .replaceAll('log_content_tab1', `log_content_${tabId}`)
+    //   .replaceAll('tc_count_tab1', `tc_count_${tabId}`)
+    //   .replaceAll('total_tc_count_tab1', `total_tc_count_${tabId}`)
+    //   .replaceAll('total_pass_count_tab1', `total_pass_count_${tabId}`)
+    //   .replaceAll('total_fail_count_tab1', `total_fail_count_${tabId}`)
+    //   .replaceAll('no_run_count_tab1', `no_run_count_${tabId}`)
+    //   .replaceAll('container_tab1', `container_${tabId}`)
+    //   .replaceAll('summary_table_tab1', `summary_table_${tabId}`)
+    //   .replaceAll('regression_name_tab1', `regression_name_${tabId}`)
+    //   .replaceAll('run_tab1', `run_${tabId}`)
+    //   .replaceAll('device_id_tab1', `device_id_${tabId}`)
+    //   .replaceAll('cmts_type_tab1', `cmts_type_${tabId}`)
+    //   .replaceAll('random_string_tab1', `random_string_${tabId}`);
+
+    const container = document.createElement('div');
+    container.classList.add('tab-body-content');
+    // container.innerHTML = newHTML;
+    newTabPane.appendChild(container);
+    tabContent.appendChild(newTabPane);
+
+    // Activate the new tab
+    const newTab = new bootstrap.Tab(document.getElementById(`${tabId}-tab`));
+    newTab.show();
+
+    try {
+      $(document).ready(function () {
+        chart = Highcharts.chart('container_' + tabId, {
+          chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            backgroundColor: '#f9f9f9',
+            type: 'pie',
+            height: 350,
+          },
+          title: {
+            text: '',
+            // align: 'cenet'
+          },
+          exporting: {
+            enabled: false // Disables the context menu
+          },
+          credits: {
+            enabled: false // Disables the Highcharts.com text
+          },
+
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: false
+              },
+              showInLegend: true
+            }
+          },
+          series: [{
+            name: null,
+            colorByPoint: true,
+            data: [{
+              name: '0 Pass',
+              y: 0,
+              color: "#00FF00"
+            }, {
+              name: '0 FAIL',
+              y: 0,
+              color: '#FF0000'
+            },
+            {
+              name: "No Run",
+              y: 100,
+              color: '#2E2EFF'
+            },
+
+            ]
+          }]
+        });
+      });
+
+    }
+    catch (err) { }
+  }
+</script>
+
+
+{% endblock %}

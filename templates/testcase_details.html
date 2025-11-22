@@ -4,6 +4,17 @@
 
 {% block content %}
 
+<style>
+    table {
+  border-spacing: 0 !important;
+  border-collapse: collapse;
+  margin: 0 !important;
+}
+td {
+  padding: 0.2rem !important;
+  line-height: 2 !important;       /* removes extra vertical spacing */
+}
+</style>
 <div>
     <!-- main body -->
     <div class="row">
@@ -53,6 +64,7 @@
                                         <tr class="text-dark">
                                             <th>Testcase Number</th>
                                             <th>Testcase Name</th>
+                                            <th>Testcase Name</th>
                                             <th>Testcase Function</th>
                                             <th>Test Reference</th> <!-- Existing column -->
                                             <th>Device Name</th> <!-- New column -->
@@ -63,12 +75,13 @@
                                     <tbody class="text-center" id="reg_report">
                                         {% for details in testcase_offset_details %}
                                         <tr class="fs-14">
-                                            <td>{{ details[2] }}</td> <!-- Assuming details[2] is Testcase Number -->
+                                            <td style="width: 2px;">{{ details[2] }}</td> <!-- Assuming details[2] is Testcase Number -->
                                             <td>{{ details[3] }}</td> <!-- Assuming details[3] is Testcase Name -->
-                                            <td>{{ details[4] }}</td> <!-- Assuming details[4] is Testcase Function -->
-                                            <td>{{ details[5] }}</td> <!-- Assuming details[5] is Test Reference -->
-                                            <td>{{ details[7] }}</td> <!-- New column for Module Name -->
-                                            <td>{{ details[6] }}</td> <!-- New column for Device Name -->
+                                            <td >{{ details[3] }}</td> <!-- Assuming details[3] is Testcase Name -->
+                                            <td style="width: 2px;">{{ details[4] }}</td> <!-- Assuming details[4] is Testcase Function -->
+                                            <td style="width: 2px;">{{ details[5] }}</td> <!-- Assuming details[5] is Test Reference -->
+                                            <td>{{ details[8] }}</td> <!-- New column for Module Name -->
+                                            <td>{{ details[7] }}</td> <!-- New column for Device Name -->
                                             <td>
                                                 <!-- Edit button -->
                                                 <a href="/edit_testcase_details/{{details[0]}}" class="btn btn-info">
@@ -90,7 +103,9 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                                5u
+                                <div class="mt-3">
+                                    {{ pagination.links }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -125,9 +140,7 @@
     </div>
 </div>
 
-<script>
 
-</script>
 
 
 {% endblock %}

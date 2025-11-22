@@ -25,9 +25,10 @@ def add_regression(request):
     cmts_type = request.form.get('cmts_type')
     device_id = request.form.get('device_id')
     regression_string = request.form.get('random_string')
+    tab = request.form.get('tab')
     r_id=0
-    curr.execute('''INSERT INTO regression(regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type,device_id, regression_string) VALUES (%s, %s, %s, %s,%s,%s,%s,%s, %s) RETURNING regression_id''',
-                  (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type,device_id,regression_string))
+    curr.execute('''INSERT INTO regression(regression_name, pass_count, fail_count, no_run_count, total_count,status,cmts_type,device_id, regression_string, tab_info) VALUES (%s, %s, %s, %s,%s,%s,%s,%s, %s, %s) RETURNING regression_id''',
+                  (regression_name, 0, 0, 0,int(total_tc_selected),"In Progress", cmts_type,device_id,regression_string, tab))
 
 
     r_id = curr.fetchone()
@@ -38,7 +39,12 @@ def add_regression(request):
     return r_id
         
 
-def update_regression(pass_tc,fail_tc,r_id):
+def update_regression(**kwargs):
+    pass_tc = kwargs.get('pass_tc')
+    fail_tc = kwargs.get('fail_tc')
+    r_id = kwargs.get('r_id')
+    log_id = kwargs.get('log_id', None)
+    status = kwargs.get('status', None)
     curr, conn=db_connection()
     curr.execute(f'SELECT * FROM regression WHERE regression_id={r_id}')
     query_data=curr.fetchone()
@@ -47,37 +53,53 @@ def update_regression(pass_tc,fail_tc,r_id):
     no_run_count=query_data[5]
     total_count=query_data[6]
 
-    pass_count+=pass_tc
-    fail_count+=fail_tc
-    curr.execute(f'UPDATE regression SET pass_count={pass_count}, fail_count={fail_count} WHERE regression_id={r_id}')
     
-    if int(total_count) == int(pass_count)+int(fail_count)+int(no_run_count):
+    if log_id is not None:
+        pass_count, fail_count, total_count,no_run = select_query_to_get_count_details(r_id)
+        if status == "PASS":
+            pass_count += 1
+            fail_count -= 1
+        else:
+            pass_count -= 1
+            fail_count += 1 
+        curr.execute('''UPDATE regression_logs_details SET status=%s WHERE log_id=%s''',(status, log_id))
+    else:
+        pass_count+=pass_tc
+        fail_count+=fail_tc
 
+    curr.execute(f'UPDATE regression SET pass_count={pass_count}, fail_count={fail_count} WHERE regression_id={r_id}')
+        
+    if int(total_count) == int(pass_count)+int(fail_count)+int(no_run_count):
         curr.execute('''UPDATE regression SET status=%s WHERE regression_id=%s''',( "Completed", r_id))
-    
+
     conn.commit()
     curr.close()
     conn.close()
 
 
 def add_regression_details(response):
-    r_id=response.get('r_id')
-    status=response.get('status')
-    fail_in=response.get('fail_in')
-    tc_no=str(response.get('tc_no'))
-    execution_time=response.get('execution_time')
-    testcase_name=response.get('testcase_name')
-    tc_logs_path=response.get('tc_logs_path')
-    
-    status=status.upper()
-    curr, conn=db_connection()
-    curr.execute('''INSERT INTO regression_logs_details(regression_id,testcase_number,testcase_name,status, failed_in,execution_time,tc_logs_path) VALUES (%s,%s,%s,%s,%s,%s,%s)''',(r_id,tc_no,testcase_name,status, fail_in, execution_time,tc_logs_path) )
-    
-    conn.commit()
-    curr.close()
-    conn.close()
+    try:
+        r_id=response.get('r_id')
+        status=response.get('status')
+        fail_in=response.get('fail_in')
+        execution_time=response.get('execution_time')
+        tc_logs_path=response.get('tc_logs_path')
+        tc_id=response.get('tc_id')
+        log_id=response.get('log_id')
+        status=status.upper()
+        curr, conn=db_connection()
+        if log_id:
+            curr.execute('''UPDATE regression_logs_details SET  failed_in=%s, execution_time=%s, tc_logs_path=%s WHERE log_id=%s''',( fail_in, execution_time, tc_logs_path, log_id))
+        else:
+            curr.execute('''INSERT INTO regression_logs_details(regression_id,status, failed_in,execution_time,tc_logs_path, testcase_id) VALUES (%s,%s,%s,%s,%s,%s)''',(r_id, status, fail_in, execution_time, tc_logs_path, tc_id) )
+        
+        conn.commit()
+        curr.close()
+        conn.close()
+    except Exception as e:
+        print('Regression Logs error ====> ', e)
 
-    
+        
 def update_regression_summary_path(r_id, file_name):
     curr, conn=db_connection()
     curr.execute('''UPDATE regression SET summary_path=%s WHERE regression_id=%s''',( str(file_name), r_id))
@@ -102,8 +124,6 @@ def select_query_to_get_count_details(reg_id):
 
 def add_regression_session(session_id, regression_string):
     curr,conn=db_connection()
-    # curr.execute('''INSERT INTO regression_session(session_id,) VALUES (%s,) ''',
-    #               (session_id))
     curr.execute('''INSERT INTO regression_session (session_id, regression_string) VALUES (%s, %s)''', (session_id,regression_string))
     conn.commit()
     curr.close()
@@ -111,6 +131,7 @@ def add_regression_session(session_id, regression_string):
 
 
 def get_sesson_id(regression_string):
+    session_id = None
     curr,conn=db_connection()
     curr.execute(f"SELECT CASE WHEN EXISTS ("+\
             "SELECT 1 "+\
@@ -120,174 +141,141 @@ def get_sesson_id(regression_string):
         "ELSE 'False'"+\
     "END AS result;", (regression_string,))
     is_exists = curr.fetchone()[0]
-    print("is exists===", is_exists)
+    
     if is_exists == 'True':
         curr.execute("SELECT session_id FROM public.regression_session WHERE regression_string = %s", (regression_string,))
         session_id = curr.fetchone()[0]
-        conn.commit()
+
     curr.close()
     conn.close()
     return session_id
 
 def get_resgression_id(regression_string):
+    print("Regression string === ", regression_string)
+    try:
+        curr,conn=db_connection()
+        curr.execute("SELECT regression_id FROM public.regression WHERE regression_string = %s", (regression_string,))
+        regression_id = curr.fetchone()[0]
+        conn.commit()
+        curr.close()
+        conn.close()
+        return regression_id
+    except Exception as e:
+        print("Session error Arris ===", e)
+
+def get_resgression_id_by_log_id(log_id):
     curr,conn=db_connection()
-    curr.execute("SELECT regression_id FROM public.regression WHERE regression_string = %s", (regression_string,))
+    curr.execute("SELECT regression_id FROM public.regression_logs_details WHERE log_id = %s", (log_id,))
     regression_id = curr.fetchone()[0]
     conn.commit()
     curr.close()
     conn.close()
     return regression_id
 
-# CREATE TABLE IF NOT EXISTS user_info(
-#     user_id serial,
-#     username text NOT NULL, 
-#     password text NOT NULL
-   
-# );
-# CREATE TABLE IF NOT EXISTS user_access(
-#     access_id serial,
-#     user_id serial,
-#     password text NOT NULL,
-#     CONSTRAINT fk_user FOREIGN KEY(user_id)
-#         REFERENCES user_info(user_id)
-   
-# );
-# CREATE TABLE IF NOT EXISTS modules_details(
-#     device_id serial ,
-#     modules_id serial PRIMARY KEY,
-#     module_name text NOT NULL,
-# CONSTRAINT fk_device FOREIGN KEY(device_id)
-#         REFERENCES devices_details(device_id)
-# );
-# CREATE TABLE IF NOT EXISTS devices_details(
-#     device_id serial PRIMARY KEY,
-#     device_name text NOT NULL,
-#     ip text NOT NULL,
-#     model text NOT NULL,
-#     vendor text not null
+def get_regressions_logs_testcase_details(tc_id):
+    curr,conn=db_connection()
+    curr.execute("SELECT  testcase_number, testcase_name, testcase_reference FROM testcase_details WHERE testcase_id = %s", (tc_id,))
+    query_data = curr.fetchone()
+    testcase_number = query_data[0]
+    testcase_name = query_data[1]
+    testcase_reference = query_data[2]
+    curr.close()
+    conn.close()
+    return testcase_number, testcase_name, testcase_reference
 
-# );
-# CREATE TABLE IF NOT EXISTS testcase_details(
-#     testcase_id serial PRIMARY KEY,
-# modules_id serial,
-#     testcase_number text not null,
-#     testcase_name text not null,
-#     testcase_function text not null,
-# CONSTRAINT fk_module FOREIGN KEY(modules_id)
-#         REFERENCES modules_details(modules_id)
-# );
+def get_testcase_function(tc_id):
+    curr,conn=db_connection()
+    curr.execute("SELECT testcase_function FROM testcase_details  WHERE testcase_id = %s", (tc_id,))
+    query_data = curr.fetchone()
+    testcase_function = query_data[0]
+    curr.close()
+    conn.close()
+    return testcase_function
 
-# def insert()
-# curr.execute('CREATE TABLE IF NOT EXISTS regression (regression_id INT,'
-#                                  'regression_name varchar (1000) NOT NULL,'
-#                                  'pass_count integer NOT NULL,'
-#                                  'fail_count integer NOT NULL,'
-#                                  'total_count integer NOT NULL,'
-#                                  'date_added date DEFAULT CURRENT_TIMESTAMP),'
-#                                 'PRIMARY KEY(regression_id)'
-#                                  )
+def get_tab_info(random_string):
+    curr,conn=db_connection()
+    curr.execute("SELECT tab_info from regression WHERE regression_string = %s", (random_string,))
+    query_data = curr.fetchone()
+    if query_data is None:
+        tab_info = None
+    else:
+        tab_info = query_data[0]
+    
+    curr.close()
+    conn.close()
+    return tab_info
+
+def get_regression_random_string(r_id):
+    curr,conn=db_connection()
+    curr.execute("SELECT regression_string from regression WHERE regression_id = %s", (r_id,))
+    query_data = curr.fetchone()
+    regression_string = query_data[11]
+    curr.close()
+    conn.close()
+    return regression_string     
 
 
-# curr.execute('CREATE TABLE IF NOT EXISTS logs (logs_id serial,'
-#                                  'regression_id INT,'
-#                                  'status varchar(1000) NOT NULL,'
-#                                  'date_added date DEFAULT CURRENT_TIMESTAMP,'
-#                                  'CONSTRAINT fk_regression FOREIGN KEY(regression_id) REFERENCES regression(regression_id)'
-#                                  )
-# CREATE TABLE IF NOT EXISTS logs(
-#     logs_id INT,
-#     regression_id INT,
-#     status varchar(1000) NOT NULL,
-#     date_added date DEFAULT CURRENT_TIMESTAMP,
+def get_tc_executed_count(rid):
+    curr, conn = db_connection()
+    curr.execute(f"SELECT count(log_id) FROM public.regression_logs_details where regression_id = {rid};")
+    query_data = curr.fetchone()
+    curr.close()
+    conn.close()
+    return query_data[0]
 
-#     CONSTRAINT fk_regression FOREIGN KEY(regression_id)
-#         REFERENCES regression(regression_id)
-# );
-
-# regression_name='ABC',
-# pass_count=1
-# fail_count=1
-# total_count=0
-# curr.execute(
-#         '''INSERT INTO regression \
-#         (regression_name, pass_count, fail_count,total_count) VALUES (%s, %s, %s, %s) RETURNING regression_id''',
-#         (regression_name, pass_count, fail_count, total_count))
-
-# data = curr.fetchone()
-# print("User ID of latest entry:", type(data[0]))
-
-# curr.execute(
-#         '''INSERT INTO logs \
-#         (regression_id,testcase_name, status) VALUES (%s,%s, %s)''',
-#         (1,"TC_1","PASS"))
-
-# CREATE TABLE IF NOT EXISTS regression_logs_details(
-#     log_id serial,
-#     regression_id serial,
-#     testcase_number text,
-#     testcase_name text,
-#     status varchar(1000),
-#     failed_in text,
-#     execution_time text,
-#     tc_logs_path text,
-#     date_added timestamp DEFAULT CURRENT_TIMESTAMP,
-#     CONSTRAINT fk_regression FOREIGN KEY(regression_id)
-#         REFERENCES regression(regression_id)
-# );
-
-# CREATE TABLE IF NOT EXISTS regression(
-#     regression_id serial,
-#     device_id serial,
-#     regression_name text NOT NULL, 
-#     pass_count integer NOT NULL,
-#     fail_count integer NOT NULL,
-#     no_run_count integer NOT NULL,
-#     total_count integer NOT NULL,
-#     summary_path text,
-#     status varchar(1000),
-#     cmts_type varchar(1000),
-#     date_added timestamp DEFAULT CURRENT_TIMESTAMP,
-#     PRIMARY KEY(regression_id)
-# CONSTRAINT fk_device FOREIGN KEY(device_id)
-#         REFERENCES devices_details(device_id)
-
-# );
-
-# ikpD10@gpa002
-# SELECT testcase_details.testcase_name FROM public.testcase_details,modules_details where testcase_details.modules_id = modules_details.modules_id and modules_details.modules_id=5;
+def get_executed_tc_status(log_id):
+    curr, conn = db_connection()
+    curr.execute(f"SELECT status FROM public.regression_logs_details where log_id = {log_id};")
+    query_data = curr.fetchone()
+    curr.close()
+    conn.close()
+    print("Executed status DB === ", query_data[0])
+    return query_data[0]
 
 
-# ALTER TABLE modules_details DROP CONSTRAINT fk_device;
-# ALTER TABLE modules_details
-# ADD CONSTRAINT fk_device FOREIGN KEY (device_id)
-# REFERENCES devices_details (device_id) ON DELETE CASCADE;
+def update_track_rerun_count(r_id, pass_count, fail_count):
+    curr, conn = db_connection()
+    curr.execute('''UPDATE track_rerun_count SET pass_count = %s, fail_count = %s WHERE reg_id = %s''', (pass_count, fail_count, r_id))
+    conn.commit()
+    curr.close()
+    conn.close()
 
+def get_rerun_pass_fail_count_status(r_id):
+    curr, conn = db_connection()
+    curr.execute(f"SELECT pass_count, fail_count, total_rerun_count FROM public.track_rerun_count where reg_id = {r_id};")
+    query_data = curr.fetchone()
+    curr.close()
+    conn.close()
+    if query_data:
+        return query_data[0], query_data[1], query_data[2]
+    else:
+        return 0, 0, 0
+    
+def delete_track_rerun_tc(r_id):
+    curr, conn = db_connection()
+    curr.execute(f"DELETE FROM track_rerun_count where reg_id = {r_id};")
+    conn.commit()
+    curr.close()
+    conn.close()
 
-# ALTER TABLE testcase_details DROP CONSTRAINT fk_module;
-# ALTER TABLE testcase_details
-# ADD CONSTRAINT fk_module FOREIGN KEY (modules_id)
-# REFERENCES modules_details (modules_id) ON DELETE CASCADE;
-
-# ALTER TABLE regression DROP CONSTRAINT fk_device;
-# ALTER TABLE regression
-# ADD CONSTRAINT fk_device FOREIGN KEY (device_id)
-# REFERENCES devices_details (device_id) ON DELETE CASCADE;
-
-
-# ALTER TABLE regression_logs_details DROP CONSTRAINT fk_regression;
-# ALTER TABLE regression
-# ADD CONSTRAINT fk_regression FOREIGN KEY (regression_id)
-# REFERENCES regression (regression_id) ON DELETE CASCADE;
-
-
-
-# WITH extracted_digits AS (
-#     SELECT 
-#         REGEXP_REPLACE(execution_time, '\D', '', 'g') AS digits_string
-#     FROM 
-#         regression_logs_details where regression_id=9
+# create table track_rerun_count(
+# 	reg_id serial NOT NULL,
+# 	pass_count INT NOT NULL DEFAULT 0,
+# 	fail_count INT NOT NULL DEFAULT 0,
+# 	total_rerun_count INT NOT NULL DEFAULT 0,
+#     testcase_details TEXT NOT NULL
+    
 # )
-# SELECT 
-#     SUM(CAST(SUBSTRING(digits_string, 1) AS INTEGER)) AS sum_of_digits
-# FROM 
-#     extracted_digits;
+
+# ALTER TABLE public.track_rerun_count
+# ADD COLUMN testcase_details TEXT NOT NULL;
+
+
+# 1. create table track_rerun_count
+# 2. rerun_tc api
+# 3. rereun_mutltiple_tc in script.js
+# 4. re_run_tc.html
+# 5. def send_chart_details(data), def rerun_tc(log_id=None), def track_rerun_tc():app.py 
+# 6. send_req in utils.py
+# 7.   socket.on('charts_details', function (msg)  and chart_container(new) changes in tab script
+# 8. changes related to log_id in each tc function

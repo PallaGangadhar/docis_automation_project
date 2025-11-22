@@ -55,141 +55,74 @@ $('#clear_logs').click(function () {
 });
 
 
-$(document).ready(function () {
-    // var socket = io.connect('http://' + document.domain + ':' + location.port);
-    var socket = io.connect('http://' + document.domain + ':' + location.port, {
-        reconnection: true,         // Enable reconnection
-        reconnectionAttempts: 5,     // Number of reconnection attempts
-        reconnectionDelay: 1000      // Delay between reconnection attempts
-    });
+// $(document).ready(function () {
+//     // var socket = io.connect('http://' + document.domain + ':' + location.port);
+//     var socket = io.connect('http://' + document.domain + ':' + location.port, {
+//         reconnection: true,         // Enable reconnection
+//         reconnectionAttempts: 5,     // Number of reconnection attempts
+//         reconnectionDelay: 1000      // Delay between reconnection attempts
+//     });
 
-    // Register session after initial connection
-    socket.on('connect', function () {
-        socket.emit('register_session', { url: window.location.href });
-    });
+//     // Register session after initial connection
+//     socket.on('connect', function () {
+//         socket.emit('register_session', { url: window.location.href });
+//     });
 
-    // Re-register session after reconnection
-    socket.on('reconnect', function (attempt) {
-        console.log('Reconnected to server after attempt', attempt);
-        socket.emit('register_session', { url: window.location.href });
-    });
+//     // Re-register session after reconnection
+//     socket.on('reconnect', function (attempt) {
+//         console.log('Reconnected to server after attempt', attempt);
+//         socket.emit('register_session', { url: window.location.href });
+//     });
 
-    socket.on('message', function (msg, cb) {
-        var color = 'black';
-        var url = window.location.href.split("?")[1]
+//     socket.on('message', function (msg, cb) {
+//         console.log("messhh")
+//         var color = 'black';
+//         console.log(msg)
 
-        if (msg.msg.includes('TestStep') == true && msg.msg.includes('Pass') == true) {
-            color = "green"
-        }
-        else if (msg.msg.includes('TestStep') == true && msg.msg.includes('FAIL') == true) {
-            color = "red"
-        }
-        var eachLine = msg.msg.split('\n');
+//     });
 
-        for (var i = 0, l = eachLine.length; i < l; i++) {
-            $('#log').append('<div style="color:' + color + '">' + $('<div/>').append(eachLine[i].trim().replace(/ /g, "&nbsp;")).html());
-        }
-        if (cb)
-            cb();
-    });
+//     socket.on('charts_details', function (msg) {
+//         var pass_per = 0.0
+//         var fail_per = 0.0
+//         var no_run_per = 0.0
 
-    socket.on('charts_details', function (msg) {
+//         total = msg.pass_tc + msg.fail_tc
+//         total_tc_selected = msg.total_count
 
-        var pass_per = 0.0
-        var fail_per = 0.0
-        var no_run_per = 0.0
-        console.log(msg)
-        total = msg.pass_tc + msg.fail_tc
-        total_tc_selected = msg.total_count
+//         pass_per = (msg.pass_tc / total_tc_selected) * 100
+//         fail_per = (msg.fail_tc / total_tc_selected) * 100
+//         no_run = total_tc_selected - (total)
 
-        pass_per = (msg.pass_tc / total_tc_selected) * 100
-        fail_per = (msg.fail_tc / total_tc_selected) * 100
-        no_run = total_tc_selected - (total)
-        no_run_per = (no_run / total_tc_selected) * 100
-        $('#total_tc_count').text(total_tc_selected);
-        $('#total_pass_count').text(msg.pass_tc);
-        $('#total_fail_count').text(msg.fail_tc);
-        $('#no_run_count').text(no_run);
-        $('#tc_count b').text("Total TC Selected: " + total_tc_selected);
-        chart.series[0].setData([
-            { name: msg.pass_tc + ' PASS', y: pass_per, color: "#00FF00" },
-            { name: msg.fail_tc + ' FAIL', y: fail_per, color: "#FF0000" },
-            { name: no_run + ' No Run', y: no_run_per, color: "#2E2EFF" },
-        ], true);
+//         no_run_per = (no_run / total_tc_selected) * 100
+//         $('#total_tc_count').text(total_tc_selected);
+//         $('#total_pass_count').text(msg.pass_tc);
+//         $('#total_fail_count').text(msg.fail_tc);
+//         $('#no_run_count').text(no_run);
+//         $('#tc_count b').text("Total TC Selected: " + total_tc_selected);
+//         chart.series[0].setData([
+//             { name: msg.pass_tc + ' PASS', y: pass_per, color: "#00FF00" },
+//             { name: msg.fail_tc + ' FAIL', y: fail_per, color: "#FF0000" },
+//             { name: no_run + ' No Run', y: no_run_per, color: "#2E2EFF" },
+//         ], true);
 
-        if (total == total_tc_selected) {
-            $('#stop').prop('disabled', true);
-            $('#clear_logs').prop('disabled', false);
-            $('#tc_status').text("Completed");
-            iter = 0;
-        }
+//         if (total == total_tc_selected) {
+//             $('#stop').prop('disabled', true);
+//             $('#clear_logs').prop('disabled', false);
+//             $('#tc_status').text("Completed");
+//             iter = 0;
+//         }
 
-    });
+//     });
 
-    socket.on('disconnect', () => {
-        socket.emit('client disconnected')
-    });
-});
+//     socket.on('disconnect', () => {
+//         socket.emit('client disconnected')
+//     });
+// });
 
 
 
 // function show_charts(pass_per, fail_per, pass, fail){
-try {
-    $(document).ready(function () {
-        chart = Highcharts.chart('container', {
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie',
-                height: 250
-            },
-            title: {
-                text: '',
-                // align: 'cenet'
-            },
-            exporting: {
-                enabled: false // Disables the context menu
-            },
-            credits: {
-                enabled: false // Disables the Highcharts.com text
-            },
 
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: false
-                    },
-                    showInLegend: true
-                }
-            },
-            series: [{
-                name: null,
-                colorByPoint: true,
-                data: [{
-                    name: '0 Pass',
-                    y: 0,
-                    color: "#00FF00"
-                }, {
-                    name: '0 FAIL',
-                    y: 0,
-                    color: '#FF0000'
-                },
-                {
-                    name: "No Run",
-                    y: 100,
-                    color: '#2E2EFF'
-                },
-
-                ]
-            }]
-        });
-    });
-
-}
-catch (err) { }
 
 
 
@@ -204,6 +137,7 @@ var uncheckboxes_value = [];
 var module_id = "";
 var module_id_arr = [];
 var testcase_names = [];
+var testcase_id = []
 
 $("input:checkbox[name='modules[]']").click(function () {
     select_testcases()
@@ -223,6 +157,7 @@ function removeDuplicates(arr) {
 }
 
 function select_testcases() {
+
     var modules = [];
     var check_module_id = "";
     $('#tc_select').prop('checked', false);
@@ -285,6 +220,12 @@ function run_tc(div_id) {
     var text = $('#regression_name').val();
     var cmts_type = $("input[name=cmts_type]").val()
     var device_id = $("input[name=device_id]").val()
+
+    const checkboxes = document.querySelectorAll(".testcases:checked"); // Select all checkboxes with class 'checkbox'
+    checkboxes.forEach(checkbox => {
+        testcase_id.push(checkbox.dataset.attr)
+    });
+    testcase_id = removeDuplicates(testcase_id)
     $('#tc_status').text("In Progres");
     if (text == "") {
         alert('Please enter regression name...')
@@ -296,7 +237,6 @@ function run_tc(div_id) {
             remove_err_ele(module_id_arr, unchecked_module_id)
         }
         for (let m = 0; m < module_id_arr.length; m++) {
-
             $("input:checkbox[name='testcase_module_" + module_id_arr[m] + "[]']").each(function () {
                 if (this.checked) {
                     testcase_names.push($(this).next('label').text());
@@ -315,22 +255,20 @@ function run_tc(div_id) {
             divelement.style.display = 'none';
             total_tc_selected = checkboxes_value.length;
             checkboxes_value = checkboxes_value.toString();
+            testcase_id = testcase_id.toString()
             testcase_names = testcase_names.toString();
             $('#stop').prop('disabled', false);
             $('#check_tc').prop('disabled', true);
             $('#tc_count b').text("Total TC Selected: " + total_tc_selected);
             $('#total_tc_count').text(total_tc_selected);
-            var random_string = generateRandomAlphanumeric(15);
-            window.location.href = "/tc_execution/" + device_id + "?" + random_string
-            $.ajax({
-                url: "/tc_execution/" + device_id + "?" + random_string,
-                // url:"/tc_execution/"+device_id,
-                method: "POST",
-                data: { "data": checkboxes_value, 'regression_name': text, 'total_tc_selected': total_tc_selected, 'cmts_type': cmts_type, "device_id": device_id, 'random_string': random_string }
-                // data:{ "data":checkboxes_value,'regression_name':text,'total_tc_selected':total_tc_selected,'cmts_type':cmts_type,"device_id":device_id }
-            });
-
-
+            console.log(testcase_id)
+            // var random_string = generateRandomAlphanumeric(15);
+            // window.location.href = "/tc_execution/" + device_id + "?" + random_string
+            // $.ajax({
+            //     url: "/tc_execution/" + device_id + "?" + random_string,
+            //     method: "POST",
+            //     data: { "data": checkboxes_value, 'regression_name': text, 'total_tc_selected': total_tc_selected, 'cmts_type': cmts_type, "device_id": , 'random_string': random_string, 'testcase_id': testcase_id }
+            // });
         }
     }
 
@@ -408,33 +346,34 @@ catch (err) {
     console.log(err)
 }
 
-var testcase_id = [];
+// var testcase_id = [];
 
-$("input:checkbox[name='reg_box']").on('change', function () {
-    if (this.checked) {
-        testcase_id.push($(this).val());
-    }
-    else {
-        remove_err_ele(testcase_id, $(this).val());
-    }
-});
+// $("input:checkbox[name='reg_box']").on('change', function () {
+//     if (this.checked) {
+//         testcase_id.push($(this).val());
+//     }
+//     else {
+//         remove_err_ele(testcase_id, $(this).val());
+//     }
+// });
 
-function delete_selected_regression() {
-    if (testcase_id.length == 0) {
-        alert('Please select atleast one testcase')
-    }
-    else {
-        testcase_id = testcase_id.toString();
-        $.ajax({
-            url: "/delete_selected_regression",
-            method: "POST",
-            data: { "data": testcase_id },
-            success: function () {
-                location.reload();
-            }
-        });
-    }
-}
+// function delete_selected_regression() {
+//     console.log("====",testcase_id)
+//     if (testcase_id.length == 0) {
+//         alert('Please select atleast one testcase')
+//     }
+//     else {
+//         testcase_id = testcase_id.toString();
+//         $.ajax({
+//             url: "/delete_selected_regression",
+//             method: "POST",
+//             data: { "data": testcase_id },
+//             success: function () {
+//                 location.reload();
+//             }
+//         });
+//     }
+// }
 
 try {
     var selected_value = window.location.href.split('?')[1].split('=')[1].split('&')[0]
@@ -521,10 +460,6 @@ $('#select_all_regression').on('click', function () {
     $("input:checkbox[name='reg_box']:checked").each(function () {
         testcase_id.push($(this).val());
     });
-
-
-
-
 });
 
 try {
@@ -540,7 +475,6 @@ try {
 catch (err) {
 }
 
-
 try {
     var selected_device = window.location.href.split('?')[1].split('=')[1].split('&')[0]
     var search_module = window.location.href.split('?')[1].split('&')[1].split('=')[1]
@@ -554,7 +488,7 @@ catch (err) {
 
 try {
     var check_for_page = window.location.href.split('?')[1].split('=')[0]
-    if (check_for_page != 'page'){
+    if (check_for_page != 'page') {
         search_device = window.location.href.split('?')[1].split('=')[1].split('&')[0]
     }
     search_device = search_device.replace(/[+]/g, ' ');
@@ -590,6 +524,8 @@ try {
 }
 catch (err) { }
 
+
+
 try {
     var url = window.location.href
     module_id = ""
@@ -613,4 +549,116 @@ try {
 
 }
 catch (err) { }
+
+$(document).ready(function () {
+    // Initialize Datepicker
+    $('#from_date, #to_date').datepicker({
+        format: "yyyy-mm-dd",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    // Capture Date Selection
+    $('#from_date_val').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    }).on('changeDate', function (e) {
+        $('#from_date_val').val(
+            e.format('yyyy-mm-dd')
+        );
+    });
+
+    $('#to_date_val').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true
+    }).on('changeDate', function (e) {
+        $('#to_date_val').val(
+            e.format('yyyy-mm-dd')
+        );
+    });
+
+});
+
+
+$(".rereun_tc").click(function () {
+    var tc_id = $("input[name=tc_id]").val()
+    var log_id = $("input[name=log_id]").val()
+    var regression_string = generateRandomAlphanumeric(15);
+    $('#log_content').attr('id', 'log_content_' + regression_string);
+
+    window.location.href = "/rerun_tc/" + log_id + "?" + regression_string
+
+    $.ajax({
+        url: "/rerun_tc/" + log_id + "?" + regression_string,
+        method: "POST",
+        data: { "tc_id": tc_id, 'log_id': log_id, 'random_string': regression_string }
+    },
+        success = function () {
+            console.log("success === ", regression_string);
+
+        }
+    );
+
+});
+
+
+$('#multiple_case').click(function () {
+    let visibility_check_checkbox = $("input:checkbox[name='rereun_mutltiple_tc']");
+    visibility_check = visibility_check_checkbox.css("visibility") == "hidden";
+    if (visibility_check) {
+        $("input:checkbox[name='rereun_mutltiple_tc']").css('visibility', 'visible');
+    }
+    else {
+        $("input:checkbox[name='rereun_mutltiple_tc']").css('visibility', 'hidden');
+        let checkboxes = document.getElementsByName("rereun_mutltiple_tc");
+        checkboxes.forEach(cb => cb.checked = false);
+
+        // for (let i = 0; i < checkboxes.length; i++) {
+        //     checkboxes[i].checked = false;
+        // }
+    }
+
+});
+
+
+$('#rereun_mutltiple_tc').click(function () {
+    const testcase_ids = []; // Your existing array
+    const logs_ids = []; // Your existing array
+    const checkboxes = document.querySelectorAll('input[name="rereun_mutltiple_tc"]:checked');
+    var reg_id = 0;
+    // var log_id = $("input[name=log_id]").val()
+    checkboxes.forEach(cb => {
+        testcase_ids.push(cb.value.split(',')[0]);
+        logs_ids.push(cb.value.split(',')[1]);
+        reg_id = cb.value.split(',')[2];
+    });
+    // let log_id_list = $("input[name='log_id']").map(function() {
+    //     return $(this).val();
+    // }).get();
+
+    total_rerun_count = testcase_ids.length
+
+    rerun_tc_list = testcase_ids.toString();
+    log_id_list = logs_ids.toString();
+    $.ajax({
+        url: "/track_rerun_tc",
+        method: "POST",
+        data: { "tc_id": rerun_tc_list, "reg_id": reg_id, "total_rerun_tc": total_rerun_count },
+        success: function () {
+            var regression_string = generateRandomAlphanumeric(15);
+            window.location.href = "/rerun_tc?reg_id=" + reg_id + "&random_string=" + regression_string+"&total_rerun_count="+total_rerun_count
+            $.ajax({
+                url: "/rerun_tc?reg_id=" + reg_id + "&random_string=" + regression_string,
+                method: "POST",
+                data: { "tc_id": rerun_tc_list, "log_id": log_id_list, "total_rerun_tc": total_rerun_count }
+            });
+        }
+    });
+})
+
+
+
+
 

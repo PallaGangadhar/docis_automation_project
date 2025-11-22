@@ -11,7 +11,8 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card shadow-lg">
-                            <div class="card-header bg-info text-white text-center fw-bold">Regression Over Time (Last 10 Days)</div>
+                            <div class="card-header bg-info text-white text-center fw-bold">Regression Over Time (Last
+                                10 Days)</div>
                             <div class="card-body">
                                 <figure class="highcharts-figure">
                                     <div id="line_chart"></div>
@@ -35,10 +36,12 @@
                 <div class="row mt-3">
                     <div class="col-lg-12">
                         <div class="card shadow-lg">
-                            <div class="card-header bg-info text-white text-center fw-bold">Regression Summary (Last 10 Days)</div>
+                            <div class="card-header bg-info text-white text-center fw-bold">Regression Summary (Last 10
+                                Days)</div>
                             <div class="card-body">
                                 {% if error_message %}
-                                <h5 class="text-center text-danger">End Date should be greater than or equal to From Date.</h5>
+                                <h5 class="text-center text-danger">End Date should be greater than or equal to From
+                                    Date.</h5>
                                 {% else %}
                                 <figure class="highcharts-figure">
                                     <div id="bar_chart" style="height: 350px;"></div>
@@ -51,28 +54,30 @@
 
                 <!-- Filter Section -->
                 <div class="row mt-3">
-                    <form id="filter_graph" method="GET" action="/" class="d-flex">
+                    <form id="filter_graph" method="GET" action="/" class="row g-2 align-items-end">
                         <div class="col-lg-2">
-                            <div id="from_date" class="input-group date">
+                            <label for="from_date_val" class="form-label">From Date</label>
+                            <div class="input-group">
                                 <input class="form-control" type="text" name="from_date" id="from_date_val"
-                                    placeholder="From Date" required />
+                                    placeholder="From Date" required  autocomplete="off" />
                                 <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div id="to_date" class="input-group date">
+                            <label for="to_date_val" class="form-label">To Date</label>
+                            <div class="input-group">
                                 <input class="form-control" type="text" name="to_date" id="to_date_val"
-                                    placeholder="To Date" required />
+                                    placeholder="To Date" required required autocomplete="off" />
                                 <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                             </div>
                         </div>
-                        <div class="col-lg-2">
-                            <button type="submit" class="btn btn-primary">Search</button>
-                            <button type="button" class="btn btn-secondary" onclick="clear_filter()">Clear</button>
+                        <div class="col-lg-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary mt-4">Search</button>
+                            <button type="button" class="btn btn-secondary mt-4" onclick="clear_filter()">Clear</button>
                         </div>
                     </form>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
 </div>
@@ -104,7 +109,7 @@
         Highcharts.chart('bar_chart', {
             chart: { type: 'column', borderRadius: 8 },
             //title: { text: 'Regression Summary (Last 10 Days)' },
-            title: { text: ''},
+            title: { text: '' },
             xAxis: { categories: reg_date, crosshair: true },
             yAxis: { min: 0, title: { text: 'Count' } },
             series: [{ name: 'Regression', data: reg_data }],
@@ -115,8 +120,8 @@
         // Line Chart
         Highcharts.chart('line_chart', {
             chart: { type: 'spline', borderRadius: 8 },
-            title: { text: ''},
-           // title: { text: 'Regression Over Time (Last 10 Days)' },
+            title: { text: '' },
+            // title: { text: 'Regression Over Time (Last 10 Days)' },
             xAxis: { categories: reg_date },
             yAxis: { title: { text: 'Count' } },
             series: [{ name: 'Regression', data: reg_data }],
@@ -125,46 +130,27 @@
         });
 
         Highcharts.chart('regression_pie_chart', {
-        chart: { type: 'pie', borderRadius: 8 },
-       title: { text: ''},
-       //'Regression Breakdown' },
-        tooltip: {
-           // pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.2f}%)'
-            pointFormat: '{point.percentage:.2f}%'
-        },
-        series: [{ 
-           // name: 'Share', 
-            data: pie_chart 
-        }],
-        exporting: { enabled: false },
-        credits: { enabled: false }
-    });
+            chart: { type: 'pie', borderRadius: 8 },
+            title: { text: '' },
+            //'Regression Breakdown' },
+            tooltip: {
+                // pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.2f}%)'
+                pointFormat: '{point.percentage:.2f}%'
+            },
+            series: [{
+                // name: 'Share', 
+                data: pie_chart
+            }],
+            exporting: { enabled: false },
+            credits: { enabled: false }
+        });
     } catch (err) { console.error(err); }
 </script>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-
 
 <script>
-    $(document).ready(function () {
-        // Initialize Datepicker
-        $('#from_date, #to_date').datepicker({
-            format: "yyyy-mm-dd",
-            autoclose: true,
-            todayHighlight: true
-        });
 
-        // Capture Date Selection
-        $('#from_date').datepicker().on('changeDate', function (e) {
-            $('#from_date_val').val(e.format(0, "yyyy-mm-dd"));
-        });
-
-        $('#to_date').datepicker().on('changeDate', function (e) {
-            $('#to_date_val').val(e.format(0, "yyyy-mm-dd"));
-        });
-    });
 </script>
 
 {% endblock %}

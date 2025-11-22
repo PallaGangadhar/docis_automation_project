@@ -467,7 +467,7 @@ thead {
 }
 
 .page_content_scroll {
-  height: 550px;
+  height: 600px;
   overflow-y: auto;
 }
 
@@ -650,6 +650,10 @@ thead {
 
 .pointer {
   cursor: pointer;
+}
+
+.mt-6 {
+  margin-top: 3rem !important;
 }
 
 @media (min-width: 768px) {

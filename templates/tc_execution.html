@@ -400,96 +400,108 @@
 
   let tabCount = 1;
 
-  function addJobTab() {
-    tabCount++;
-
-    const tabId = `tab${tabCount}`;
+  function addJobTab(close = false, tab_count = 0) {
+ 
+    
     const tabList = document.getElementById('myTab');
     const tabContent = document.getElementById('myTabContent');
+    if (close == true) {
+        // const child = document.getElementById(`tab${tab_count}-tab`);
+        console.log("tab_count:", tab_count);
+        const parent = document.getElementById("myTabContent");
+        const child = document.getElementById(tab_count);
+        console.log("child:", child);
+        // tabContent.removeChild(child);
+        
+    }
+    else {
 
-    // Create new tab button
-    const newTabBtn = document.createElement('li');
-    newTabBtn.classList.add('nav-item');
-    newTabBtn.innerHTML = `
+      tabCount++;
+      const tabId = `tab${tabCount}`;
+
+      // Create new tab button
+      const newTabBtn = document.createElement('li');
+      newTabBtn.classList.add('nav-item');
+      newTabBtn.innerHTML = `
     <button class="nav-link d-flex align-items-center" id="${tabId}-tab"
             data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">
       Execution ${tabCount}
       <span class="ms-2 text-danger close-tab" data-tab="${tabId}" style="cursor:pointer;">&times;</span>
     </button>
   `;
-    tabList.appendChild(newTabBtn);
+      tabList.appendChild(newTabBtn);
 
-    // Create new tab content pane
-    const newTabPane = document.createElement('div');
-    newTabPane.classList.add('tab-pane', 'fade');
-    newTabPane.id = tabId;
-    newTabPane.setAttribute('role', 'tabpanel');
+      // Create new tab content pane
+      const newTabPane = document.createElement('div');
+      newTabPane.classList.add('tab-pane', 'fade');
+      newTabPane.id = tabId;
+      newTabPane.setAttribute('role', 'tabpanel');
 
-    // Clone template and replace tab-specific IDs
-    const template = document.getElementById('tabContentTemplate');
-    const clone = template.content.cloneNode(true);
-    const tempContainer = document.createElement('div');
-    tempContainer.appendChild(clone);
+      // Clone template and replace tab-specific IDs
+      const template = document.getElementById('tabContentTemplate');
+      const clone = template.content.cloneNode(true);
+      const tempContainer = document.createElement('div');
+      tempContainer.appendChild(clone);
 
-    let newHTML = tempContainer.innerHTML
-      .replaceAll('vendor_select_tab1', `vendor_select_${tabId}`)
-      .replaceAll('deviceSelect_tab1', `deviceSelect_${tabId}`)
-      .replaceAll('ul_modules_tab1', `ul_modules_${tabId}`)
-      .replaceAll('ul_testcases_tab1', `ul_testcases_${tabId}`)
-      .replaceAll('log_content_tab1', `log_content_${tabId}`)
-      .replaceAll('tc_count_tab1', `tc_count_${tabId}`)
-      .replaceAll('total_tc_count_tab1', `total_tc_count_${tabId}`)
-      .replaceAll('total_pass_count_tab1', `total_pass_count_${tabId}`)
-      .replaceAll('total_fail_count_tab1', `total_fail_count_${tabId}`)
-      .replaceAll('no_run_count_tab1', `no_run_count_${tabId}`)
-      .replaceAll('container_tab1', `container_${tabId}`)
-      .replaceAll('summary_table_tab1', `summary_table_${tabId}`)
-      .replaceAll('regression_name_tab1', `regression_name_${tabId}`)
-      .replaceAll('run_tab1', `run_${tabId}`)
-      .replaceAll('device_id_tab1', `device_id_${tabId}`)
-      .replaceAll('cmts_type_tab1', `cmts_type_${tabId}`)
-      .replaceAll('random_string_tab1', `random_string_${tabId}`);
+      let newHTML = tempContainer.innerHTML
+        .replaceAll('vendor_select_tab1', `vendor_select_${tabId}`)
+        .replaceAll('deviceSelect_tab1', `deviceSelect_${tabId}`)
+        .replaceAll('ul_modules_tab1', `ul_modules_${tabId}`)
+        .replaceAll('ul_testcases_tab1', `ul_testcases_${tabId}`)
+        .replaceAll('log_content_tab1', `log_content_${tabId}`)
+        .replaceAll('tc_count_tab1', `tc_count_${tabId}`)
+        .replaceAll('total_tc_count_tab1', `total_tc_count_${tabId}`)
+        .replaceAll('total_pass_count_tab1', `total_pass_count_${tabId}`)
+        .replaceAll('total_fail_count_tab1', `total_fail_count_${tabId}`)
+        .replaceAll('no_run_count_tab1', `no_run_count_${tabId}`)
+        .replaceAll('container_tab1', `container_${tabId}`)
+        .replaceAll('summary_table_tab1', `summary_table_${tabId}`)
+        .replaceAll('regression_name_tab1', `regression_name_${tabId}`)
+        .replaceAll('run_tab1', `run_${tabId}`)
+        .replaceAll('device_id_tab1', `device_id_${tabId}`)
+        .replaceAll('cmts_type_tab1', `cmts_type_${tabId}`)
+        .replaceAll('random_string_tab1', `random_string_${tabId}`);
 
-    const container = document.createElement('div');
-    container.classList.add('tab-body-content');
-    container.innerHTML = newHTML;
-    newTabPane.appendChild(container);
-    tabContent.appendChild(newTabPane);
+      const container = document.createElement('div');
+      container.classList.add('tab-body-content');
+      container.innerHTML = newHTML;
+      newTabPane.appendChild(container);
+      tabContent.appendChild(newTabPane);
+      // Activate new tab
+      const newTab = new bootstrap.Tab(document.getElementById(`${tabId}-tab`));
+      newTab.show();
 
-    // Activate new tab
-    const newTab = new bootstrap.Tab(document.getElementById(`${tabId}-tab`));
-    newTab.show();
-
-    // Initialize Highcharts
-    try {
-      $(document).ready(function () {
-        Highcharts.chart('container_' + tabId, {
-          chart: {
-            type: 'pie',
-            height: 350,
-            backgroundColor: '#f9f9f9'
-          },
-          title: { text: '' },
-          credits: { enabled: false },
-          exporting: { enabled: false },
-          plotOptions: {
-            pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: { enabled: false },
-              showInLegend: true
-            }
-          },
-          series: [{
-            data: [
-              { name: '0 Pass', y: 0, color: "#00FF00" },
-              { name: '0 Fail', y: 0, color: "#FF0000" },
-              { name: "No Run", y: 100, color: "#2E2EFF" }
-            ]
-          }]
+      // Initialize Highcharts
+      try {
+        $(document).ready(function () {
+          Highcharts.chart('container_' + tabId, {
+            chart: {
+              type: 'pie',
+              height: 350,
+              backgroundColor: '#f9f9f9'
+            },
+            title: { text: '' },
+            credits: { enabled: false },
+            exporting: { enabled: false },
+            plotOptions: {
+              pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: { enabled: false },
+                showInLegend: true
+              }
+            },
+            series: [{
+              data: [
+                { name: '0 Pass', y: 0, color: "#00FF00" },
+                { name: '0 Fail', y: 0, color: "#FF0000" },
+                { name: "No Run", y: 100, color: "#2E2EFF" }
+              ]
+            }]
+          });
         });
-      });
-    } catch (err) { }
+      } catch (err) { }
+    }
   }
 
 

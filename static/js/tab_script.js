@@ -33,7 +33,7 @@ $(document).ready(function () {
     $.ajax({
       url: "/get_tab_modules_details",
       method: "POST",
-      data: { data: device },
+      data: { data: device, tab:device_active_tab },
       success: function (data) {
         $('#ul_modules_' + device_active_tab).html(data); // use dynamic deviceSelect ID
         $('#ul_modules_' + device_active_tab).each(function () {
@@ -122,13 +122,11 @@ $(document).ready(function () {
 
   // 🧠 Update UI for each tab
   function updateTabModuleInfo(activeTabId, selectedModules) {
-
-
     $.ajax({
       url: '/get_tab_testcase_details',
       method: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify({ modules: selectedModules[activeTabId] }),
+      data: JSON.stringify({ modules: selectedModules[activeTabId], tabid: activeTabId }),
       success: function (data) {
         $('#ul_testcases_' + activeTabId).html(data);
 
@@ -630,15 +628,25 @@ $(document).on('click', '.summary_table .pagination a', function (e) {
 $(document).on("click", ".close-tab", function (e) {
   e.stopPropagation();
   const tabId = $(this).data("tab");
-
+  addJobTab(closed=true, tab_count=tabId);
   $(`#${tabId}-tab`).closest("li").remove();
   $(`#${tabId}`).remove();
-
   tabCount--;
+  // $(`#tab-${tabCount}`).addClass('tab-pane fade');
+  
 
   for (let i = 0; i < $('#myTab button').length; i++) {
     const btn = $('#myTab button').eq(i);
-    btn.attr("id", "tab" + (i + 1) + "-tab");        // change id
+    const div_change = $('#myTabContent .tab-pane').eq(i);
+    if(i==0){
+      btn.attr("id", "tab1-tab"); 
+      btn.attr("data-bs-target", "#tab1" );        // change id
+    }       // change id
+    else{
+      btn.attr("id", "tab" + (i + 1) + "-tab"); 
+      btn.attr("data-bs-target", "#tab" + (i + 1));    
+      div_change.attr("id", "tab" + (i + 1));
+    }
     btn.text("Execution " + (i + 1));
     if (i > 0) {
       btn.append(

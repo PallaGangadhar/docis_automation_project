@@ -125,6 +125,7 @@ def get_offset_details(**kwargs):
          and 1=1"
         query, params = filter_testcase(tc_name,module_type,device_type,query)
         order_by_field = "testcase_id"
+        order = 'DESC'
 
     elif table_name == "devices_details":
         search_device = kwargs.get('search_devices')

@@ -77,11 +77,17 @@ def get_tc_status(tc_id, reg_id):
     conn.close()
     return status
 
+def get_page_url(request):
+    try: 
+        return request.url.split('http://127.0.0.1:5000/')[1]
+    except:
+        return 'None'
 
 app.jinja_env.filters['total_time'] = total_time
 app.jinja_env.filters['remove_space'] = remove_space
 app.jinja_env.filters['generate_random_alphanumeric'] = generate_random_alphanumeric
 app.jinja_env.filters['get_tc_status'] = get_tc_status
+app.jinja_env.filters['get_page_url'] = get_page_url
 
 socketio = SocketIO(app, async_mode=async_mode)
 
@@ -307,6 +313,7 @@ def tc_execution():
     conn.commit()
     curr.close()
     conn.close()
+   
     return render_template('tc_execution.html',vendor_details=vendor_details,devices_details=devices_details)
 
 
@@ -1030,19 +1037,24 @@ def get_device_details():
 def get_tab_modules_details():
     if request.method == 'POST':
         device_id = request.form.get('data')
+        
+        tabid = request.form.get('tab')
         curr, conn=db_connection()
         curr.execute("select modules_id, module_name from modules_details where device_id = %s",(device_id,) )
-        module_tab_details=curr.fetchall()
+        module_tab_details = curr.fetchall()
+        curr.execute("select device_name, ip, model, vendor from devices_details where device_id = %s",(device_id,) )
+        device_details = curr.fetchall()
         conn.commit()
         curr.close()
         conn.close()
-        return render_template('get_tab_modules_details.html',module_tab_details=module_tab_details)
+        return render_template('get_tab_modules_details.html',module_tab_details=module_tab_details, tabid=tabid, device_details=device_details)
     
 @app.route('/get_tab_testcase_details',  methods=['GET','POST'])
 def get_tab_testcase_details():
     if request.method == 'POST':
         testcase_tab_details = None
         modules_id = request.get_json()['modules']
+        tabid = request.get_json()['tabid']
 
         if len(modules_id) > 0:
             placeholders = ','.join(['%s'] * len(modules_id)) 
@@ -1056,7 +1068,7 @@ def get_tab_testcase_details():
             testcase_tab_details=curr.fetchall()
             curr.close()
             conn.close()
-        return render_template('get_tab_testcase_details.html',testcase_tab_details=testcase_tab_details)
+        return render_template('get_tab_testcase_details.html',testcase_tab_details=testcase_tab_details, tabid=tabid)
 
 @app.route('/get_tc_execution_status',  methods=['GET','POST'])
 def get_tc_execution_status():
@@ -1106,6 +1118,21 @@ def track_rerun_tc():
         curr.close()
         conn.close()
         return Response({'msg':''})
+
+@app.route('/get_tab_device_details_popup',  methods=['GET','POST'])
+def get_tab_device_details_popup():
+    if request.method == 'POST':
+        device_id = request.form.get('data')
+        tabid = request.form.get('tab')
+        curr, conn=db_connection()
+        curr.execute("select device_name, ip, model, vendor from devices_details where device_id = %s",(device_id,) )
+        device_details = curr.fetchone()
+        print("device details ==== ", device_details)
+        conn.commit()
+        curr.close()
+        conn.close()
+        return render_template('get_tab_device_details_popup.html', tabid=tabid, device_details=device_details)
+    
 
 
 if __name__ == '__main__':

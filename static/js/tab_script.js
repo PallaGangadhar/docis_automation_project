@@ -30,11 +30,13 @@ $(document).ready(function () {
     const device_name = $('#deviceSelect_' + device_active_tab + ' option:selected').text();
     $('#device_id_' + device_active_tab).val(device);
     $('#cmts_type_' + device_active_tab).val(device_name)
+
     $.ajax({
       url: "/get_tab_modules_details",
       method: "POST",
       data: { data: device, tab:device_active_tab },
       success: function (data) {
+        
         $('#ul_modules_' + device_active_tab).html(data); // use dynamic deviceSelect ID
         $('#ul_modules_' + device_active_tab).each(function () {
           const ulId = $(this).attr('id'); // e.g., "ul_modules_tab1"
@@ -54,6 +56,15 @@ $(document).ready(function () {
       },
       error: function (xhr, status, error) {
         alert("Error: " + error);
+      }
+    });
+    $.ajax({
+      url: "/get_tab_device_details_popup",
+      method: "POST",
+      data: { data: device, tab:device_active_tab },
+      success: function (data) {
+        $('#device_de_popup_'+device_active_tab).prop('disabled', true);
+        $('#device_de_popup_'+device_active_tab).html(data);
       }
     });
   });

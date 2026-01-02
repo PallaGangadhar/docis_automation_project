@@ -90,8 +90,9 @@
 </head>
 
 <body>
-    {% include 'sidebar.html' %}
-
+    {% if request | get_page_url != 'login'%}
+        {% include 'sidebar.html' %}
+    {% endif %}
     <div class="main-content" id="main">
         <div>
             {% include 'header.html' %}

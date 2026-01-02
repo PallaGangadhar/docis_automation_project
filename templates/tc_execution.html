@@ -303,57 +303,21 @@
                 </table>
 
                 <div class="table table-bordered mt-3">
-
                   <button class="btn btn-primary"><a href="/view_regression_details" class="text-white">View
                       Regressions</a></button>
                   <!-- Button trigger modal -->
                   <button type="button" class="btn btn-primary " data-bs-toggle="modal"
-                    data-bs-target="#device_de_popup">
+                    data-bs-target="#device_de_popup_tab1" disabled>
                     View Device Details
                   </button>
-
                 </div>
-
               </div>
-
             </div>
 
             <!-- Modal -->
-            <div class="modal fade" id="device_de_popup" tabindex="-1" aria-labelledby="exampleModalLabel"
+            <div class="modal fade" id="device_de_popup_tab1" tabindex="-1" aria-labelledby="exampleModalLabel"
               aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Device Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <table class="table table-bordered mt-2">
-                      <thead>
-                        <tr>
-                          <th scope="col" class="text-center">Device Name</th>
-                          <th scope="col" class="text-center">Device IP</th>
-                          <th scope="col" class="text-center">Modal</th>
-                          <th scope="col" class="text-center">Vendor</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {% if device_details %}
-                        <tr>
-                          <td class="text-center">{{device_details[1]}}</td>
-                          <td class="text-center">{{device_details[2]}}</td>
-                          <td class="text-center">{{device_details[3]}}</td>
-                          <td class="text-center">{{device_details[4]}}</td>
-                        </tr>
-                        {% endif %}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  </div>
-                </div>
-              </div>
+             
             </div>
 
           </div>
@@ -460,7 +424,16 @@
         .replaceAll('run_tab1', `run_${tabId}`)
         .replaceAll('device_id_tab1', `device_id_${tabId}`)
         .replaceAll('cmts_type_tab1', `cmts_type_${tabId}`)
-        .replaceAll('random_string_tab1', `random_string_${tabId}`);
+        .replaceAll('random_string_tab1', `random_string_${tabId}`)
+        .replaceAll('device_de_popup_tab1', `device_de_popup_${tabId}`)
+        .replaceAll('device_details_name_tab1', `device_details_name_${tabId}`)
+        .replaceAll('device_details_ip_tab1', `device_details_ip_${tabId}`)
+        .replaceAll('device_de_model_tab1', `device_de_model_${tabId}`)
+        .replaceAll('device_de_vendor_tab1', `device_de_vendor_${tabId}`)
+        .replaceAll('exampleModalLabel_tab1', `exampleModalLabel_${tabId}`)
+
+        ;
+
 
       const container = document.createElement('div');
       container.classList.add('tab-body-content');
